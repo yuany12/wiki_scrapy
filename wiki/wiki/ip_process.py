@@ -1,4 +1,4 @@
-fout = open('proxy_list.txt', 'w')
+fout = open('../proxy_list.txt', 'w')
 cnt, prev = 0, ''
 for line in open('raw_ips.txt'):
     cnt += 1

@@ -24,7 +24,7 @@ RETRY_HTTP_CODES = [500, 503, 504, 400, 403, 404, 408]
 DOWNLOADER_MIDDLEWARES = {
     'scrapy.contrib.downloadermiddleware.retry.RetryMiddleware': 90,
     # Fix path to this module
-    'wiki.randomproxy.RandomProxy': 100,
+    'wiki.randomproxy.randomproxy.RandomProxy': 100,
     'scrapy.contrib.downloadermiddleware.httpproxy.HttpProxyMiddleware': 110,
 }
 
