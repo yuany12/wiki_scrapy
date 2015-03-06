@@ -26,10 +26,11 @@ class WikiSpider(scrapy.Spider):
                     if link.get('href') is not None:
                         sublinks.append(link['href'])
         for div in soup.find_all('div'):
-            if div.h2 is None: continue
-            if div.h2.contents is None: continue
-            if div.h2.contents[-1] is None: continue
-            if not div.h2.contents[-1].startswith('Pages in category'): continue
+            try:
+                flag = div.h2.contents[-1].startswith('Pages in category')
+            except:
+                flag = False
+            if not flag: continue
             for link in div.find_all('a'):
                 if link.get('href') is None or link.string is None: continue
                 if link['href'] == '/wiki/' + link.string.replace(' ', '_'):
