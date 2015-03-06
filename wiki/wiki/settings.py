@@ -13,9 +13,12 @@ BOT_NAME = 'wiki'
 SPIDER_MODULES = ['wiki.spiders']
 NEWSPIDER_MODULE = 'wiki.spiders'
 
+DOWNLOAD_DELAY = 0.2
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'wiki (+http://www.yourdomain.com)'
 
+'''
 # Retry many times since proxies often fail
 RETRY_TIMES = 10
 # Retry on most error codes since proxies fail for different reasons
@@ -27,6 +30,7 @@ DOWNLOADER_MIDDLEWARES = {
     'wiki.randomproxy.randomproxy.RandomProxy': 100,
     'scrapy.contrib.downloadermiddleware.httpproxy.HttpProxyMiddleware': 110,
 }
+'''
 
 # Proxy list containing entries like
 # http://host1:port
