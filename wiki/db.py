@@ -88,24 +88,23 @@ def cat_dfs(id, cur, s, visited):
     if cur.rowcount == 0:
         print s
     else:
-        cat_dfs(cur.fetchone()[0], cur, copy.deepcopy(s), copy.deepcopy(visited))
+        cat_dfs(cur.fetchone()[0], cur, s, visited)
 
 def page_dfs(id, cur, s):
     cur.execute("select title from page where id = %s", id)
     s += "Page: " + cur.fetchone()[0] + " | "
     cur.execute("select cid from cat2page where pid = %s", id)
-    cat_dfs(cur.fetchone()[0], cur, s)
+    cat_dfs(cur.fetchone()[0], cur, s, set())
 
 def search(query):
     cur = get_connection().cursor()
     cur.execute("select id from cat where title = %s", query)
     if cur.rowcount > 0:
-        s, visited = "", set()
-        cat_dfs(cur.fetchone()[0], cur, s, visited)
-    cur.execute("select id from page where title = %s", query)
-    if cur.rowcount > 0:
-        s = ""
-        page_dfs(cur.fetchone()[0], cur, s)
+        cat_dfs(cur.fetchone()[0], cur, "", set())
+    else:
+        cur.execute("select id from page where title = %s", query)
+        if cur.rowcount > 0:
+            page_dfs(cur.fetchone()[0], cur, "")
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
