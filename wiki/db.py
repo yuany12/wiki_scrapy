@@ -85,7 +85,7 @@ def cat_dfs(id, cur, s):
         print s
     else:
         for row in cur.fetchall():
-            cat_dfs(row[0], cur)
+            cat_dfs(row[0], cur, s)
 
 def page_dfs(id, cur, s):
     cur.execute("select title from page where id = %s", id)
