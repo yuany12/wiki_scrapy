@@ -88,15 +88,13 @@ def cat_dfs(id, cur, s, visited):
     if cur.rowcount == 0:
         print s
     else:
-        for row in cur.fetchall():
-            cat_dfs(row[0], cur, copy.deepcopy(s), copy.deepcopy(visited))
+        cat_dfs(cur.fetchone()[0], cur, copy.deepcopy(s), copy.deepcopy(visited))
 
 def page_dfs(id, cur, s):
     cur.execute("select title from page where id = %s", id)
     s += "Page: " + cur.fetchone()[0] + " | "
     cur.execute("select cid from cat2page where pid = %s", id)
-    for row in cur.fetchall():
-        cat_dfs(row[0], cur, s)
+    cat_dfs(cur.fetchone()[0], cur, s)
 
 def search(query):
     cur = get_connection().cursor()
