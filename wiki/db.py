@@ -93,7 +93,7 @@ def cat_dfs(id, cur, s, visited):
 def page_dfs(id, cur, s):
     cur.execute("select title from page where id = %s", id)
     s += "Page: " + cur.fetchone()[0] + " | "
-    cur.execute("select cid from cat2page where pid = %s", id)
+    cur.execute("select cat_id from cat2page where page_id = %s", id)
     cat_dfs(cur.fetchone()[0], cur, s, set())
 
 def search(query):
