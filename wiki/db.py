@@ -38,7 +38,8 @@ def insert_contents():
     cats = json.load(open('out.json'))
     cat2ind, cat_cnt = {}, 0
     page2ind, page_cnt = {}, 0
-    cur = get_connection().cursor()
+    db = get_connection()
+    cur = db.cursor()
     tt, ttt = 0, len(cats)
     cur.execute('set names utf8')
     cur.execute('set character set utf8')
@@ -64,7 +65,7 @@ def insert_contents():
                 cur.execute("insert into page values (%(id)s, %(title)s)", {'id': page_cnt, 'title': page})
                 page_cnt += 1
             cur.execute("insert into cat2page (cid, pid) values (%(cid)s, %(pid)s)", {'cid': cat2ind[cat], 'pid': page2ind[page]})
-        cur.commit()
+        db.commit()
 
 def create_index():
     cur = get_connection().cursor()
