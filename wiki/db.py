@@ -97,6 +97,8 @@ def page_dfs(id, cur, s):
 def search(query):
     cur = get_connection().cursor()
     cur.execute("select id from cat where title = %s", query)
+    print cur.rowcount
+    return
     if cur.rowcount > 0:
         s = ""
         cat_dfs(cur.fetchone()[0], cur, s)
