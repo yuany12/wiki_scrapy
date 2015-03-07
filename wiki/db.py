@@ -16,10 +16,10 @@ def create_tables():
     cur.execute("drop table if exists cat")
     cur.execute("drop table if exists page")
     cur.execute("create table cat (id int not null, \
-        title varchar (63), \
+        title varchar (255), \
         primary key (id))")
     cur.execute("create table page (id int not null, \
-        title varchar (63), \
+        title varchar (255), \
         primary key (id))")
     cur.execute("create table cat2cat (id int not null auto_increment, \
         parent_id int, \
