@@ -78,5 +78,4 @@ def create_index():
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
-    create_tables()
-    insert_contents()
+    create_index()
