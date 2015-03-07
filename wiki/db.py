@@ -64,7 +64,7 @@ def insert_contents():
                 page2ind[page] = page_cnt
                 cur.execute("insert into page values (%(id)s, %(title)s)", {'id': page_cnt, 'title': page})
                 page_cnt += 1
-            cur.execute("insert into cat2page (cid, pid) values (%(cid)s, %(pid)s)", {'cid': cat2ind[cat], 'pid': page2ind[page]})
+            cur.execute("insert into cat2page (cat_id, page_id) values (%(cat_id)s, %(page_id)s)", {'cat_id': cat2ind[cat], 'page_id': page2ind[page]})
         db.commit()
 
 def create_index():
