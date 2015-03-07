@@ -2,6 +2,7 @@ import MySQLdb as mdb
 import json
 import logging
 import sys
+import copy
 
 def get_connection():
     password = open('password.txt').readline().strip()
@@ -77,15 +78,18 @@ def create_index():
     cur.execute("create index c_index on cat2page (cat_id)")
     cur.execute("create index p_index on cat2page (page_id)")
 
-def cat_dfs(id, cur, s):
+def cat_dfs(id, cur, s, visited):
     cur.execute("select title from cat where id = %s", id)
-    s += "Category: " + cur.fetchone()[0] + " | "
+    title = cur.fetchone()[0]
+    if title in visited: return
+    s += "Category: " + title + " | "
+    visited.add(title)
     cur.execute("select parent_id from cat2cat where child_id = %s", id)
     if cur.rowcount == 0:
         print s
     else:
         for row in cur.fetchall():
-            cat_dfs(row[0], cur, s)
+            cat_dfs(row[0], cur, copy.deepcopy(s), copy.deepcopy(visited))
 
 def page_dfs(id, cur, s):
     cur.execute("select title from page where id = %s", id)
@@ -97,11 +101,9 @@ def page_dfs(id, cur, s):
 def search(query):
     cur = get_connection().cursor()
     cur.execute("select id from cat where title = %s", query)
-    print cur.rowcount
-    return
     if cur.rowcount > 0:
-        s = ""
-        cat_dfs(cur.fetchone()[0], cur, s)
+        s, visited = "", set()
+        cat_dfs(cur.fetchone()[0], cur, s, visited)
     cur.execute("select id from page where title = %s", query)
     if cur.rowcount > 0:
         s = ""
