@@ -34,6 +34,7 @@ class WikiSpider(scrapy.Spider):
                             item['subcats'].append(link.string)
                             if link.get('href') is not None:
                                 sublinks.append(link['href'])
+        page_set = set()
         for div in soup.find_all('div'):
             try:
                 flag = div.h2.contents[-1].startswith('Pages in category')
@@ -43,7 +44,8 @@ class WikiSpider(scrapy.Spider):
             for link in div.find_all('a'):
                 if link.get('href') is None or link.string is None: continue
                 if link['href'] == '/wiki/' + link.string.replace(' ', '_'):
-                    item['pages'].append(link.string)
+                    page_set.add(link.string)
+        item['pages'] = list(page_set)
         yield item
         for sublink in sublinks:
             yield scrapy.Request(url = 'http://en.wikipedia.org' + sublink, callback = self.parse)

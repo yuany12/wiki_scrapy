@@ -13,7 +13,7 @@ BOT_NAME = 'wiki'
 SPIDER_MODULES = ['wiki.spiders']
 NEWSPIDER_MODULE = 'wiki.spiders'
 
-DOWNLOAD_DELAY = 0.1
+DOWNLOAD_DELAY = 0.08
 
 DEPTH_PRIORITY = 1
 SCHEDULER_DISK_QUEUE = 'scrapy.squeue.PickleFifoDiskQueue'
