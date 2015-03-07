@@ -38,21 +38,22 @@ def insert_contents():
     page2ind, page_cnt = {}, 0
     cur = get_connection().cursor()
     tt, ttt = 0, len(cats)
-    for cat in cats:
+    for c in cats:
         if tt % 1000 == 0:
             logging.info("traverse categories %d/%d" % (tt, ttt))
         tt += 1
+        cat = c['title']
         if cat not in cat2ind:
             cat2ind[cat] = cat_cnt
             cur.execute("insert into cat values (%(id)s, %(title)s)", {'id': cat_cnt, 'title': cat})
             cat_cnt += 1
-        for subcat in cat['subcats']:
+        for subcat in c['subcats']:
             if subcat not in cat2ind:
                 cat2ind[subcat] = cat_cnt
                 cur.execute("insert into cat values (%(id)s, %(title)s)", {'id': cat_cnt, 'title': subcat})
                 cat_cnt += 1
             cur.execute("insert into cat2cat values (%(parent_id)s, %(child_id)s)", {'parent_id': cat2ind[cat], 'child_id': cat2ind[subcat]})
-        for page in cat['pages']:
+        for page in c['pages']:
             if page not in page2ind:
                 page2ind[page] = page_cnt
                 cur.execute("insert into page values (%(id)s, %(title)s)", {'id': page_cnt, 'title': page})
