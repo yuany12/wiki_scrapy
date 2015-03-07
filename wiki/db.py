@@ -9,10 +9,10 @@ def get_connection():
 def create_tables():
     con = get_connection()
     cur = con.cursor()
-    cur.execute("drop table if exists cat")
-    cur.execute("drop table if exists page")
     cur.execute("drop table if exists cat2cat")
     cur.execute("drop table if exists cat2page")
+    cur.execute("drop table if exists cat")
+    cur.execute("drop table if exists page")
     cur.execute("create table cat (id int not null, \
         title varchar (63), \
         primary key (id))")
