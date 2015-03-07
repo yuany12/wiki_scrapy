@@ -4,7 +4,9 @@ import logging
 
 def get_connection():
     password = open('password.txt').readline().strip()
-    return mdb.connect('localhost', 'root', password, 'wiki_entities')
+    db = mdb.connect('localhost', 'root', password, 'wiki_entities')
+    db.set_character_set('utf8')
+    return db
 
 def create_tables():
     con = get_connection()
@@ -38,6 +40,9 @@ def insert_contents():
     page2ind, page_cnt = {}, 0
     cur = get_connection().cursor()
     tt, ttt = 0, len(cats)
+    cur.execute('set names utf8')
+    cur.execute('set character set utf8')
+    cur.execute('set character_set_connection = utf8')
     for c in cats:
         if tt % 1000 == 0:
             logging.info("traverse categories %d/%d" % (tt, ttt))
