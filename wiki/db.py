@@ -101,10 +101,9 @@ def search(query):
     cur.execute("select id from cat where title = %s", query)
     if cur.rowcount > 0:
         cat_dfs(cur.fetchone()[0], cur, "", set())
-    else:
-        cur.execute("select id from page where title = %s", query)
-        if cur.rowcount > 0:
-            page_dfs(cur.fetchone()[0], cur, "")
+    cur.execute("select id from page where title = %s", query)
+    if cur.rowcount > 0:
+        page_dfs(cur.fetchone()[0], cur, "")
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
