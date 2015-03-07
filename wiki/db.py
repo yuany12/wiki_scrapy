@@ -52,13 +52,13 @@ def insert_contents():
                 cat2ind[subcat] = cat_cnt
                 cur.execute("insert into cat values (%(id)s, %(title)s)", {'id': cat_cnt, 'title': subcat})
                 cat_cnt += 1
-            cur.execute("insert into cat2cat values (%(parent_id)s, %(child_id)s)", {'parent_id': cat2ind[cat], 'child_id': cat2ind[subcat]})
+            cur.execute("insert into cat2cat (parent_id, child_id) values (%(parent_id)s, %(child_id)s)", {'parent_id': cat2ind[cat], 'child_id': cat2ind[subcat]})
         for page in c['pages']:
             if page not in page2ind:
                 page2ind[page] = page_cnt
                 cur.execute("insert into page values (%(id)s, %(title)s)", {'id': page_cnt, 'title': page})
                 page_cnt += 1
-            cur.execute("insert into cat2page values (%(cid)s, %(pid)s)", {'cid': cat2ind[cat], 'pid': page2ind[page]})
+            cur.execute("insert into cat2page (cid, pid) values (%(cid)s, %(pid)s)", {'cid': cat2ind[cat], 'pid': page2ind[page]})
         cur.commit()
 
 def create_index():
