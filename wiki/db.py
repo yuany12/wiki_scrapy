@@ -1,6 +1,7 @@
 import MySQLdb as mdb
 import json
 import logging
+import sys
 
 def get_connection():
     password = open('password.txt').readline().strip()
@@ -76,6 +77,34 @@ def create_index():
     cur.execute("create index c_index on cat2page (cat_id)")
     cur.execute("create index p_index on cat2page (page_id)")
 
+def cat_dfs(id, cur, s):
+    cur.execute("select title from cat where id = %s", id)
+    s += "Category: " + cur.fetchone()[0] + " | "
+    cur.execute("select parent_id from cat2cat where child_id = %s", id)
+    if cur.rowcount == 0:
+        print s
+    else:
+        for row in cur.fetchall():
+            cat_dfs(row[0], cur)
+
+def page_dfs(id, cur, s):
+    cur.execute("select title from page where id = %s", id)
+    s += "Page: " + cur.fetchone()[0] + " | "
+    cur.execute("select cid from cat2page where pid = %s", id)
+    for row in cur.fetchall():
+        cat_dfs(row[0], cur, s)
+
+def search(query):
+    cur = get_connection().cursor()
+    cur.execute("select id from cat where title = %s", query)
+    if cur.rowcount > 0:
+        s = ""
+        cat_dfs(cur.fetchone()[0], cur, s)
+    cur.execute("select id from page where title = %s", query)
+    if cur.rowcount > 0:
+        s = ""
+        page_dfs(cur.fetchone()[0], cur, s)
+
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
-    create_index()
+    search(sys.argv[1])
