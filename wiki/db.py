@@ -98,11 +98,11 @@ def page_dfs(id, cur, s):
 
 def search(query):
     cur = get_connection().cursor()
-    cur.execute("select id from page where title = %s", "%%" + query + "%%")
+    cur.execute("select id from page where title like %s", "%%" + query + "%%")
     if cur.rowcount > 0:
         page_dfs(cur.fetchone()[0], cur, "")
     else:
-        cur.execute("select id from cat where title = %s", "%%" + query + "%%")
+        cur.execute("select id from cat where title like %s", "%%" + query + "%%")
         if cur.rowcount > 0:
             cat_dfs(cur.fetchone()[0], cur, "", set())
 
