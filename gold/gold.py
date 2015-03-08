@@ -41,7 +41,7 @@ def extract_entities(tokens, cur):
                 break
     return ids
 
-def print_pages(link):
+def print_page(link):
     print extract_entities(page_tokens(link), get_connection().cursor())
 
 def create_table(cur):
