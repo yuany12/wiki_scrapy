@@ -18,7 +18,7 @@ def page_tokens(link):
 
 def extract_entities(tokens, cur):
     entities = []
-    for n in range(1, MAX_N_GRAM + 1):
+    for n in range(MIN_N_GRAM, MAX_N_GRAM + 1):
         for i in range(len(tokens) - n + 1):
             n_gram = " ".join(tokens[i: i + n])
             cur.execute("select * from page where title = %s", n_gram)
