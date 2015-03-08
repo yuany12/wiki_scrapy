@@ -64,7 +64,7 @@ def link_pages():
         i += 1
         if row[1] is None or row[1] == '': continue
         for entity_id in extract_entities(page_tokens(row[1]), wiki_cur):
-            cur.execute("insert into entities (author_id, page_id) values %(author_id)s, %(page_id)s", {'author_id': row[0], 'page_id': entity_id})
+            cur.execute("insert into entities (author_id, page_id) values (%(author_id)s, %(page_id)s)", {'author_id': row[0], 'page_id': entity_id})
         db.commit()
 
 if __name__ == '__main__':
