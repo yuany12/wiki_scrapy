@@ -30,7 +30,7 @@ def extract_entities(tokens, cur):
 
 def print_page(link):
     entities = extract_entities(page_tokens(link), get_connection().cursor())
-    for e in entities: print e[1]
+    for e in entities: print e
 
 if __name__ == '__main__':
     if len(sys.argv) > 2:
