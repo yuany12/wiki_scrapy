@@ -4,8 +4,8 @@ import nltk
 import sys
 import MySQLdb as mdb
 
-MIN_N_GRAM = 1
-MAX_N_GRAM = 5
+MIN_N_GRAM = 2
+MAX_N_GRAM = 3
 
 def get_connection():
     password = open('password.txt').readline().strip()
@@ -17,7 +17,6 @@ def page_tokens(link):
     return nltk.word_tokenize(BeautifulSoup(urllib2.urlopen(link).read()).get_text())
 
 def extract_entities(tokens, cur):
-    token_groups = remove_dump(tokens)
     entities = set()
     for n in range(MIN_N_GRAM, MAX_N_GRAM + 1):
         for i in range(len(tokens) - n + 1):
