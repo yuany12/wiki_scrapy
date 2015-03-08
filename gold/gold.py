@@ -22,7 +22,7 @@ def extract_entities(tokens, cur):
         for i in range(len(tokens) - n + 1):
             n_gram = " ".join(tokens[i: i + n])
             if n_gram in entities: continue
-            cur.execute("select * from page where title = %s", n_gram)
+            cur.execute("select * from cat where title = %s", n_gram)
             if cur.rowcount > 0:
                 entities.add(cur.fetchone()[1])
                 continue
