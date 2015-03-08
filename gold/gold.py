@@ -14,7 +14,10 @@ def get_connection():
     return db
 
 def page_tokens(link):
-    return nltk.word_tokenize(BeautifulSoup(urllib2.urlopen(link, timeout = 1).read()).get_text())
+    try:
+        return nltk.word_tokenize(BeautifulSoup(urllib2.urlopen(link, timeout = 1).read()).get_text())
+    except:
+        return []
 
 def extract_entities(tokens, cur):
     entities = set()
