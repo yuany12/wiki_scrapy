@@ -25,7 +25,7 @@ def extract_entities(tokens, cur):
             cur.execute("select * from page where title = %s", n_gram)
             if cur.rowcount > 0:
                 print  n_gram
-                entities.add(cur.fetchone())
+                entities.add(n_gram)
                 continue
     return entities
 
