@@ -27,7 +27,7 @@ def extract_entities(tokens, cur):
         for n in range(MAX_N_GRAM, MIN_N_GRAM - 1, -1):
             if i + n > len(tokens): break
             n_gram = " ".join(tokens[i: i + n])
-            if n_gram in entities: continue
+            if n_gram in entities: break
             cur.execute("select * from page where title = %s", n_gram)
             if cur.rowcount > 0:
                 row = cur.fetchone()[1]
