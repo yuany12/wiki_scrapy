@@ -23,7 +23,6 @@ def page_tokens(link):
 
 def extract_entities(tokens, cur):
     entities = set()
-    for n in range(MIN_N_GRAM, MAX_N_GRAM + 1):
     for i in range(len(tokens)):
         for n in range(MAX_N_GRAM, MIN_N_GRAM - 1, -1):
             if i + n > len(tokens): break
