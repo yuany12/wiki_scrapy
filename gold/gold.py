@@ -3,6 +3,7 @@ import urllib2
 import nltk
 import sys
 import MySQLdb as mdb
+import logging
 
 MIN_N_GRAM = 2
 MAX_N_GRAM = 3
@@ -17,6 +18,7 @@ def page_tokens(link):
     try:
         return nltk.word_tokenize(BeautifulSoup(urllib2.urlopen(link, timeout = 1).read()).get_text())
     except:
+        logging.warning("time out %s" % link)
         return []
 
 def extract_entities(tokens, cur):
