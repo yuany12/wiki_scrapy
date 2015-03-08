@@ -4,7 +4,8 @@ import nltk
 import sys
 import MySQLdb as mdb
 
-MAX_N_GRAM = 4
+MIN_N_GRAM = 1
+MAX_N_GRAM = 3
 
 def get_connection():
     password = open('password.txt').readline().strip()
@@ -35,3 +36,6 @@ def print_page(link):
 
 if __name__ == '__main__':
     print_page(sys.argv[1])
+    if sys.argc > 1:
+        MIN_N_GRAM = int(sys.argv[2])
+        MAX_N_GRAM = int(sys.argv[3])
