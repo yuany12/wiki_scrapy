@@ -14,6 +14,10 @@ def get_connection():
     db.set_character_set('utf8')
     return db
 
+def connect_arnet():
+    password = open('password.txt').readline().strip()
+    return mdb.connect('localhost', 'root', password, 'arnet_db')
+
 def page_tokens(link):
     try:
         return nltk.word_tokenize(BeautifulSoup(urllib2.urlopen(link, timeout = 1).read()).get_text())
@@ -22,7 +26,7 @@ def page_tokens(link):
         return []
 
 def extract_entities(tokens, cur):
-    entities = set()
+    entities, ids = set(), set()
     for i in range(len(tokens)):
         for n in range(MAX_N_GRAM, MIN_N_GRAM - 1, -1):
             if i + n > len(tokens): break
@@ -30,14 +34,27 @@ def extract_entities(tokens, cur):
             if n_gram in entities: break
             cur.execute("select * from page where title = %s", n_gram)
             if cur.rowcount > 0:
-                row = cur.fetchone()[1]
-                if not any(s[0].isupper() for s in row.split()[1:]): entities.add(row)
+                row = cur.fetchone()
+                if not any(s[0].isupper() for s in row[1].split()[1:]):
+                    entities.add(row[1])
+                    ids.add(row[0])
                 break
-    return entities
+    return ids
 
-def print_page(link):
-    entities = extract_entities(page_tokens(link), get_connection().cursor())
-    for e in entities: print e
+def print_pages(link):
+    print extract_entities(page_tokens(link), get_connection().cursor())
+
+def create_table(cur):
+    cur.execute("drop table if exists entities")
+    cur.execute("create table entities (id int not null auto_increment, \
+        author_id int, \
+        page_id int, \
+        primary key (id))")
+
+def link_pages():
+    cur = connect_arnet().cursor()
+    create_table(cur)
+    cur.execute("select * from contact_info")
 
 if __name__ == '__main__':
     if len(sys.argv) > 2:
