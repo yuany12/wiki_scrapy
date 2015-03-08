@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import urllib2
 import nltk
 import sys
+import MySQLdb as mdb
 
 MAX_N_GRAM = 4
 
