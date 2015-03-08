@@ -20,14 +20,12 @@ def extract_entities(tokens, cur):
     entities = []
     for n in range(MIN_N_GRAM, MAX_N_GRAM + 1):
         for i in range(len(tokens) - n + 1):
+            print i
             n_gram = " ".join(tokens[i: i + n])
             cur.execute("select * from page where title = %s", n_gram)
             if cur.rowcount > 0:
                 entities.append(cur.fetchone())
                 continue
-            cur.execute("select * from page where title like %s", "%%" + n_gram + "%%")
-            if cur.rowcount > 0:
-                entities.append(cur.fetchone())
     return entities
 
 def print_page(link):
