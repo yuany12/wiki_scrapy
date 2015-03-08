@@ -17,23 +17,24 @@ def page_tokens(link):
     return nltk.word_tokenize(BeautifulSoup(urllib2.urlopen(link).read()).get_text())
 
 def extract_entities(tokens, cur):
-    entities = []
+    entities = set()
     for n in range(MIN_N_GRAM, MAX_N_GRAM + 1):
         for i in range(len(tokens) - n + 1):
-            print i
             n_gram = " ".join(tokens[i: i + n])
+            if n_gram in entities: continue
             cur.execute("select * from page where title = %s", n_gram)
             if cur.rowcount > 0:
-                entities.append(cur.fetchone())
+                print  n_gram
+                entities.add(cur.fetchone())
                 continue
     return entities
 
 def print_page(link):
     entities = extract_entities(page_tokens(link), get_connection().cursor())
-    for e in entities: print e[1]
+    #for e in entities: print e[1]
 
 if __name__ == '__main__':
-    print_page(sys.argv[1])
-    if sys.argc > 1:
+    if len(sys.argv) > 2:
         MIN_N_GRAM = int(sys.argv[2])
         MAX_N_GRAM = int(sys.argv[3])
+    print_page(sys.argv[1])
