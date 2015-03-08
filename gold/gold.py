@@ -5,7 +5,7 @@ import sys
 import MySQLdb as mdb
 
 MIN_N_GRAM = 1
-MAX_N_GRAM = 3
+MAX_N_GRAM = 5
 
 def get_connection():
     password = open('password.txt').readline().strip()
@@ -24,14 +24,13 @@ def extract_entities(tokens, cur):
             if n_gram in entities: continue
             cur.execute("select * from page where title = %s", n_gram)
             if cur.rowcount > 0:
-                print  n_gram
-                entities.add(n_gram)
+                entities.add(cur.fetchone()[1])
                 continue
     return entities
 
 def print_page(link):
     entities = extract_entities(page_tokens(link), get_connection().cursor())
-    #for e in entities: print e[1]
+    for e in entities: print e[1]
 
 if __name__ == '__main__':
     if len(sys.argv) > 2:
