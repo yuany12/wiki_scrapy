@@ -24,14 +24,16 @@ def page_tokens(link):
 def extract_entities(tokens, cur):
     entities = set()
     for n in range(MIN_N_GRAM, MAX_N_GRAM + 1):
-        for i in range(len(tokens) - n + 1):
+    for i in range(len(tokens)):
+        for n in range(MAX_N_GRAM, MIN_N_GRAM - 1, -1):
+            if i + n > len(tokens): break
             n_gram = " ".join(tokens[i: i + n])
             if n_gram in entities: continue
             cur.execute("select * from page where title = %s", n_gram)
             if cur.rowcount > 0:
                 row = cur.fetchone()[1]
                 if not any(s[0].isupper() for s in row.split()[1:]): entities.add(row)
-                continue
+                break
     return entities
 
 def print_page(link):
