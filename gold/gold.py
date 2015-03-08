@@ -56,15 +56,19 @@ def link_pages():
     cur = db.cursor()
     create_table(cur)
     cur.execute("select id, homepage from contact_info")
-    wiki_cur = get_connection.cursor()
-    for i in range(cur.rowcount):
-        row = cur.fetchone()
+    wiki_cur = get_connection().cursor()
+    i, tot = 0, cur.rowcount
+    for row in cur.fetchall():
+        if i % 100 == 0:
+            logging.info("Processing %d/%d" % (i, tot))
+        i += 1
         if row[1] is None or row[1] == '': continue
         for entity_id in extract_entities(page_tokens(row[1]), wiki_cur):
             cur.execute("insert into entities (author_id, page_id) values %(author_id)s, %(page_id)s", {'author_id': row[0], 'page_id': entity_id})
         db.commit()
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     if len(sys.argv) > 2:
         MIN_N_GRAM = int(sys.argv[2])
         MAX_N_GRAM = int(sys.argv[3])
