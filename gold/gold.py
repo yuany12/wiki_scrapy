@@ -22,7 +22,6 @@ def page_tokens(link):
     try:
         return nltk.word_tokenize(BeautifulSoup(urllib2.urlopen(link, timeout = 1).read()).get_text())
     except:
-        logging.warning("time out %s" % link)
         return []
 
 def extract_entities(tokens, cur):
@@ -57,13 +56,17 @@ def link_pages():
     create_table(cur)
     cur.execute("select id, homepage from contact_info")
     wiki_cur = get_connection().cursor()
-    i, tot = 0, cur.rowcount
+    i, tot, inv = 0, cur.rowcount, 0
     for row in cur.fetchall():
         if i % 100 == 0:
-            logging.info("Processing %d/%d" % (i, tot))
+            logging.info("Processing %d/%d; invalid %d" % (i, tot, inv))
         i += 1
-        if row[1] is None or row[1] == '': continue
-        for entity_id in extract_entities(page_tokens(row[1]), wiki_cur):
+        if row[1] is None or row[1] == '':
+            inv += 1
+            continue
+        entity_ids = extract_entities(page_tokens(row[1]), wiki_cur)
+        if len(entity_ids) == 0: inv += 1
+        for entity_id in entity_ids:
             cur.execute("insert into entities (author_id, page_id) values (%(author_id)s, %(page_id)s)", {'author_id': row[0], 'page_id': entity_id})
         db.commit()
 
