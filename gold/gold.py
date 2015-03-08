@@ -52,12 +52,20 @@ def create_table(cur):
         primary key (id))")
 
 def link_pages():
-    cur = connect_arnet().cursor()
+    db = connect_arnet()
+    cur = db.cursor()
     create_table(cur)
-    cur.execute("select * from contact_info")
+    cur.execute("select id, homepage from contact_info")
+    wiki_cur = get_connection.cursor()
+    for i in range(cur.rowcount):
+        row = cur.fetchone()
+        if row[1] is None or row[1] == '': continue
+        for entity_id in extract_entities(page_tokens(row[1]), wiki_cur):
+            cur.execute("insert into entities (author_id, page_id) values %(author_id)s, %(page_id)s", {'author_id': row[0], 'page_id': entity_id})
+        db.commit()
 
 if __name__ == '__main__':
     if len(sys.argv) > 2:
         MIN_N_GRAM = int(sys.argv[2])
         MAX_N_GRAM = int(sys.argv[3])
-    print_page(sys.argv[1])
+    link_pages()
