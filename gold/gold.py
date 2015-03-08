@@ -21,7 +21,7 @@ def extract_entities(tokens, cur):
     for n in range(MIN_N_GRAM, MAX_N_GRAM + 1):
         for i in range(len(tokens) - n + 1):
             n_gram = " ".join(tokens[i: i + n])
-            if len(n_gram) > 1 and n_gram[1][0].isupper(): continue
+            if n > 1 and tokens[i + 1].isupper(): continue
             if n_gram in entities: continue
             cur.execute("select * from page where title = %s", n_gram)
             if cur.rowcount > 0:
