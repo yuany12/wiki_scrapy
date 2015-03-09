@@ -77,6 +77,7 @@ def link_pages():
         if i % 100 == 0:
             logging.info("Processing %d/%d; invalid %d" % (i, tot, inv))
         i += 1
+        if i < 200: continue
         entity_ids = extract_entities(page_tokens(row[1]), entity_dict)
         if len(entity_ids) == 0: inv += 1
         for entity_id in entity_ids:
