@@ -74,6 +74,14 @@ def dump_homepage():
         fout.write(str(row[0]) + '\t' + row[1] + '\n')
     fout.close()
 
+def dump_entities():
+    cur = get_connection().cursor()
+    cur.execute("select id, title from page")
+    fout = open('entity.dump', 'w')
+    for row in cur.fetchall():
+        fout.write(str(row[0]) + '\t' + row[1] + '\n')
+    fout.close()
+
 def link_pages():
     db = connect_arnet()
     cur = db.cursor()
@@ -97,4 +105,4 @@ if __name__ == '__main__':
     if len(sys.argv) > 2:
         MIN_N_GRAM = int(sys.argv[2])
         MAX_N_GRAM = int(sys.argv[3])
-    dump_homepage()
+    dump_entities()
