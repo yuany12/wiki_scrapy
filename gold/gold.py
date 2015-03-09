@@ -78,6 +78,7 @@ def load_homepage():
     homepages = []
     for line in open('homepage.dump'):
         inputs = line.strip().split('\t')
+        if len(inputs) < 2: continue
         homepages.append((int(inputs[0]), inputs[1]))
     return homepages
 
