@@ -74,6 +74,13 @@ def dump_homepage():
         fout.write(str(row[0]) + '\t' + row[1] + '\n')
     fout.close()
 
+def load_homepage():
+    homepages = []
+    for line in open('homepage.dump'):
+        inputs = line.strip().split('\t')
+        homepages.append((int(inputs[0]), inputs[1]))
+    return homepages
+
 def dump_entities():
     cur = get_connection().cursor()
     cur.execute("select id, title from page")
@@ -82,27 +89,32 @@ def dump_entities():
         fout.write(str(row[0]) + '\t' + row[1] + '\n')
     fout.close()
 
+def load_entities():
+    entity_dict = {}
+    for line in open('entity.dump'):
+        inputs = line.strip().split('\t')
+        entity_dict[inputs[1]] = int(inputs[0])
+    return entity_dict
+
 def link_pages():
-    db = connect_arnet()
-    cur = db.cursor()
-    create_table(cur)
-    cur.execute("select id, homepage from contact_info where homepage <> %s", "")
-    wiki_cur = get_connection().cursor()
-    entity_dict = create_dict(wiki_cur)
+    homepages = load_homepage()
+    entity_dict = load_entities()
     i, tot, inv = 0, cur.rowcount, 0
-    for row in cur.fetchall():
+    fout = open('page_links.dump')
+    for row in homepages:
         if i % 100 == 0:
             logging.info("Processing %d/%d; invalid %d" % (i, tot, inv))
         i += 1
         entity_ids = extract_entities(page_tokens(row[1]), entity_dict)
-        if len(entity_ids) == 0: inv += 1
-        for entity_id in entity_ids:
-            cur.execute("insert into entities (author_id, page_id) values (%(author_id)s, %(page_id)s)", {'author_id': row[0], 'page_id': entity_id})
-        db.commit()
+        if len(entity_ids) == 0:
+            inv += 1
+            continue
+        fout.write(str(row[0]) + ' ' + ",".join([str(e) for e in entity_ids]) + '\n')
+    fout.close()
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     if len(sys.argv) > 2:
         MIN_N_GRAM = int(sys.argv[2])
         MAX_N_GRAM = int(sys.argv[3])
-    dump_entities()
+    link_pages()
