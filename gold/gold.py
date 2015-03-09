@@ -115,6 +115,8 @@ def link_pages():
     fout.close()
 
 if __name__ == '__main__':
+    urllib3_logger = logging.getLogger('urllib3')
+    urllib3_logger.setLevel(logging.CRITICAL)
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     if len(sys.argv) > 2:
         MIN_N_GRAM = int(sys.argv[2])
