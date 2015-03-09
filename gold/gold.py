@@ -94,7 +94,8 @@ def load_entities():
     entity_dict = {}
     for line in open('entity.dump'):
         inputs = line.strip().split('\t')
-        entity_dict[inputs[1]] = int(inputs[0])
+        if not any(s[0].isupper() for s in inputs[1].split()[1:]):
+            entity_dict[inputs[1].lower()] = int(inputs[0])
     return entity_dict
 
 def link_pages():
