@@ -21,8 +21,13 @@ def connect_arnet():
 def page_tokens(link):
     try:
         return nltk.word_tokenize(BeautifulSoup(urllib2.urlopen(link, timeout = 1).read()).get_text())
-    except:
+    except urllib2.HTTPError, e:
+        logging.error(e.code)
         return []
+    except Exception, detail:
+        logging.error(detail)
+        return []
+    return []
 
 def extract_entities(tokens, entity_dict):
     entities, ids = set(), set()
@@ -77,7 +82,6 @@ def link_pages():
         if i % 100 == 0:
             logging.info("Processing %d/%d; invalid %d" % (i, tot, inv))
         i += 1
-        if i < 200: continue
         entity_ids = extract_entities(page_tokens(row[1]), entity_dict)
         if len(entity_ids) == 0: inv += 1
         for entity_id in entity_ids:
