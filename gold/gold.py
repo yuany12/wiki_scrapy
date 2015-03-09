@@ -24,19 +24,16 @@ def page_tokens(link):
     except:
         return []
 
-def extract_entities(tokens, cur):
+def extract_entities(tokens, entity_dict):
     entities, ids = set(), set()
     for i in range(len(tokens)):
         for n in range(MAX_N_GRAM, MIN_N_GRAM - 1, -1):
             if i + n > len(tokens): break
-            n_gram = " ".join(tokens[i: i + n])
+            n_gram = " ".join(tokens[i: i + n]).lower()
             if n_gram in entities: break
-            cur.execute("select * from page where title = %s", n_gram)
-            if cur.rowcount > 0:
-                row = cur.fetchone()
-                if not any(s[0].isupper() for s in row[1].split()[1:]):
-                    entities.add(row[1])
-                    ids.add(row[0])
+            if n_gram in entity_dict:
+                entities.add(n_gram)
+                ids.add(entity_dict[n_gram])
                 break
     return ids
 
@@ -50,21 +47,31 @@ def create_table(cur):
         page_id int, \
         primary key (id))")
 
+def create_dict(cur):
+    cur.execute("select * from page")
+    ret = {}
+    i, tot = 0, cur.rowcount
+    for row in cur.fetchall():
+        if i % 10000 == 0:
+            logging.info("Creating dictionary %d/%d" % (i, tot))
+        i += 1
+        if not any(s[0].isupper() for s in row[1].split()[1:]):
+            ret[row[1].lower()] = row[0]
+    return ret
+
 def link_pages():
     db = connect_arnet()
     cur = db.cursor()
     create_table(cur)
-    cur.execute("select id, homepage from contact_info")
+    cur.execute("select id, homepage from contact_info where homepage <> %s", "")
     wiki_cur = get_connection().cursor()
+    entity_dict = create_dict(wiki_cur)
     i, tot, inv = 0, cur.rowcount, 0
     for row in cur.fetchall():
         if i % 100 == 0:
             logging.info("Processing %d/%d; invalid %d" % (i, tot, inv))
         i += 1
-        if row[1] is None or row[1] == '':
-            inv += 1
-            continue
-        entity_ids = extract_entities(page_tokens(row[1]), wiki_cur)
+        entity_ids = extract_entities(page_tokens(row[1]), entity_dict)
         if len(entity_ids) == 0: inv += 1
         for entity_id in entity_ids:
             cur.execute("insert into entities (author_id, page_id) values (%(author_id)s, %(page_id)s)", {'author_id': row[0], 'page_id': entity_id})
