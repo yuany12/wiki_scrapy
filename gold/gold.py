@@ -66,10 +66,13 @@ def create_dict(cur):
             ret[row[1].lower()] = row[0]
     return ret
 
-def set_proxy():
-    proxy = urllib2.ProxyHandler({'http': '104.236.43.250:50080'})
-    opener = urllib2.build_opener(proxy)
-    urllib2.install_opener(opener)
+def dump_homepage():
+    cur = connect_arnet().cursor()
+    cur.execute("select id, homepage from contact_info where homepage <> %s", "")
+    fout = open('homepage.dump', 'w')
+    for row in cur.fetchall():
+        fout.write(str(row[0]) + '\t' + row[1] + '\n')
+    fout.close()
 
 def link_pages():
     db = connect_arnet()
@@ -94,4 +97,4 @@ if __name__ == '__main__':
     if len(sys.argv) > 2:
         MIN_N_GRAM = int(sys.argv[2])
         MAX_N_GRAM = int(sys.argv[3])
-    link_pages()
+    dump_homepage()
