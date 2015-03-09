@@ -26,7 +26,6 @@ def page_tokens(link):
         return []
     except Exception, detail:
         logging.error(detail)
-        set_proxy()
         return []
     return []
 
@@ -71,7 +70,6 @@ def set_proxy():
     urllib2.install_opener(opener)
 
 def link_pages():
-    set_proxy()
     db = connect_arnet()
     cur = db.cursor()
     create_table(cur)
@@ -82,7 +80,6 @@ def link_pages():
     for row in cur.fetchall():
         if i % 100 == 0:
             logging.info("Processing %d/%d; invalid %d" % (i, tot, inv))
-            set_proxy()
         i += 1
         entity_ids = extract_entities(page_tokens(row[1]), entity_dict)
         if len(entity_ids) == 0: inv += 1
