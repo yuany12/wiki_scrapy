@@ -23,13 +23,15 @@ def page_tokens(link):
     try:
         #return nltk.word_tokenize(BeautifulSoup(urllib2.urlopen(link, timeout = 1).read()).get_text())
         return nltk.word_tokenize(BeautifulSoup(requests.get(link, timeout = 1).text).get_text())
-    except urllib2.HTTPError, e:
-        logging.error(e.code)
+    except:
         return []
-    except Exception, detail:
-        logging.error(detail)
-        return []
-    return []
+    # except urllib2.HTTPError, e:
+    #     logging.error(e.code)
+    #     return []
+    # except Exception, detail:
+    #     logging.error(detail)
+    #     return []
+    # return []
 
 def extract_entities(tokens, entity_dict):
     entities, ids = set(), set()
@@ -102,17 +104,21 @@ def link_pages():
     homepages = load_homepage()
     entity_dict = load_entities()
     i, tot, inv = 0, len(homepages), 0
-    fout = open('page_links.dump', 'w')
+    output = ""
     for row in homepages:
         if i % 100 == 0:
             logging.info("Processing %d/%d; invalid %d" % (i, tot, inv))
+            if i > 0:
+                fout = open('page_links.dump', 'a+')
+                fout.write(output)
+                output = ""
+                fout.close()
         i += 1
         entity_ids = extract_entities(page_tokens(row[1]), entity_dict)
         if len(entity_ids) == 0:
             inv += 1
             continue
-        fout.write(str(row[0]) + ' ' + ",".join([str(e) for e in entity_ids]) + '\n')
-    fout.close()
+        output += str(row[0]) + ' ' + ",".join([str(e) for e in entity_ids]) + '\n'
 
 if __name__ == '__main__':
     urllib3_logger = logging.getLogger('urllib3')
