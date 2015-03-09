@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-import urllib2
+import requests
 import nltk
 import sys
 import MySQLdb as mdb
@@ -26,6 +26,7 @@ def page_tokens(link):
         return []
     except Exception, detail:
         logging.error(detail)
+        set_proxy()
         return []
     return []
 
@@ -81,6 +82,7 @@ def link_pages():
     for row in cur.fetchall():
         if i % 100 == 0:
             logging.info("Processing %d/%d; invalid %d" % (i, tot, inv))
+            set_proxy()
         i += 1
         entity_ids = extract_entities(page_tokens(row[1]), entity_dict)
         if len(entity_ids) == 0: inv += 1
