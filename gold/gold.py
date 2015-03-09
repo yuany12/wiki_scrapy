@@ -100,7 +100,7 @@ def load_entities():
 def link_pages():
     homepages = load_homepage()
     entity_dict = load_entities()
-    i, tot, inv = 0, cur.rowcount, 0
+    i, tot, inv = 0, len(homepages), 0
     fout = open('page_links.dump')
     for row in homepages:
         if i % 100 == 0:
