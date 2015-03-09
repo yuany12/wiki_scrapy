@@ -101,7 +101,7 @@ def link_pages():
     homepages = load_homepage()
     entity_dict = load_entities()
     i, tot, inv = 0, len(homepages), 0
-    fout = open('page_links.dump')
+    fout = open('page_links.dump', 'w')
     for row in homepages:
         if i % 100 == 0:
             logging.info("Processing %d/%d; invalid %d" % (i, tot, inv))
