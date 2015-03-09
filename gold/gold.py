@@ -59,7 +59,13 @@ def create_dict(cur):
             ret[row[1].lower()] = row[0]
     return ret
 
+def set_proxy():
+    proxy = urllib2.ProxyHandler({'http': '104.236.43.250:50080'})
+    opener = urllib2.build_opener(proxy)
+    urllib2.install_opener(opener)
+
 def link_pages():
+    set_proxy()
     db = connect_arnet()
     cur = db.cursor()
     create_table(cur)
