@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import urllib2
+import requests
 import nltk
 import sys
 import MySQLdb as mdb
@@ -20,7 +21,8 @@ def connect_arnet():
 
 def page_tokens(link):
     try:
-        return nltk.word_tokenize(BeautifulSoup(urllib2.urlopen(link, timeout = 1).read()).get_text())
+        #return nltk.word_tokenize(BeautifulSoup(urllib2.urlopen(link, timeout = 1).read()).get_text())
+        return nltk.word_tokenize(BeautifulSoup(requests.get(link, proxies = {'http': '104.236.43.250:50080'}).text).get_text())
     except urllib2.HTTPError, e:
         logging.error(e.code)
         return []
