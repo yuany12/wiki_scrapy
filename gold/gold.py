@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-import requests
+import urllib2
 import nltk
 import sys
 import MySQLdb as mdb
