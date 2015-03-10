@@ -5,7 +5,7 @@ def count():
     cnt = collections.defaultdict(int)
     for line in open('page_links.dump'):
         for word in line.strip().split()[1].split(','): cnt[int(word)] += 1
-    return sorted([(k, v) for k, v in cnt.iteritems()], key = lambda x: x[1])
+    return sorted([(k, v) for k, v in cnt.iteritems()], key = lambda x: x[1], reverse = True)
 
 def create_dict():
     password = open('password.txt').readline().strip()
