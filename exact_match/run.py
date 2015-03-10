@@ -17,10 +17,11 @@ def get_text(author_id):
     free_text = ""
     for row in rows:
         cur.execute("select title from publication where id = %s", row[0])
-        free_text += cur.fetchone()[0]
-        cur.execute("select abstract from publication_ext where id = %s", row[0])
-        tmp_text = cur.fetchone()[0]
-        if tmp_text != '': free_text += ' ' + tmp_text
+        if cur.rowcount > 0:
+            free_text += cur.fetchone()[0]
+            cur.execute("select abstract from publication_ext where id = %s", row[0])
+            tmp_text = cur.fetchone()[0] if cur.rowcount > 0 else ''
+            if tmp_text != '': free_text += ' ' + tmp_text
     return nltk.word_tokenize(free_text)
 
 def extract_terms(tokens, entity_dict):
