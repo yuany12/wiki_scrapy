@@ -24,13 +24,12 @@ def extract_terms(author_id, entity_dict):
     cur.execute('set character_set_connection = utf8')
     cur.execute("select pid from na_author2pub where aid = %s", author_id)
     rows = cur.fetchall()
-    free_text = ""
     entities = collections.defaultdict(int)
     for row in rows:
         cur.execute("select title, ncitation from publication where id = %s", row[0])
         if cur.rowcount > 0:
             t_row = cur.fetchone()
-            free_text += ' ' + t_row[0]
+            free_text = t_row[0]
             ncitation = t_row[1]
             if ncitation > 0:
                 cur.execute("select abstract from publication_ext where id = %s", row[0])
