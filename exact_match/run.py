@@ -17,7 +17,7 @@ def connect_wiki():
     db.set_character_set('utf8')
     return db
 
-def get_text(author_id):
+def extract_terms(author_id, entity_dict):
     cur = connect_arnet().cursor()
     cur.execute('set names utf8')
     cur.execute('set character set utf8')
@@ -25,23 +25,24 @@ def get_text(author_id):
     cur.execute("select pid from na_author2pub where aid = %s", author_id)
     rows = cur.fetchall()
     free_text = ""
-    for row in rows:
-        cur.execute("select title from publication where id = %s", row[0])
-        if cur.rowcount > 0:
-            free_text += ' ' + cur.fetchone()[0]
-            cur.execute("select abstract from publication_ext where id = %s", row[0])
-            tmp_text = cur.fetchone()[0] if cur.rowcount > 0 else ''
-            if tmp_text is not None and tmp_text != '': free_text += ' ' + tmp_text
-    return nltk.word_tokenize(free_text)
-
-def extract_terms(tokens, entity_dict):
     entities = collections.defaultdict(int)
-    for i in range(len(tokens)):
-        for n in range(MAX_N_GRAM, MIN_N_GRAM - 1, -1):
-            if i + n > len(tokens): break
-            n_gram = " ".join(tokens[i: i + n]).lower()
-            if n_gram in entity_dict:
-                entities[n_gram] += 1
+    for row in rows:
+        cur.execute("select title, ncitation from publication where id = %s", row[0])
+        if cur.rowcount > 0:
+            t_row = cur.fetchone()
+            free_text += ' ' + t_row[0]
+            ncitation = t_row[1]
+            if ncitation > 0:
+                cur.execute("select abstract from publication_ext where id = %s", row[0])
+                tmp_text = cur.fetchone()[0] if cur.rowcount > 0 else ''
+                if tmp_text is not None and tmp_text != '': free_text += ' ' + tmp_text
+                tokens = nltk.word_tokenize(free_text)
+                for i in range(len(tokens)):
+                    for n in range(MAX_N_GRAM, MIN_N_GRAM - 1, -1):
+                        if i + n > len(tokens): break
+                        n_gram = " ".join(tokens[i: i + n]).lower()
+                        if n_gram in entity_dict:
+                            entities[n_gram] += ncitation
     return sorted([(k, v) for k, v in entities.iteritems()], key = lambda x: x[1], reverse = True)
 
 def create_dict():
@@ -57,4 +58,4 @@ if __name__ == '__main__':
     reload(sys)
     sys.setdefaultencoding("utf-8")
     entity_dict = create_dict()
-    print extract_terms(get_text(int(sys.argv[1])), entity_dict)
+    print extract_terms(int(sys.argv[1]), entity_dict)
