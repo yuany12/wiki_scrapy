@@ -48,5 +48,4 @@ def create_dict():
 
 if __name__ == '__main__':
     entity_dict = create_dict()
-    _, entities = extract_terms(get_text(int(sys.argv[1])), entity_dict)
-    print entities
+    print extract_terms(get_text(int(sys.argv[1])), entity_dict)
