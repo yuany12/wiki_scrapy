@@ -13,10 +13,15 @@ def connect_arnet():
 
 def connect_wiki():
     password = open('password.txt').readline().strip()
-    return mdb.connect('localhost', 'root', password, 'wiki_entities')
+    db = mdb.connect('localhost', 'root', password, 'wiki_entities')
+    db.set_character_set('utf8')
+    return db
 
 def get_text(author_id):
     cur = connect_arnet().cursor()
+    cur.execute('set names utf8')
+    cur.execute('set character set utf8')
+    cur.execute('set character_set_connection = utf8')
     cur.execute("select pid from na_author2pub where aid = %s", author_id)
     rows = cur.fetchall()
     free_text = ""
