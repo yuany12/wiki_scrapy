@@ -6,6 +6,7 @@ import sys
 import collections
 
 MAX_N_GRAM, MIN_N_GRAM = 3, 2
+NCITATION = False
 
 def connect_arnet():
     password = open('password.txt').readline().strip()
@@ -31,7 +32,7 @@ def extract_terms(author_id, entity_dict):
             t_row = cur.fetchone()
             free_text = t_row[0]
             ncitation = t_row[1]
-            if ncitation > 0:
+            if ncitation > 0 or not NCITATION:
                 cur.execute("select abstract from publication_ext where id = %s", row[0])
                 tmp_text = cur.fetchone()[0] if cur.rowcount > 0 else ''
                 if tmp_text is not None and tmp_text != '': free_text += ' ' + tmp_text
@@ -41,7 +42,7 @@ def extract_terms(author_id, entity_dict):
                         if i + n > len(tokens): break
                         n_gram = " ".join(tokens[i: i + n]).lower()
                         if n_gram in entity_dict:
-                            entities[n_gram] += ncitation
+                            entities[n_gram] += ncitation if NCITATION else 1
     return sorted([(k, v) for k, v in entities.iteritems()], key = lambda x: x[1], reverse = True)
 
 def create_dict():
@@ -56,5 +57,6 @@ def create_dict():
 if __name__ == '__main__':
     reload(sys)
     sys.setdefaultencoding("utf-8")
+    if sys.argv[2].startswith('c'): NCITATION = True
     entity_dict = create_dict()
     print extract_terms(int(sys.argv[1]), entity_dict)
