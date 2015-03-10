@@ -27,7 +27,7 @@ def get_text(author_id):
             cur.execute("select abstract from publication_ext where id = %s", row[0])
             tmp_text = cur.fetchone()[0] if cur.rowcount > 0 else ''
             if tmp_text is not None and tmp_text != '': free_text += ' ' + tmp_text
-    return nltk.word_tokenize(free_text)
+    return nltk.word_tokenize(free_text.decode('utf-8'))
 
 def extract_terms(tokens, entity_dict):
     entities = collections.defaultdict(int)
