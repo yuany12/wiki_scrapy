@@ -1,6 +1,7 @@
 import MySQLdb as mdb
 import nltk
 import sys
+import collections
 
 MAX_N_GRAM, MIN_N_GRAM = 3, 2
 
@@ -27,17 +28,14 @@ def get_text(author_id):
     return nltk.word_tokenize(free_text)
 
 def extract_terms(tokens, entity_dict):
-    entities, ids = set(), set()
+    entities = collections.defaultdict(int)
     for i in range(len(tokens)):
         for n in range(MAX_N_GRAM, MIN_N_GRAM - 1, -1):
             if i + n > len(tokens): break
             n_gram = " ".join(tokens[i: i + n]).lower()
-            if n_gram in entities: break
             if n_gram in entity_dict:
-                entities.add(n_gram)
-                ids.add(entity_dict[n_gram])
-                break
-    return ids, entities
+                entities[n_gram] += 1
+    return sorted([(k, v) for k, v in entities.iteritems()], key = lambda x: x[1], reverse = True)
 
 def create_dict():
     cur = connect_wiki().cursor()
