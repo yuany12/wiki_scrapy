@@ -12,7 +12,7 @@ def create_tables():
     cur.execute("create table con2page (id int not null auto_increment, \
         contact_id int, \
         page_id int, \
-        primary key (id)")
+        primary key (id))")
 
 def insert_contents():
     db = get_connection()
