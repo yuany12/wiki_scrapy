@@ -59,4 +59,5 @@ if __name__ == '__main__':
     sys.setdefaultencoding("utf-8")
     if sys.argv[2].startswith('c'): NCITATION = True
     entity_dict = create_dict()
-    print extract_terms(int(sys.argv[1]), entity_dict)
+    for e in extract_terms(int(sys.argv[1]), entity_dict):
+        print e[0], e[1]
