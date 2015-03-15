@@ -33,9 +33,9 @@ def extract_terms(author_id, entity_dict):
             free_text = t_row[0]
             ncitation = t_row[1]
             if ncitation > 0 or not NCITATION:
-                cur.execute("select abstract from publication_ext where id = %s", row[0])
-                tmp_text = cur.fetchone()[0] if cur.rowcount > 0 else ''
-                if tmp_text is not None and tmp_text != '': free_text += ' ' + tmp_text
+                #cur.execute("select abstract from publication_ext where id = %s", row[0])
+                #tmp_text = cur.fetchone()[0] if cur.rowcount > 0 else ''
+                #if tmp_text is not None and tmp_text != '': free_text += ' ' + tmp_text
                 tokens = nltk.word_tokenize(free_text)
                 for i in range(len(tokens)):
                     for n in range(MAX_N_GRAM, MIN_N_GRAM - 1, -1):
