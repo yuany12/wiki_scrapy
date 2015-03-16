@@ -38,6 +38,7 @@ if __name__ == '__main__':
         fout = open(jconf + '.out', 'w')
         for aid, cnt in author_list(cur, paper_list(cur, jconf_id)):
             cur.execute("select names from na_person where id = %s", aid)
+            if cur.rowcount == 0: continue
             names = cur.fetchone()[0]
             fout.write(str(aid) + '\t' + str(cnt) + '\t' + names + '\n')
         fout.close()
