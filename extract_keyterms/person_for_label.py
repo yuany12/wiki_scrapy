@@ -31,10 +31,13 @@ def author_list(cur, paper_ids):
     return sorted([(k, v) for k, v in author2cnt.iteritems()], key = lambda x: x[1], reverse = True)
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     cur = arnet_db().cursor()
     for jconf_id, jconf in jconfs_list(cur):
         logging.info('extracting %s' % jconf)
         fout = open(jconf + '.out', 'w')
-        for author, cnt in author_list(cur, paper_list(cur, jconf_id)):
-            fout.write(author + '\t' + str(cnt) + '\n')
+        for aid, cnt in author_list(cur, paper_list(cur, jconf_id)):
+            cur.execute("select names from na_person where id = %s", aid)
+            names = cur.fetchone()[0]
+            fout.write(str(aid) + '\t' + str(cnt) + '\t' + names + '\n')
         fout.close()
