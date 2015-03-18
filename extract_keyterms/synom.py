@@ -22,7 +22,7 @@ def desym(infile, outfile, cur):
                     cur.execute("select rd_title from redirect where rd_from = %s", row[0])
                     name = cur.fetchone()[0].lower()
                     break
-            if word.startswith('Social'): print name    ##########
+            if word.startswith('social'): print name    ##########
             if name in appeared: continue
             appeared.add(name)
             words.append(word)
