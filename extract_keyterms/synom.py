@@ -14,17 +14,16 @@ def desym(infile, outfile, cur):
         words = []
         for word in inputs[2].split('|'):
             cur.execute("select page_id, page_is_redirect from page where page_title = %s", word.capitalize())
-            redirect, duplic = False, False
+            name = word
             for row in cur.fetchall():
                 if row[1] == 1:
                     redirect = True
                     cur.execute("select rd_title from redirect where rd_from = %s", row[0])
                     name = cur.fetchone()[0].lower()
-                    if name in appeared: duplic = True
-                    else: appeared.add(name)
                     break
-            if not duplic: words.append(word)
-            if not redirect: appeared.add(word)
+            if name in appeared: continue
+            appeared.add(name)
+            words.append(word)
         fout.write("\t".join(inputs[:2] + ["|".join(words)]) + '\n')
     fout.close()
 
