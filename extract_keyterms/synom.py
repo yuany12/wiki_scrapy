@@ -10,6 +10,7 @@ def desym(infile, outfile, cur):
     fout = open(outfile, 'w')
     for line in open(infile):
         inputs = line.strip().split('\t')
+        if len(inputs) < 3: continue
         words = []
         for word in inputs[2].split('|'):
             cur.execute("select page_id, page_is_redirect from page where page_title = %s", word.capitalize())
