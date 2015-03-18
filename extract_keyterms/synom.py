@@ -12,7 +12,7 @@ def desym(infile, outfile, cur):
         inputs = line.strip().split()
         words = []
         for word in inputs[2].split('|'):
-            cur.execute("select page_id, page_isredirect from page where page_title = %s", word.capitalize())
+            cur.execute("select page_id, page_is_redirect from page where page_title = %s", word.capitalize())
             flag = True
             for row in cur.fetchall():
                 if row[1] == 1:
