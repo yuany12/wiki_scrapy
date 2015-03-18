@@ -1,7 +1,8 @@
+import logging
 
 def get_cursor():
     password = open('password.txt').readline().strip()
-    return = mdb.connect('localhost', 'root', password, 'wikipedia').cursor()
+    return mdb.connect('localhost', 'root', password, 'wikipedia').cursor()
 
 def desym(infile, outfile, cur):
     appeared = set()
@@ -27,6 +28,8 @@ def desym(infile, outfile, cur):
     fout.close()
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     cur = get_cursor()
     for jconf in ['ASPLOS', 'SIGCOMM', 'CRYPTO', 'OSDI', 'STOC', 'SIGMOD Conference', 'KDD', 'SIGGRAPH', 'ICML', 'CHI']:
+        logging.info('processing %s' % jconf)
         desym('res_' + jconf + '.out', 'desym_' + jconf + '.out', cur)
