@@ -18,7 +18,7 @@ def load_db(cur):
     return pages
 
 def desym(infile, outfile, cur, pages):
-    fout = open(outfile, 'w')
+    #fout = open(outfile, 'w')    #######
     for line in open(infile):
         appeared = set()
         inputs = line.strip().split('\t')
@@ -35,8 +35,8 @@ def desym(infile, outfile, cur, pages):
             if word.startswith('social_'): print word, name
             appeared.add(name)
             words.append(word)
-        fout.write("\t".join(inputs[:2] + ["|".join(words)]) + '\n')
-    fout.close()
+        #fout.write("\t".join(inputs[:2] + ["|".join(words)]) + '\n')   ###########
+    #fout.close() #######
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
