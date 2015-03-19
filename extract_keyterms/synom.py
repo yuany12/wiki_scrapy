@@ -8,11 +8,11 @@ def get_cursor():
 def load_db(cur):
     cur.execute("select page_id, page_is_redirect, page_namespace, page_title from page")
     pages = {}
-    cnt, tot = 0, cur.rowcount
-    for row in cur.fetchall():
-        if cnt % 10000 == 0:
-            logging.info('loading %d/%d' % (cnt, tot))
-        cnt += 1
+    tot = cur.rowcount
+    for i in range(tot):
+        row = cur.fetchone()
+        if i % 10000 == 0:
+            logging.info('loading %d/%d' % (i, tot))
         if row[2] != 0: continue
         pages[row[3].lower()] = (row[0], row[1])
     return pages
