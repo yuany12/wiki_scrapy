@@ -14,7 +14,12 @@ def load_db(cur):
         if i % 10000 == 0:
             logging.info('loading %d/%d' % (i, tot))
         if row[2] != 0: continue
-        if row[3].lower() in pages and row[3].split('_')[1][0].isupper(): continue
+        if row[3].lower() in pages:
+            words = row[3].split('_')
+            if len(words) == 1:
+                if words[0][0].isupper(): continue
+            else:
+                if words[1][0].isupper(): continue
         pages[row[3].lower()] = (row[0], row[1])
     return pages
 
