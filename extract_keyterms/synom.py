@@ -16,8 +16,7 @@ def load_db(cur):
         if row[2] != 0: continue
         if row[3].lower() in pages:
             words = row[3].split('_')
-            if len(words) == 1:
-                if words[0][0].isupper(): continue
+            if len(words) == 1: continue
             else:
                 if words[1][0].isupper(): continue
         pages[row[3].lower()] = (row[0], row[1])
