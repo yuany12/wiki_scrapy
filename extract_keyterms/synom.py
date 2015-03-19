@@ -14,15 +14,15 @@ def load_db(cur):
         if i % 10000 == 0:
             logging.info('loading %d/%d' % (i, tot))
         if row[2] != 0: continue
+        if row[3].lower() in pages and row[3].split('_')[1][0].isupper(): continue
         pages[row[3].lower()] = (row[0], row[1])
     return pages
 
 def desym(infile, outfile, cur, pages):
-    #fout = open(outfile, 'w')    #######
+    fout = open(outfile, 'w')
     for line in open(infile):
         appeared = set()
         inputs = line.strip().split('\t')
-        if not inputs[1].startswith('Jie '): continue ########
         if len(inputs) < 3: continue
         words = []
         for word in inputs[2].split('|'):
@@ -32,11 +32,10 @@ def desym(infile, outfile, cur, pages):
                 cur.execute("select rd_title from redirect where rd_from = %s", pages[word][0])
                 name = cur.fetchone()[0].lower()
             if name in appeared: continue
-            if word.startswith('social_'): print word, name
             appeared.add(name)
             words.append(word)
-        #fout.write("\t".join(inputs[:2] + ["|".join(words)]) + '\n')   ###########
-    #fout.close() #######
+        fout.write("\t".join(inputs[:2] + ["|".join(words)]) + '\n')
+    fout.close()
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
