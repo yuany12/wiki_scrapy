@@ -25,8 +25,8 @@ def load_db(cur):
 
 def redirect(infile, outfile, cur, pages):
     fout = open(outfile, 'w')
+    appeared = {}
     for line in open(infile):
-        appeared = {}
         word = line.strip()
         if word not in pages: continue
         name = word
