@@ -5,14 +5,13 @@ def get_cursor():
     return mdb.connect('localhost', 'root', password, 'wikipedia').cursor()
 
 def load_db(cur):
-    cur.execute("select page_id, page_is_redirect, page_namespace, page_title from page")
+    cur.execute("select page_id, page_is_redirect, page_namespace, page_title from page where page_id < 10000")
     pages = {}
     tot = cur.rowcount
     for i in range(tot):
         row = cur.fetchone()
         if i % 10000 == 0:
             logging.info('loading %d/%d' % (i, tot))
-        if i == 10000: break
         if row[2] != 0: continue
         if row[3].lower() in pages:
             words = row[3].split('_')
