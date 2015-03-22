@@ -12,6 +12,7 @@ def load_db(cur):
         row = cur.fetchone()
         if i % 10000 == 0:
             logging.info('loading %d/%d' % (i, tot))
+        if i == 10000: break
         if row[2] != 0: continue
         if row[3].lower() in pages:
             words = row[3].split('_')
