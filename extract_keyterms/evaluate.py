@@ -103,7 +103,7 @@ def evaluate_extrator_plus_kb(pages, cur, jconfs):
         persons = read_from_person('person_desym_' + jconf +'.out')
         gold = read_from_label('re_desym_' + jconf + '.out.csv', pages, cur)
         _, goldterms = read_from_keyterms('desym_' + jconf + '.out', pages, cur, gold)
-        keyterms = read_extractor_plus_kb('ext_terms/res_' + jconf + '.out', pages, cur, gold)
+        keyterms = read_extractor_plus_kb('ext_terms/res_' + jconf + '.out', pages, cur)
         for person in persons:
             ctp, cfp, cfn = evaluate(keyterms[person], goldterms[person])
             tp, fp, fn = tp + ctp, fp + cfp, fn + cfn
