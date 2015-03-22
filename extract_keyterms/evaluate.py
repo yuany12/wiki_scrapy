@@ -62,6 +62,7 @@ def read_from_extractor(infile, pages, cur, gold):
     ret = {}
     for line in open(infile):
         inputs = line.strip().split('\t')
+        if len(inputs) < 3: continue
         ret[int(inputs[0])] = redirect([e.replace(' ', '_') for e in inputs[2].split(',')], pages, cur)
     return ret
 
