@@ -6,7 +6,7 @@ def get_cursor():
     return mdb.connect('localhost', 'root', password, 'wikipedia').cursor()
 
 def load_db(cur):
-    cur.execute("select page_id, page_is_redirect, page_namespace, page_title from page where page_id < 10000")
+    cur.execute("select page_id, page_is_redirect, page_namespace, page_title from page")
     pages = {}
     tot = cur.rowcount
     for i in range(tot):
