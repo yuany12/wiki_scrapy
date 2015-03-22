@@ -88,7 +88,8 @@ def evaluate_extractor_baseline(pages, cur, jconfs):
             tp, fp, fn = tp + ctp, fp + cfp, fn + cfn
     return tp, fp, fn
 
-def report(name, tp, fp, fn):
+def report(name, vals):
+    tp, fp, fn = vals[0], vals[1], vals[2]
     precision = float(tp) / (tp + fp) if tp + fp > 0 else 0.0
     recall = float(tp) / (tp + fn) if tp + fn > 0 else 0.0
     f1 = 2 * precision * recall / (precision + recall) if precision + recall > 0 else 0.0
