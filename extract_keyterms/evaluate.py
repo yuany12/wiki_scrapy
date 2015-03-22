@@ -48,13 +48,13 @@ def read_from_label(infile, pages, cur):
     for line in open(infile):
         inputs = line.strip().split(',')
         if inputs[0] == '1': ret.append(inputs[1])
-    return redirect(ret)
+    return redirect(ret, pages, cur)
 
 def read_from_keyterms(infile, pages, cur, gold):
     ret, gold_ret = {}, {}
     for line in open(infile):
         inputs = line.strip().split('\t')
-        ret[int(inputs[0])] = redirect(inputs[2].split('|'))
+        ret[int(inputs[0])] = redirect(inputs[2].split('|'), pages, cur)
         gold_ret[int(inputs[0])] = ret[int(inputs[0])].intersection(gold)
     return ret, gold_ret
 
@@ -62,7 +62,7 @@ def read_from_extractor(infile, pages, cur, gold):
     ret = {}
     for line in open(infile):
         inputs = line.strip().split('\t')
-        ret[int(inputs[0])] = redirect([e.replace(' ', '_') for e in inputs[2].split(',')])
+        ret[int(inputs[0])] = redirect([e.replace(' ', '_') for e in inputs[2].split(',')], pages, cur)
     return ret
 
 def evaluate_keyterm_baseline(pages, cur, jconfs):
@@ -79,7 +79,7 @@ def evaluate_keyterm_baseline(pages, cur, jconfs):
 def evaluate_extractor_baseline(pages, cur, jconfs):
     tp, fp, fn = 0, 0, 0
     for jconf in jconfs:
-        persons = read_from_person('tag_desym_' + jconf + '.out')
+        persons = read_from_person('person_desym_' + jconf + '.out')
         gold = read_from_label('re_desym_' + jconf + '.out.csv', pages, cur)
         keyterms = read_from_extractor('ext_terms/res_' + jconf + '.out', pages, cur, gold)
         _, goldterms = read_from_keyterms('desym_' + jconf + '.out', pages, cur, gold)
