@@ -68,7 +68,7 @@ def read_from_extractor(infile, pages, cur, gold):
 def evaluate_keyterm_baseline(pages, cur, jconfs):
     tp, fp, fn = 0, 0, 0
     for jconf in jconfs:
-        persons = read_from_person('tag_desym_' + jconf + '.out')
+        persons = read_from_person('person_desym_' + jconf + '.out')
         gold = read_from_label('re_desym_' + jconf + '.out.csv', pages, cur)
         keyterms, goldterms = read_from_keyterms('desym_' + jconf + '.out', pages, cur, gold)
         for person in persons:
