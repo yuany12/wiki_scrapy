@@ -1,3 +1,4 @@
+import MySQLdb as mdb
 
 def get_cursor():
     password = open('password.txt').readline().strip()
