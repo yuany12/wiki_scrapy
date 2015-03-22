@@ -85,7 +85,7 @@ def evaluate_extractor_baseline(pages, cur, jconfs):
         keyterms = read_from_extractor('ext_terms/res_' + jconf + '.out', pages, cur, gold)
         _, goldterms = read_from_keyterms('desym_' + jconf + '.out', pages, cur, gold)
         for person in persons:
-            ctp, cfp, cfn = evaluate(keyterms[person], keyterms[person])
+            ctp, cfp, cfn = evaluate(keyterms[person], goldterms[person])
             tp, fp, fn = tp + ctp, fp + cfp, fn + cfn
     return tp, fp, fn
 
