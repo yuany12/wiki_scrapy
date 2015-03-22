@@ -1,4 +1,5 @@
 import MySQLdb as mdb
+import logging
 
 def get_cursor():
     password = open('password.txt').readline().strip()
@@ -94,6 +95,7 @@ def report(name, tp, fp, fn):
     print 'evaluating %s: %f, %f, %f' % (name, precision, recall, f1)
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     cur = get_cursor()
     pages = load_db(cur)
     jconfs = ['KDD', 'ICML']
