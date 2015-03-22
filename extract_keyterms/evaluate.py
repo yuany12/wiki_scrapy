@@ -71,7 +71,7 @@ def read_extractor_plus_kb(infile, pages, cur):
     for line in open(infile):
         inputs = line.strip().split('\t')
         if len(inputs) < 3: continue
-        ret[int(inputs[0])] = redirect([e.replace(' ', '_') for e in inputs[2].split(',') if e in pages], pages, cur)
+        ret[int(inputs[0])] = redirect([e.replace(' ', '_') for e in inputs[2].split(',') if e.replace(' ', '_') in pages], pages, cur)
     return ret
 
 def evaluate_keyterm_baseline(pages, cur, jconfs):
