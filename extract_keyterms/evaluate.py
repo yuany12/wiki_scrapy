@@ -6,7 +6,7 @@ def get_cursor():
     return mdb.connect('localhost', 'root', password, 'wikipedia').cursor()
 
 def load_db(cur):
-    cur.execute("select page_id, page_is_redirect, page_namespace, page_title from page")
+    cur.execute("select page_id, page_is_redirect, page_namespace, page_title from page where page_id < 10000")
     pages = {}
     tot = cur.rowcount
     for i in range(tot):
@@ -66,6 +66,14 @@ def read_from_extractor(infile, pages, cur, gold):
         ret[int(inputs[0])] = redirect([e.replace(' ', '_') for e in inputs[2].split(',')], pages, cur)
     return ret
 
+def read_extractor_plus_kb(infile, pages, cur):
+    ret = {}
+    for line in open(infile):
+        inputs = line.strip().split('\t')
+        if len(inputs) < 3: continue
+        ret[int(inputs[0])] = redirect([e.replace(' ', '_') for e in inputs[2].split(',') if e in pages], pages, cur)
+    return ret
+
 def evaluate_keyterm_baseline(pages, cur, jconfs):
     tp, fp, fn = 0, 0, 0
     for jconf in jconfs:
@@ -89,6 +97,18 @@ def evaluate_extractor_baseline(pages, cur, jconfs):
             tp, fp, fn = tp + ctp, fp + cfp, fn + cfn
     return tp, fp, fn
 
+def evaluate_extrator_plus_kb(pages, cur, jconfs):
+    tp, fp, fn = 0, 0, 0
+    for jconf in jconfs:
+        persons = read_from_person('person_desym_' + jconf +'.out')
+        gold = read_from_label('re_desym_' + jconf + '.out.csv', pages, cur)
+        _, goldterms = read_from_keyterms('desym_' + jconf + '.out', pages, cur, gold)
+        keyterms = read_extractor_plus_kb('ext_terms/res_' + jconf + '.out', pages, cur, gold)
+        for person in persons:
+            ctp, cfp, cfn = evaluate(keyterms[person], goldterms[person])
+            tp, fp, fn = tp + ctp, fp + cfp, fn + cfn
+    return tp, fp, fn
+
 def report(name, vals):
     tp, fp, fn = vals[0], vals[1], vals[2]
     precision = float(tp) / (tp + fp) if tp + fp > 0 else 0.0
@@ -101,5 +121,6 @@ if __name__ == '__main__':
     cur = get_cursor()
     pages = load_db(cur)
     jconfs = ['KDD', 'ICML']
-    report('keyterm', evaluate_keyterm_baseline(pages, cur, jconfs))
-    report('extractor', evaluate_extractor_baseline(pages, cur, jconfs))
+    #report('keyterm', evaluate_keyterm_baseline(pages, cur, jconfs))
+    #report('extractor', evaluate_extractor_baseline(pages, cur, jconfs))
+    report('extractor_kb', evaluate_extrator_plus_kb(pages, cur, jconfs))
