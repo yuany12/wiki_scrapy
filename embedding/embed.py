@@ -23,7 +23,7 @@ class author_word_embedding:
 
     def build_graph(self):
         cur = self.conn_db('arnet_db').cursor()
-        cur.execute("select id, title from publication where id < 1000")
+        cur.execute("select id, title from publication")
         self.vertices = collections.defaultdict(list)
         self.vocab = []
         ext = extractor.extractor(self.conn_db('wikipedia').cursor())
@@ -73,7 +73,7 @@ class author_word_embedding:
             model.save('author_word.model')
 
 if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.DEBUG)
+    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
     emd = author_word_embedding()
     emd.build_graph()
