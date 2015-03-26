@@ -25,7 +25,7 @@ class author_word_embedding:
         cur.execute("select id, title from publication where id < 10000")
         self.vertices = collections.defaultdict(list)
         self.vocab = []
-        ext = extractor.extractor(conn_db('wikipedia').cursor())
+        ext = extractor.extractor(self.conn_db('wikipedia').cursor())
         cnt, tot = 0, cur.rowcount
         for row in cur.fetchall():
             if cnt % 10000 == 0:
