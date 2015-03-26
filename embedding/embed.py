@@ -4,6 +4,7 @@ import collections
 import gensim
 import cPickle
 import multiprocessing
+import logging
 
 SIZE = 128
 WINDOW = 24
