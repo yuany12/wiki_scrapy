@@ -33,16 +33,16 @@ class extractor:
         i, ret = 0, []
         while i < len(tokens) - 1:
             if i + 2 < len(tokens) and self.pos_rule(tokens[i: i + 3]):
-                word = "_".join(e.orth_.lower() for e in tokens[i: i + 3])
+                word = u"_".join(tokens[j].orth_ for j in range(i, i + 3)).encode('utf8').lower()
                 if word in self.entities:
                     ret.append(word)
                     i += 3
                     continue
             if self.pos_rule(tokens[i: i + 2]):
-                word = "_".join(e.orth_.lower() for e in tokens[i: i + 2])
+                word = u"_".join(tokens[j].orth_ for j range(i, i + 3)).encode('utf8').lower()
                 if word in self.entities:
                     ret.append(word)
                     i += 2
                     continue
             i += 1
-        return [e.encode('utf8') for e in ret]
+        return ret
