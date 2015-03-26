@@ -39,7 +39,7 @@ class extractor:
                     i += 3
                     continue
             if self.pos_rule([tokens[j] for j in range(i, i + 2)]):
-                word = u"_".join(tokens[j].orth_ for j in range(i, i + 3)).encode('utf8').lower()
+                word = u"_".join(tokens[j].orth_ for j in range(i, i + 2)).encode('utf8').lower()
                 if word in self.entities:
                     ret.append(word)
                     i += 2
