@@ -33,10 +33,10 @@ class author_word_embedding:
             cnt += 1
             keywords = ext.extract_str(row[1])
             cur.execute("select abstract from publication_ext where id = %d" % row[0])
-            sub_row = cur.fetchone():
+            sub_row = cur.fetchone()
                 if sub_row is not None and sub_row[0] is not None and sub_row[0] != '': keywords += ext.extract_str(sub_row[0])
             cur.execute("select aid from na_author2pub where pid = %d" % row[0])
-            for sub_row in cur.fetchall():
+            for sub_roew in cur.fetchall():
                 keywords.append("A_" + str(sub_row[0]))
             for i in range(len(keywords)):
                 for j in range(i + 1, len(keywords)):
