@@ -32,13 +32,13 @@ class extractor:
         tokens = self.tagger(s.decode('utf8'), tag = True, parse = False)
         i, ret = 0, []
         while i < len(tokens) - 1:
-            if i + 2 < len(tokens) and self.pos_rule(tokens[i: i + 3]):
+            if i + 2 < len(tokens) and self.pos_rule([tokens[j] for j in range(i, i + 3)]):
                 word = u"_".join(tokens[j].orth_ for j in range(i, i + 3)).encode('utf8').lower()
                 if word in self.entities:
                     ret.append(word)
                     i += 3
                     continue
-            if self.pos_rule(tokens[i: i + 2]):
+            if self.pos_rule([tokens[j] for j in range(i, i + 2)]):
                 word = u"_".join(tokens[j].orth_ for j in range(i, i + 3)).encode('utf8').lower()
                 if word in self.entities:
                     ret.append(word)
