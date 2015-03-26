@@ -29,7 +29,7 @@ class extractor:
         return True
 
     def extract_str(self, s):
-        tokens = self.tagger(s, tag = True, parse = False)
+        tokens = self.tagger(s.decode('utf8'), tag = True, parse = False)
         i, ret = 0, []
         while i < len(tokens) - 1:
             if i + 2 < len(tokens) and self.pos_rule(tokens[i: i + 3]):
@@ -45,4 +45,4 @@ class extractor:
                     i += 2
                     continue
             i += 1
-        return ret
+        return [e.encode('utf8') for e in ret]
