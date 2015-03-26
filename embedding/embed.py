@@ -35,7 +35,7 @@ class author_word_embedding:
             cur.execute("select abstract from publication_ext where id = %s", str(row[0]))
             for sub_row in cur.fetchone():
                 if sub_row is not None and sub_row[0] is not None and sub_row[0] != '': keywords += ext.extract_str(sub_row[0])
-            cur.execute("select aid from na_author2pub where pid = %s", row[0])
+            cur.execute("select aid from na_author2pub where pid = %s", str(row[0]))
             for sub_row in cur.fetchall():
                 keywords.append("A_" + str(sub_row[0]))
             for i in range(len(keywords)):
