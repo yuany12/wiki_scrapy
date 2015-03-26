@@ -32,7 +32,7 @@ class author_word_embedding:
                 logging.info('building graph %d/%d' % (cnt, tot))
             cnt += 1
             keywords = ext.extract_str(row[1])
-            cur.execute("select abstract from publication_ext where id = %s", row[0])
+            cur.execute("select abstract from publication_ext where id = %d", row[0])
             for sub_row in cur.fetchone():
                 if sub_row[0] is not None and sub_row[0] != '': keywords += ext.extract_str(sub_row[0])
             cur.execute("select aid from na_author2pub where pid = %s", row[0])
