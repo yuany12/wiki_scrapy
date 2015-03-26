@@ -5,6 +5,7 @@ import gensim
 import cPickle
 import multiprocessing
 import logging
+import random
 
 SIZE = 128
 WINDOW = 24
@@ -22,7 +23,7 @@ class author_word_embedding:
 
     def build_graph(self):
         cur = self.conn_db('arnet_db').cursor()
-        cur.execute("select id, title from publication where id < 10000")
+        cur.execute("select id, title from publication where id < 1000")
         self.vertices = collections.defaultdict(list)
         self.vocab = []
         ext = extractor.extractor(self.conn_db('wikipedia').cursor())
