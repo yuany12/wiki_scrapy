@@ -8,10 +8,10 @@ import logging
 import random
 
 SIZE = 128
-WINDOW = 24
+WINDOW = 7
 NEGATIVE = 10
 RAN_TIMES = 100
-LENGTH = 40
+LENGTH = 20
 
 class author_word_embedding:
 
@@ -72,11 +72,21 @@ class author_word_embedding:
             model.train(self.generator())
             model.save('author_word.model')
 
+    def resume_training(self):
+        model = gensim.models.Word2Vec.load('author_word.model')
+        model.window = WINDOW
+        for i in range(RAN_TIMES):
+            logging.info('training model %d/%d' % (i, RAN_TIMES))
+            model.train(self.generator())
+            model.save('author_word.model')
+
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
     emd = author_word_embedding()
-    emd.build_graph()
-    emd.save_graph()
-    emd.train_model()
+    #emd.build_graph()
+    #emd.save_graph()
+    #emd.train_model()
+    emd.load_graph()
+    emd.resume_training()
     
