@@ -1,4 +1,5 @@
 import gensim
+import MySQLdb as mdb
 
 def arnet_conn():
     password = open('password.txt').readline().strip()
