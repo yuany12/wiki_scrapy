@@ -9,7 +9,7 @@ def test():
     model = gensim.models.Word2Vec.load('author_word.model')
     cur = arnet_conn().cursor()
     for word in ['machine_learning', 'data_mining', 'deep_learning', 'social_network', 'support_vector_machine', \
-     'neural_network', 'deep_network', 'euclidean_space', 'word_embedding', 'natural_language_processing']:
+     'neural_network', 'vector_space', 'euclidean_space', 'word_embedding', 'natural_language_processing']:
         for e in model.most_similar(positive = [word], negative = [], topn = 15):
             if e[0].startswith('A_'):
                 cur.execute("select names from na_person where id = %s", e[0][2:])
