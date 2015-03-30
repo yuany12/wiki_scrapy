@@ -58,7 +58,7 @@ def train_model(keyword2idx, idx2keyword, word2cnt, author2tags, model):
         evs[:, i] = model[idx2keyword[i]]
     params = {'embedding_size': DIMENSION, 'num_entities': len(idx2keyword), 'slice_size': 4,
         'lamda': 1e-2, 'batch_size': 1000, 'corrupt_size': 10, 'num_iterations': 100,
-        'batch_iterations': 5, 'ev_fixed': False, 'threshold': -0.0, 'save_file': 'ntn_model.dump'}
+        'batch_iterations': 5, 'ev_fixed': True, 'threshold': -0.0, 'save_file': 'ntn_model.dump'}
     network = ntn.my_neural_tensor_network(params, evs)
     data = get_training_data(author2tags, keyword2idx, model, word2cnt)
     network.train(data)
