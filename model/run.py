@@ -3,6 +3,7 @@ import cPickle
 import collections
 import numpy as np
 import ntn
+import gensim
 
 SAMPLE_RATE = 0.5
 DIMENSION = 128
