@@ -7,10 +7,10 @@ import cPickle
 import logging
 
 class my_neural_tensor_network():
-    def __init__(self, params, init_evs = None):
-        if type(params) is str:
-            self.load(params)
-            return
+    def __init__(self, params, init_evs = None, load_file = None):
+        # if type(params) is str:
+        #     self.load(params)
+        #     return
         self.embedding_size = params['embedding_size']
         self.num_entities = params['num_entities']
         self.slice_size = params['slice_size']
@@ -26,15 +26,18 @@ class my_neural_tensor_network():
         
         r = 1e-1
         entity_vectors = init_evs.copy() if init_evs is not None else np.random.random((self.embedding_size, self.num_entities)) * 2 * r - r 
-        r = 1 / math.sqrt(2 * self.embedding_size)
-        W = np.random.random((self.embedding_size, self.embedding_size, self.slice_size)) * 2 * r - r
-        v = np.zeros((self.slice_size, 2 * self.embedding_size))
-        b, u = np.zeros((self.slice_size)), np.zeros((self.slice_size))
-        if not self.ev_fixed:
-            self.theta, self.decode = self.stackToParams(W, v, b, u, entity_vectors)
-        else:
-            self.theta, self.decode = self.stackToParams(W, v, b, u)
-            self.entity_vectors = entity_vectors
+        
+        if load_file is None:
+            r = 1 / math.sqrt(2 * self.embedding_size)
+            W = np.random.random((self.embedding_size, self.embedding_size, self.slice_size)) * 2 * r - r
+            v = np.zeros((self.slice_size, 2 * self.embedding_size))
+            b, u = np.zeros((self.slice_size)), np.zeros((self.slice_size))
+            if not self.ev_fixed:
+                self.theta, self.decode = self.stackToParams(W, v, b, u, entity_vectors)
+            else:
+                self.theta, self.decode = self.stackToParams(W, v, b, u)
+                self.entity_vectors = entity_vectors
+        else: self.load(load_file)
 
     def stackToParams(self, *args):
         theta, decode = [], []
@@ -141,7 +144,11 @@ class my_neural_tensor_network():
             if (i + 1) % self.save_period == 0: self.save()
 
     def save(self):
-        cPickle.dump(self.__dict__, open(self.save_file, 'w'))
+        # cPickle.dump(self.__dict__, open(self.save_file, 'w'))
+        cPickle.dump(self.theta, open(self.save_file + '.theta', 'w'))
+        cPickle.dump(self.decode, open(self.save_file + '.decode', 'w'))
 
     def load(self, filename):
-        self.__dict__ = cPickle.load(open(filename))
+        # self.__dict__ = cPickle.load(open(filename))
+        self.theta = cPickle.load(open(filename + '.theta'))
+        self.decode = cPickle.load(open(filename + '.decode'))
