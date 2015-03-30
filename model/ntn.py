@@ -136,7 +136,7 @@ class my_neural_tensor_network():
             indices['e1'], indices['e2'] = np.tile(data[batch, 0], self.cor_size), np.tile(data[batch, 1], self.cor_size)
             indices['e3'] = np.random.randint(self.num_entities, size = self.batch_size * self.cor_size)
             flip = np.random.random() < 0.5
-            self.theta = opt.minimize(self.cost, self.theta, args = (indices, flip), method = 'L-BFGS-B', jac = True, options = {'maxiter': self.batch_iterations, 'disp': False}).x
+            self.theta = opt.minimize(self.cost, self.theta, args = (indices, flip), method = 'L-BFGS-B', jac = True, options = {'maxiter': self.batch_iterations, 'disp': True}).x
             self.save()
 
     def save(self):
