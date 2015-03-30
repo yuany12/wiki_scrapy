@@ -4,12 +4,14 @@ import collections
 import numpy as np
 import ntn
 import gensim
+import logging
 
 SAMPLE_RATE = 0.5
 DIMENSION = 128
 SAMPLE_RATIO = 0.5
 
 def get_reverse_index(model):
+    logging.info('get_reverse_index')
     vocab = cPickle.load(open('../embedding/vocab.graph.dump', 'rb'))
     keyword2idx, idx2keyword = collections.defaultdict(int), []
     idx = 0
@@ -26,6 +28,7 @@ def connect_arnet():
     return mdb.connect('localhost', 'root', password, 'arnet_db')
 
 def load_wiki_tag(cur):
+    logging.info('load_wiki_tag')
     cur.execute("select aid, tag, cnt from wiki_tag")
     word2cnt = collections.defaultdict(int)
     author2tags = collections.defaultdict(list)
@@ -37,11 +40,12 @@ def load_wiki_tag(cur):
     return author2tags, word2cnt
 
 def get_training_data(author2tags, keyword2idx, model, word2cnt):
+    logging.info('get_training_data')
     data = []
     for author, tags in author2tags.iteritems():
         if author not in model: continue
         author_idx = keyword2idx[author]
-        for tag in tags[: SAMPLE_RATIO * len(tags)]:
+        for tag in tags[: int(SAMPLE_RATIO * len(tags))]:
             word = tag[0]
             if word2cnt[word] < 10 or word not in model: continue
             word_idx = keyword2idx[word]
@@ -60,6 +64,7 @@ def train_model(keyword2idx, idx2keyword, word2cnt, author2tags, model):
     network.train(data)
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     cur = connect_arnet().cursor()
     model = gensim.models.Word2Vec.load('../embedding/author_word.model')
     keyword2idx, idx2keyword = get_reverse_index(model)
