@@ -63,5 +63,5 @@ if __name__ == '__main__':
     cur = connect_arnet().cursor()
     model = gensim.models.Word2Vec.load('../embedding/author_word.model')
     keyword2idx, idx2keyword = get_reverse_index(model)
-    author2tags, word2cnt = load_wiki_tag()
+    author2tags, word2cnt = load_wiki_tag(cur)
     train_model(keyword2idx, idx2keyword, word2cnt, author2tags, model)
