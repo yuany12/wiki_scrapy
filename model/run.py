@@ -50,7 +50,7 @@ def get_training_data(author2tags, keyword2idx, model, word2cnt):
             if word2cnt[word] < 10 or word not in model: continue
             word_idx = keyword2idx[word]
             data.append([author_idx, word_idx])
-    logging.info('training data size = %d' % data.shape[0])
+    logging.info('training data size = %d' % len(data))
     return np.array(data)
 
 def train_model(keyword2idx, idx2keyword, word2cnt, author2tags, model):
