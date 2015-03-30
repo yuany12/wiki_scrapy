@@ -31,7 +31,7 @@ def load_wiki_tag(cur):
     author2tags = collections.defaultdict(list)
     for row in cur.fetchall():
         word2cnt[row[1]] += row[2]
-        author2tags['A_' + str(row[0])] += (row[1], row[2])
+        author2tags['A_' + str(row[0])].append((row[1], row[2]))
     for k in author2tags.keys():
         author2tags[k].sort(key = lambda x: x[1], reverse = True)
     return author2tags, word2cnt
