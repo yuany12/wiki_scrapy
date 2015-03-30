@@ -6,9 +6,8 @@ import ntn
 import gensim
 import logging
 
-SAMPLE_RATE = 0.5
 DIMENSION = 128
-SAMPLE_RATIO = 0.5
+SAMPLE_RATIO = 0.18
 
 def get_reverse_index(model):
     logging.info('get_reverse_index')
@@ -62,7 +61,6 @@ def train_model(keyword2idx, idx2keyword, word2cnt, author2tags, model):
         'batch_iterations': 5, 'ev_fixed': False, 'threshold': -0.0, 'save_file': 'ntn_model.dump'}
     network = ntn.my_neural_tensor_network(params, evs)
     data = get_training_data(author2tags, keyword2idx, model, word2cnt)
-    return ####### for test
     network.train(data)
 
 if __name__ == '__main__':
