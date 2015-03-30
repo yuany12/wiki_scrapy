@@ -25,7 +25,7 @@ class my_neural_tensor_network():
         self.save_period = params['save_period']
         
         r = 1e-1
-        entity_vectors = init_evs.copy() if init_evs is not None else np.random.random((self.embedding_size, self.num_entities)) * 2 * r - r 
+        self.entity_vectors = init_evs.copy() if init_evs is not None else np.random.random((self.embedding_size, self.num_entities)) * 2 * r - r 
         
         if load_file is None:
             r = 1 / math.sqrt(2 * self.embedding_size)
@@ -36,7 +36,6 @@ class my_neural_tensor_network():
                 self.theta, self.decode = self.stackToParams(W, v, b, u, entity_vectors)
             else:
                 self.theta, self.decode = self.stackToParams(W, v, b, u)
-                self.entity_vectors = entity_vectors
         else: self.load(load_file)
 
     def stackToParams(self, *args):
@@ -147,8 +146,12 @@ class my_neural_tensor_network():
         # cPickle.dump(self.__dict__, open(self.save_file, 'w'))
         cPickle.dump(self.theta, open(self.save_file + '.theta', 'w'))
         cPickle.dump(self.decode, open(self.save_file + '.decode', 'w'))
+        if not self.ev_fixed:
+            cPickle.dump(self.entity_vectors, open(self.save_file + '.evs', 'w'))
 
     def load(self, filename):
         # self.__dict__ = cPickle.load(open(filename))
         self.theta = cPickle.load(open(filename + '.theta'))
         self.decode = cPickle.load(open(filename + '.decode'))
+        if not self.ev_fixed:
+            self.entity_vectors = cPickle.load(open(filename + '.evs'))
