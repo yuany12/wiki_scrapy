@@ -22,6 +22,7 @@ class my_neural_tensor_network():
         self.ev_fixed = params['ev_fixed']
         self.threshold = params['threshold']
         self.save_file = params['save_file']
+        self.save_period = params['save_period']
         
         r = 1e-1
         entity_vectors = init_evs.copy() if init_evs is not None else np.random.random((self.embedding_size, self.num_entities)) * 2 * r - r 
@@ -137,7 +138,7 @@ class my_neural_tensor_network():
             indices['e3'] = np.random.randint(self.num_entities, size = self.batch_size * self.cor_size)
             flip = np.random.random() < 0.5
             self.theta = opt.minimize(self.cost, self.theta, args = (indices, flip), method = 'L-BFGS-B', jac = True, options = {'maxiter': self.batch_iterations, 'disp': True}).x
-            self.save()
+            if (i + 1) % self.save_period == 0: self.save()
 
     def save(self):
         cPickle.dump(self.__dict__, open(self.save_file, 'w'))
