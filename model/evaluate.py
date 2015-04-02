@@ -97,8 +97,20 @@ def calc_score():
             ry[py[i][1]] = 1
         measure(ry, y)
 
+def sort_res():
+    for jconf in ['KDD', 'ICML']:
+        l = []
+        for line in open('ntn_predict_' + jconf + '.out'):
+            inputs = line.strip().split(',')
+            l.append((line, float(inputs[-1])))
+        l.sort(key = lambda x: x[1], reverse = True)
+        fout = open('ntn_predict_' + jconf + '.sort.out', 'w')
+        for e in l:
+            fout.write(e[0])
+        fout.close()
+
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     # test()
-    calc_score()
-    
+    # calc_score()
+    sort_res()
