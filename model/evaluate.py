@@ -53,6 +53,7 @@ def test():
         for author in persons:
             words = author2words[author]
             for word in words:
+                if word not in word2label or word not in keyword2idx: continue
                 author_id, word_id = keyword2idx['A_' + str(author)], keyword2idx[word]
                 test_data.append([author_id, word_id])
                 label = 1 if word2label[word] == 1 else 0
