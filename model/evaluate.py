@@ -4,6 +4,7 @@ import gensim
 import ntn
 import run
 import numpy as np
+import logging
 
 DIMENSION = 128
 
