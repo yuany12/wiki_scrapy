@@ -13,7 +13,7 @@ def test():
       'A_745329', 'A_123223', 'A_386117']:
         name = word
         if name.startswith('A_'):
-            cur.execute("select names from na_person where id = %", int(name[2:]))
+            cur.execute("select names from na_person where id = %s", name[2:])
             name = cur.fetchone()[0]
         for e in model.most_similar(positive = [word], negative = [], topn = 15):
             if e[0].startswith('A_'):
