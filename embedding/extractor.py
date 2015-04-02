@@ -7,7 +7,7 @@ class extractor:
     forbidden = {'PRP','PRP$','VBZ', '.', ':', '``', "''", 'DT'}
 
     def __init__(self, cur):
-        cur.execute("select page_title from page")
+        cur.execute("select page_title from page limit 1000")
         self.entities = []
         cnt, tot = 0, cur.rowcount
         for row in cur.fetchall():

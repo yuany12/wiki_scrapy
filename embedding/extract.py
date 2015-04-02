@@ -26,9 +26,8 @@ def extract_all():
         if len(keywords) > 0: title_keywords[id] = keywords
 
         cur.execute("select abstract from publication_ext")
-        abs = cur.fetchone()
+        abs = cur.fetchone()[0]
         if abs is not None:
-            abs = abs[0]
             keywords = ext.extract_str(abs)
             if len(keywords) > 0: title_keywords[id] = keywords
 
