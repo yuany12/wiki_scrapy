@@ -1,6 +1,7 @@
 import extractor
 import logging
 import cPickle
+import MySQLdb as mdb
 
 def get_db(database):
     password = open('password.txt').readline().strip()
