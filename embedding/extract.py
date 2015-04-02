@@ -15,7 +15,7 @@ def extract_all():
     ext = extractor.extractor(get_db('wikipedia'))
 
     cur = get_db('arnet_db')
-    cur.execute("select id, title from publication limit 1000")
+    cur.execute("select id, title from publication")
     cnt, tot = 0, cur.rowcount
     for id, title in cur.fetchall():
         if cnt % 100 == 0:
