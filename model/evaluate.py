@@ -63,7 +63,7 @@ def test():
         logging.info('predicting %s' % jconf)
 
         p_data = network.predict(test_data, score = True)
-        fout = open('ntn_predict_' + jconf + '.out')
+        fout = open('ntn_predict_' + jconf + '.out', 'w')
         for i in range(len(test_label)):
             author = idx2keyword[test_data[i][0]]
             word = idx2keyword[test_data[i][1]]
