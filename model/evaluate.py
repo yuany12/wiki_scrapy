@@ -70,6 +70,35 @@ def test():
             fout.write(",".join([author, word, str(test_label[i]), str(p_data[i])]) + '\n')
         fout.close()
 
+def measure(py, y):
+    tp, fn, fp = 0, 0, 0
+    for i in range(len(py)):
+        if py[i] == 1 and y[i] == 1: tp += 1
+        elif py[i] == 1: fp += 1
+        elif y[i] == 1: fn += 1
+    prec = float(tp) / (tp + fp) if tp + fp > 0 else 0.0
+    recall = float(tp) / (tp + fn) if tp + fn > 0 else 0.0
+    f1 = 2 * prec * recall / (prec + recall) if prec + recall > 0 else 0.0
+    logging.info('precision = %.8f' % prec)
+    logging.info('recall = %.8f' % recall)
+    logging.info('f1 = %.8f' % f1)
+
+def calc_score():
+    for jconf in ['KDD', 'ICML']:
+        py, y = [], []
+        for line in open('ntn_predict_' + jconf + '.out'):
+            inputs = line.strip().split(',')
+            py.append(float(inputs[-1]))
+            y.append(int(inputs[-2]))
+        py = sorted([(py[i], i) for i in range(len(py))], key = lambda x: x[0], reverse = True)
+        pos_cnt = sum(y)
+        ry = [0 for _ in range(len(y))]
+        for i in range(pos_cnt):
+            ry[py[i][1]] = 1
+        measure(ry, y)
+
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
-    test()
+    # test()
+    calc_score()
+    
