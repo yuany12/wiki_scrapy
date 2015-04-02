@@ -36,3 +36,6 @@ def extract_all():
     logging.info('dumping abs_keywords')
     cPickle.dump(abs_keywords, open('abs_keywords.dump', 'wb'))
 
+if __name__ == '__main__':
+    extract_all()
+
