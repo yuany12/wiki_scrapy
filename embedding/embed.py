@@ -1,5 +1,5 @@
 import MySQLdb as mdb
-import extractor
+# import extractor
 import collections
 import gensim
 import cPickle
