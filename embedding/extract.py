@@ -26,10 +26,12 @@ def extract_all():
         if len(keywords) > 0: title_keywords[id] = keywords
 
         cur.execute("select abstract from publication_ext where id = %s", id)
-        abs = cur.fetchone()[0]
+        abs = cur.fetchone()
         if abs is not None:
-            keywords = ext.extract_str(abs)
-            if len(keywords) > 0: title_keywords[id] = keywords
+            abs = abs[0]
+            if abs is not None:
+                keywords = ext.extract_str(abs)
+                if len(keywords) > 0: title_keywords[id] = keywords
 
     logging.info('dumping title_keywords')
     cPickle.dump(title_keywords, open('title_keywords.dump', 'wb'))
