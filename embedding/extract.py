@@ -14,6 +14,7 @@ def extract_all():
     abs_keywords = {}
     ext = extractor.extractor(get_db('wikipedia'))
 
+    cur = get_db('arnet_db')
     cur.execute("select id, title from publication limit 1000")
     cnt, tot = 0, cur.rowcount
     for id, title in cur.fetchall():
