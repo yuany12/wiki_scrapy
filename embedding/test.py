@@ -8,9 +8,7 @@ def arnet_conn():
 def test():
     model = gensim.models.Word2Vec.load('author_word.model')
     cur = arnet_conn().cursor()
-    for word in ['machine_learning', 'data_mining', 'deep_learning', 'social_network', 'support_vector_machine', \
-     'neural_network', 'vector_space', 'euclidean_space', 'word_embedding', 'natural_language_processing', 'A_1458619', \
-      'A_745329', 'A_123223', 'A_386117']:
+    for word in ['A_1458619', 'A_745329', 'A_123223', 'A_386117']:
         name = word
         if name.startswith('A_'):
             cur.execute("select names from na_person where id = %s", name[2:])
