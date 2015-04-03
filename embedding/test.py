@@ -16,7 +16,9 @@ def test():
         for e in model.most_similar(positive = [word], negative = [], topn = 15):
             if e[0].startswith('A_'):
                 cur.execute("select names from na_person where id = %s", e[0][2:])
-                e = (cur.fetchone()[0], e[1])
+                row = cur.fetchone()[0]
+                if row is not None and row[0] is not None:
+                    e = (row[0], e[1])
             print name, e
 
 if __name__ == '__main__':
