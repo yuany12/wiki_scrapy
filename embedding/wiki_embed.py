@@ -10,7 +10,7 @@ MIN_COUNT = 10
 SAMPLE = 1e-4
 
 TH_DB_CNT = 10
-TH_HIT_CNT = 3
+TH_HIT_CNT = 4
 
 class wiki_embedding:
     
@@ -22,12 +22,15 @@ class wiki_embedding:
         for k, v in title_keywords.iteritems():
             for keyword in v:
                 self.keywords[keyword] += 1
+        for k, v in abs_keywords.iteritems():
+            for keyword in v:
+                self.keywords[keyword] += 1
 
     def generator(self):
         cnt = 0
         for line in open('../../wiki/wiki.text'):
-            if cnt % 10000 == 0:
-                logging.info('processing line %d' % cnt)
+            if cnt % 100 == 0:
+                logging.info('processing line %d/7980452' % cnt)
             cnt += 1
             inputs = line.strip().split():
             i, hit_cnt = 0, 0
