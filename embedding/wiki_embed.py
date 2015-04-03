@@ -3,6 +3,7 @@ import cPickle
 from collections import defaultdict as dd
 import gensim
 import logging
+import multiprocessing
 
 SIZE = 200
 WINDOW = 10
@@ -15,14 +16,28 @@ TH_HIT_CNT = 4
 class wiki_embedding:
     
     def load_vocab(self):
+        logging.info('loading title_keywords')
         title_keywords = cPickle.load(open('title_keywords.dump', 'rb'))
+
+        logging.info('loading abs_keywords')
         abs_keywords = cPickle.load(open('abs_keywords.dump', 'rb'))
 
         self.keywords = dd(int)
+        cnt, tot = 0, len(title_keywords)
         for k, v in title_keywords.iteritems():
+            if cnt % 10000 == 0:
+                logging.info('iterating title_keywords %d/%d' % (cnt, tot))
+            cnt += 1
+
             for keyword in v:
                 self.keywords[keyword] += 1
+
+        cnt, tot = 0, len(abs_keywords)
         for k, v in abs_keywords.iteritems():
+            if cnt % 10000 == 0:
+                logging.info('iterating abs_keywords %d/%d' % (cnt, tot))
+            cnt += 1
+            
             for keyword in v:
                 self.keywords[keyword] += 1
 
