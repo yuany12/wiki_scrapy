@@ -43,9 +43,15 @@ class wiki_embedding:
 
     def generator(self):
         cnt = 0
+        cache = []
         for line in open('../../wiki/wiki.text'):
             if cnt % 100 == 0:
                 logging.info('writing line %d/7980452' % cnt)
+                fout = open('wiki_corpus.txt', 'a+')
+                for cacheline in cache:
+                    fout.write(cacheline + '\n')
+                fout.close()
+                cache = []
             cnt += 1
             inputs = line.strip().split()
             i, hit_cnt = 0, 0
@@ -67,19 +73,24 @@ class wiki_embedding:
                 ret.append(inputs[i])
                 i += 1
             if hit_cnt < TH_HIT_CNT: continue
+            cache.append(" ".join(ret))
             yield ret
+
+    def loader(self):
+        for line in open('wiki_corpus.txt'):
+            yield line.strip().split()
 
     def train_model(self):
         model = gensim.models.Word2Vec(None, size = SIZE, window = WINDOW, min_count = MIN_COUNT, \
              workers = multiprocessing.cpu_count(), sample = SAMPLE)
         model.build_vocab(self.generator())
         model.save('keyword.model')
-        model.train(self.generator())
+        model.train(self.loader())
         model.save('keyword.model')
 
     def resume_training(self):
         model = gensim.models.Word2Vec.load('keyword.model')
-        model.train(self.generator())
+        model.train(self.loader())
         model.save('keyword.model')
 
 if __name__ == '__main__':
