@@ -1,7 +1,7 @@
 
 import cPickle
 from collections import defaultdict as dd
-from gensim import LineSentence
+import gensim
 import logging
 
 SIZE = 200
