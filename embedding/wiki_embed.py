@@ -32,7 +32,7 @@ class wiki_embedding:
             if cnt % 100 == 0:
                 logging.info('processing line %d/7980452' % cnt)
             cnt += 1
-            inputs = line.strip().split():
+            inputs = line.strip().split()
             i, hit_cnt = 0, 0
             ret = []
             while i + 2 <= len(inputs):
