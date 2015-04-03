@@ -8,7 +8,7 @@ def arnet_conn():
 def test():
     model = gensim.models.Word2Vec.load('author_word.model')
     cur = arnet_conn().cursor()
-    for word in ['A_1458619', 'A_745329', 'A_123223', 'A_386117', 'A_1464342', 'A_826096', 'A_191749']:
+    for word in ['A_1458619', 'A_745329', 'A_123223', 'A_386117', 'A_1464342', 'A_826096', 'A_191749', 'A_221919', 'A_161041']:
         name = word
         if name.startswith('A_'):
             cur.execute("select names from na_person where id = %s", name[2:])
