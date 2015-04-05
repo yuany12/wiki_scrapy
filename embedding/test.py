@@ -140,7 +140,7 @@ def test_ranking_4():
         ret2 = sorted([(k, wordcnt[k]) for k, v in word2dist.iteritems()], key = lambda x: x[1], reverse = True)
         ranking = dd(int)
         for i, ele in enumerate(ret):
-            ranking[ele[1]] += i
+            ranking[ele[0]] += i
         res = sorted([(k, v) for k, v in ranking.iteritems()], key = lambda x: x[1])
         fout.write(names + '\n')
         for r in res:
