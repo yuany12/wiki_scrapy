@@ -67,7 +67,7 @@ def sample_vectors():
 def test_ranking():
     cur = arnet_conn().cursor()
     author2wordvec = cPickle.load(open('vector_case_study.dump', 'rb'))
-    fout = open('vector_case_study.out', 'w')
+    fout = open('ranking-1.out', 'w')
     for author, words in author2wordvec.iteritems():
         cur.execute("select names from na_person where id = %s", author)
         names = cur.fetchone()[0]
@@ -85,8 +85,31 @@ def test_ranking():
         fout.write('=' * 20 + '\n')
     fout.close()
 
+def test_ranking_2():
+    cur = arnet_conn().cursor()
+    author2wordvec = cPickle.load(open('vector_case_study.dump', 'rb'))
+    fout = open('ranking-2.out', 'w')
+    for author, words in author2wordvec.iteritems():
+        cur.execute("select names from na_person where id = %s", author)
+        names = cur.fetchone()[0]
+        word2dist, wordcnt = {}, dd(int)
+        for word, vec in words:
+            min_dist = None
+            for word2, vec2 in words:
+                if word2 != word:
+                    cur_dist = np.linalg.norm(vec - vec2)
+                    if min_dist is None or cur_dist < min_dist:
+                        min_dist = cur_dist
+            word2dist[word] = dist
+        ret = sorted([(k, v) for k, v in word2dist.iteritems()], key = lambda x: x[1])
+        fout.write(names + '\n')
+        for r in ret:
+            fout.write(r[0] + '\t' + str(r[1]) + '\n')
+        fout.write('=' * 20 + '\n')
+    fout.close() 
+
 
 if __name__ == '__main__':
     # test()
     # sample_vectors()
-    test_ranking()
+    test_ranking_2()
