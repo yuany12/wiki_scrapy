@@ -51,6 +51,7 @@ def test():
 def sample_vectors():
     model = gensim.models.Word2Vec.load('keyword.model')
     title_keywords = cPickle.load(open('title_keywords.dump', 'rb'))
+    abs_keywords = cPickle.load(open('abs_keywords.dump', 'rb'))
 
     cur = arnet_conn().cursor()
     author2wordvec = dd(list)
@@ -59,16 +60,22 @@ def sample_vectors():
     1464342, 221919, 161041, 265966, 560995, 750943, 14169490]:
         cur.execute("select pid from na_author2pub where aid = %s", aid)
         for row in cur.fetchall():
-            if row is not None and row[0] is not None and row[0] in title_keywords:
-                for keyword in title_keywords[row[0]]:
-                    if keyword not in model: continue
-                    author2wordvec[aid].append((keyword, model[keyword]))
-    cPickle.dump(author2wordvec, open('vector_case_study.dump', 'wb'))
+            if row is not None and row[0] is not None:
+                if row[0] in title_keywords:
+                    for keyword in title_keywords[row[0]]:
+                        if keyword not in model: continue
+                        author2wordvec[aid].append((keyword, model[keyword]))
+                if row[0] in abs_keywords:
+                    for keyword in abs_keywords[row[0]]:
+                        if keyword not in model: continue
+                        author2wordvec[aid].append((keyword, model[keyword]))
+
+    cPickle.dump(author2wordvec, open('vector_all.dump', 'wb'))
 
 def test_ranking():
     cur = arnet_conn().cursor()
-    author2wordvec = cPickle.load(open('vector_case_study.dump', 'rb'))
-    fout = open('ranking-1.out', 'w')
+    author2wordvec = cPickle.load(open('vector_all.dump', 'rb'))
+    fout = open('ranking-all-1.out', 'w')
     for author, words in author2wordvec.iteritems():
         cur.execute("select names from na_person where id = %s", author)
         names = cur.fetchone()[0]
@@ -88,8 +95,8 @@ def test_ranking():
 
 def test_ranking_2():
     cur = arnet_conn().cursor()
-    author2wordvec = cPickle.load(open('vector_case_study.dump', 'rb'))
-    fout = open('ranking-2.out', 'w')
+    author2wordvec = cPickle.load(open('vector_all.dump', 'rb'))
+    fout = open('ranking-all-2.out', 'w')
     for author, words in author2wordvec.iteritems():
         cur.execute("select names from na_person where id = %s", author)
         names = cur.fetchone()[0]
@@ -105,8 +112,8 @@ def test_ranking_2():
 
 def test_ranking_3():
     cur = arnet_conn().cursor()
-    author2wordvec = cPickle.load(open('vector_case_study.dump', 'rb'))
-    fout = open('ranking-3.out', 'w')
+    author2wordvec = cPickle.load(open('vector_all.dump', 'rb'))
+    fout = open('ranking-all-3.out', 'w')
     for author, words in author2wordvec.iteritems():
         cur.execute("select names from na_person where id = %s", author)
         names = cur.fetchone()[0]
@@ -125,8 +132,8 @@ def test_ranking_3():
 
 def test_ranking_4():
     cur = arnet_conn().cursor()
-    author2wordvec = cPickle.load(open('vector_case_study.dump', 'rb'))
-    fout = open('ranking-4.out', 'w')
+    author2wordvec = cPickle.load(open('vector_all.dump', 'rb'))
+    fout = open('ranking-all-4.out', 'w')
     for author, words in author2wordvec.iteritems():
         cur.execute("select names from na_person where id = %s", author)
         names = cur.fetchone()[0]
