@@ -129,8 +129,9 @@ def test_ranking_4():
     for author, words in author2wordvec.iteritems():
         cur.execute("select names from na_person where id = %s", author)
         names = cur.fetchone()[0]
-        word2dist= {}
+        word2dist, wordcnt = {}, dd(int)
         for word, vec in words:
+            wordcnt[word] += 1
             dist = 0.0
             for _, vec2 in words:
                 dist += np.linalg.norm(vec - vec2)
