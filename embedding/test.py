@@ -57,11 +57,11 @@ def sample_vectors():
 
     for aid in [1458619, 826096, 935753, 123223, 745329, 687715, 191749, 1152750]:
         cur.execute("select pid from na_author2pub where aid = %s", aid)
-        row = cur.fetchone()
-        if row is not None and row[0] is not None and row[0] in title_keywords:
-            for keyword in title_keywords[row[0]]:
-                if keyword not in model: continue
-                author2wordvec[aid].append((keyword, model[keyword]))
+        for row in cur.fetchall():
+            if row is not None and row[0] is not None and row[0] in title_keywords:
+                for keyword in title_keywords[row[0]]:
+                    if keyword not in model: continue
+                    author2wordvec[aid].append((keyword, model[keyword]))
     cPickle.dump(author2wordvec, open('vector_case_study.dump', 'wb'))
 
 def test_ranking():
@@ -84,5 +84,5 @@ def test_ranking():
 
 if __name__ == '__main__':
     # test()
-    # sample_vectors()
-    test_ranking()
+    sample_vectors()
+    # test_ranking()
