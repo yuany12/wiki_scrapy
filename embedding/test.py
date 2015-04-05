@@ -64,7 +64,25 @@ def sample_vectors():
                 author2wordvec[aid].append((keyword, model[keyword]))
     cPickle.dump(author2wordvec, open('vector_case_study.dump', 'wb'))
 
+def test_ranking():
+    author2wordvec = cPickle.load(open('vector_case_study.dump', 'rb'))
+    fout = open('vector_case_study.out', 'w')
+    for author, words in author2wordvec.iteritems():
+        ret = []
+        for word, vec in words:
+            dist = 0.0
+            for _, vec2 in words:
+                dist += np.linalg.norm(vec - vec2)
+            ret.append((word, dist))
+        ret.sort(key = lambda x: x[1])
+        fout.write(author + '\n')
+        for r in ret:
+            fout.write(r[0] + '\t' + str(r[1]) + '\n')
+        fout.write('=' * 20 + '\n')
+    fout.close()
+
 
 if __name__ == '__main__':
     # test()
-    sample_vectors()
+    # sample_vectors()
+    test_ranking()
