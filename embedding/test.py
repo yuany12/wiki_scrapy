@@ -55,7 +55,8 @@ def sample_vectors():
     cur = arnet_conn().cursor()
     author2wordvec = dd(list)
 
-    for aid in [1458619, 826096, 935753, 123223, 745329, 687715, 191749, 1152750]:
+    for aid in [1458619, 826096, 935753, 123223, 745329, 687715, 191749, 1152750, 534472, 549002, 534472, 1622, 386117, \
+    1464342, 221919, 161041, 265966, 560995, 750943, 14169490]:
         cur.execute("select pid from na_author2pub where aid = %s", aid)
         for row in cur.fetchall():
             if row is not None and row[0] is not None and row[0] in title_keywords:
@@ -105,7 +106,7 @@ def test_ranking_2():
 def test_ranking_3():
     cur = arnet_conn().cursor()
     author2wordvec = cPickle.load(open('vector_case_study.dump', 'rb'))
-    fout = open('ranking-1.out', 'w')
+    fout = open('ranking-3.out', 'w')
     for author, words in author2wordvec.iteritems():
         cur.execute("select names from na_person where id = %s", author)
         names = cur.fetchone()[0]
@@ -153,5 +154,7 @@ def test_ranking_4():
 
 if __name__ == '__main__':
     # test()
-    # sample_vectors()
+    sample_vectors()
+    test_ranking_2()
+    test_ranking_3()
     test_ranking_4()
