@@ -84,5 +84,5 @@ def test_ranking():
 
 if __name__ == '__main__':
     # test()
-    sample_vectors()
-    # test_ranking()
+    # sample_vectors()
+    test_ranking()
