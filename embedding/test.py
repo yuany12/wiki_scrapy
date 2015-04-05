@@ -122,8 +122,33 @@ def test_ranking_3():
         fout.write('=' * 20 + '\n')
     fout.close()
 
+def test_ranking_4():
+    cur = arnet_conn().cursor()
+    author2wordvec = cPickle.load(open('vector_case_study.dump', 'rb'))
+    fout = open('ranking-4.out', 'w')
+    for author, words in author2wordvec.iteritems():
+        cur.execute("select names from na_person where id = %s", author)
+        names = cur.fetchone()[0]
+        word2dist= {}
+        for word, vec in words:
+            dist = 0.0
+            for _, vec2 in words:
+                dist += np.linalg.norm(vec - vec2)
+            word2dist[word] = dist
+        ret = sorted([(k, v) for k, v in word2dist.iteritems()], key = lambda x: x[1])
+        ret2 = sorted([(k, wordcnt[k]) for k, v in word2dist.iteritems()], key = lambda x: x[1], reverse = True)
+        ranking = dd(int)
+        for i, ele in enumerate(ret):
+            ranking[ele[1]] += i
+        res = sorted([(k, v) for k, v in ranking.iteritems()], key = lambda x: x[1])
+        fout.write(names + '\n')
+        for r in ret:
+            fout.write(r[0] + '\t' + str(r[1]) + '\n')
+        fout.write('=' * 20 + '\n')
+    fout.close()
+
 
 if __name__ == '__main__':
     # test()
     # sample_vectors()
-    test_ranking_3()
+    test_ranking_4()
