@@ -5,6 +5,8 @@ from matplotlib import pyplot as plt
 import numpy as np
 import random
 import string
+import cPickle
+from collections import defaultdict as dd
 
 def arnet_conn():
     password = open('password.txt').readline().strip()
@@ -46,6 +48,23 @@ def test():
 
     plt.savefig('test.embedding.png', bbox_inches = 'tight')
 
+def sample_vectors():
+    model = gensim.models.Word2Vec.load('keyword.model')
+    title_keywords = cPickle.load(open('title_keywords.dump', 'rb'))
+
+    cur = arnet_conn().cursor()
+    author2wordvec = dd(list)
+
+    for aid in [1458619, 826096, 935753, 123223, 745329, 687715, 191749, 1152750]:
+        cur.execute("select pid from na_author2pub where aid = %s", aid)
+        row = cur.fetchone()
+        if row is not None and row[0] is not None:
+            for keyword in title_keywords[row[0]]:
+                if keyword not in model: continue
+                author2wordvec[aid].append((keyword, model[keyword]))
+    cPickle.save(author2wordvec, open('vector_case_study.dump', 'wb'))
+
 
 if __name__ == '__main__':
-    test()
+    # test()
+    sample_vectors()
