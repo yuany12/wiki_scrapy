@@ -62,7 +62,7 @@ def sample_vectors():
             for keyword in title_keywords[row[0]]:
                 if keyword not in model: continue
                 author2wordvec[aid].append((keyword, model[keyword]))
-    cPickle.save(author2wordvec, open('vector_case_study.dump', 'wb'))
+    cPickle.dump(author2wordvec, open('vector_case_study.dump', 'wb'))
 
 
 if __name__ == '__main__':
