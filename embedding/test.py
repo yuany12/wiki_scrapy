@@ -75,7 +75,7 @@ def test_ranking():
                 dist += np.linalg.norm(vec - vec2)
             ret.append((word, dist))
         ret.sort(key = lambda x: x[1])
-        fout.write(author + '\n')
+        fout.write(str(author) + '\n')
         for r in ret:
             fout.write(r[0] + '\t' + str(r[1]) + '\n')
         fout.write('=' * 20 + '\n')
