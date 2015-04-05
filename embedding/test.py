@@ -141,6 +141,8 @@ def test_ranking_4():
         ranking = dd(int)
         for i, ele in enumerate(ret):
             ranking[ele[0]] += i
+        for i, ele in enumerate(ret2):
+            ranking[ele[0]] += i
         res = sorted([(k, v) for k, v in ranking.iteritems()], key = lambda x: x[1])
         fout.write(names + '\n')
         for r in res:
