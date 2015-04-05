@@ -143,7 +143,7 @@ def test_ranking_4():
             ranking[ele[1]] += i
         res = sorted([(k, v) for k, v in ranking.iteritems()], key = lambda x: x[1])
         fout.write(names + '\n')
-        for r in ret:
+        for r in res:
             fout.write(r[0] + '\t' + str(r[1]) + '\n')
         fout.write('=' * 20 + '\n')
     fout.close()
