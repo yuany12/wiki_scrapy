@@ -100,7 +100,7 @@ def test_ranking_2():
                     cur_dist = np.linalg.norm(vec - vec2)
                     if min_dist is None or cur_dist < min_dist:
                         min_dist = cur_dist
-            word2dist[word] = dist
+            word2dist[word] = min_dist
         ret = sorted([(k, v) for k, v in word2dist.iteritems()], key = lambda x: x[1])
         fout.write(names + '\n')
         for r in ret:
