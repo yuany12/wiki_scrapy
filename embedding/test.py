@@ -71,13 +71,14 @@ def test_ranking():
     for author, words in author2wordvec.iteritems():
         cur.execute("select names from na_person where id = %s", author)
         names = cur.fetchone()[0]
-        ret = []
+        word2dist, wordcnt = {}, dd(int)
         for word, vec in words:
+            wordcnt[word] += 1
             dist = 0.0
             for _, vec2 in words:
                 dist += np.linalg.norm(vec - vec2)
-            ret.append((word, dist))
-        ret.sort(key = lambda x: x[1])
+            word2dist[word] = dist
+        ret = sorted([(k, v / wordcnt[k]) for k, v in word2dist.iteritems()], key = lambda x: x[1])
         fout.write(names + '\n')
         for r in ret:
             fout.write(r[0] + '\t' + str(r[1]) + '\n')
