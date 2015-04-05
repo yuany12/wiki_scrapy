@@ -94,15 +94,8 @@ def test_ranking_2():
         names = cur.fetchone()[0]
         word2dist, wordcnt = {}, dd(int)
         for word, vec in words:
-            min_dist = None
-            for word2, vec2 in words:
-                if word2 != word:
-                    cur_dist = np.linalg.norm(vec - vec2)
-                    if min_dist is None or cur_dist < min_dist:
-                        min_dist = cur_dist
-            word2dist[word] = min_dist
             wordcnt[word] += 1
-        ret = sorted([(k, wordcnt[k]) for k, v in word2dist.iteritems()], key = lambda x: x[1])
+        ret = sorted([(k, wordcnt[k]) for k, v in wordcnt.iteritems()], key = lambda x: x[1], reverse = True)
         fout.write(names + '\n')
         for r in ret:
             fout.write(r[0] + '\t' + str(r[1]) + '\n')
