@@ -1,7 +1,7 @@
 import gensim
 import MySQLdb as mdb
-from tsne import bh_sne
-from matplotlib import pyplot as plt
+# from tsne import bh_sne
+# from matplotlib import pyplot as plt
 import numpy as np
 import random
 import string
@@ -10,7 +10,7 @@ from collections import defaultdict as dd
 
 def arnet_conn():
     password = open('password.txt').readline().strip()
-    return mdb.connect('166.111.7.105', 'root', password, 'arnet_db')
+    return mdb.connect('127.0.0.1', 'root', password, 'arnet_db')
 
 def test():
     model = gensim.models.Word2Vec.load('author_word.model')
@@ -58,7 +58,7 @@ def sample_vectors():
     for aid in [1458619, 826096, 935753, 123223, 745329, 687715, 191749, 1152750]:
         cur.execute("select pid from na_author2pub where aid = %s", aid)
         row = cur.fetchone()
-        if row is not None and row[0] is not None:
+        if row is not None and row[0] is not None and row[0] in title_keywords:
             for keyword in title_keywords[row[0]]:
                 if keyword not in model: continue
                 author2wordvec[aid].append((keyword, model[keyword]))
