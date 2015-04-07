@@ -1,4 +1,5 @@
 
+import MySQLdb as mdb
 import gensim
 import cPickle
 from collections import defaultdict as dd
