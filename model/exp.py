@@ -7,7 +7,7 @@ import numpy as np
 import logging
 import random
 
-SAMPLE_RATE = 0.2
+SAMPLE_RATE = 0.3
 NEG_POS_RATIO = 10
 
 def load_author_model():
@@ -57,7 +57,8 @@ def gen_dataset(title_keywords, abs_keywords, author_model, keyword_model):
                 for k2 in keyword_cnt.keys():
                     if k1 == k2: continue
                     if k2 not in keyword_model: continue
-                    cur_dist += np.linalg.norm(keyword_model[k1] - keyword_model[k2]) * keyword_cnt[k2]
+                    # cur_dist += np.linalg.norm(keyword_model[k1] - keyword_model[k2]) * keyword_cnt[k2]
+                    cur_dist += keyword_model.similarity(k1, k2) * keyword_cnt[k2]
                 keyword_dist.append((k1, cur_dist))
             keyword_dist.sort(key = lambda x: x[1])
             for keyword, _ in keyword_dist[:int(len(keyword_dist) * SAMPLE_RATE)]:
@@ -88,9 +89,9 @@ def create_npy(author_model, keyword_model):
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
-    # title_keywords, abs_keywords = load_keyword_dict()
+    title_keywords, abs_keywords = load_keyword_dict()
     author_model = load_author_model()
     keyword_model = load_keyword_model()
-    # gen_dataset(title_keywords, abs_keywords, author_model, keyword_model)
-    create_npy(author_model, keyword_model)
+    gen_dataset(title_keywords, abs_keywords, author_model, keyword_model)
+    # create_npy(author_model, keyword_model)
 
