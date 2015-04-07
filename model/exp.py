@@ -17,10 +17,10 @@ def load_keyword_model():
 
 def load_keyword_dict():
     logging.info('loading title keywords')
-    title_keywords = cPickle.load('../embedding/title_keywords.dump')
+    title_keywords = cPickle.load(open('../embedding/title_keywords.dump', 'rb'))
 
     logging.info('loading abstract keywords')
-    abs_keywords = cPickle.load('../embedding/abs_keywords.dump')
+    abs_keywords = cPickle.load(open('../embedding/abs_keywords.dump', 'rb'))
 
     return title_keywords, abs_keywords
 
