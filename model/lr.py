@@ -1,6 +1,7 @@
 
 from sklearn import linear_model
 import cPickle
+import numpy as np
 
 def train_lr():
     clf = linear_model.LogisticRegression(C = 1.0, tol = 1e-6)
