@@ -5,8 +5,10 @@ import cPickle
 from collections import defaultdict as dd
 import numpy as np
 import logging
+import random
 
 SAMPLE_RATE = 0.2
+NEG_POS_RATIO = 10
 
 def load_author_model():
     logging.info('loading author model')
@@ -62,11 +64,33 @@ def gen_dataset(title_keywords, abs_keywords, author_model, keyword_model):
                 fout.write(author_str + ',' + keyword + '\n')
     fout.close()
 
+def create_npy(author_model, keyword_model):
+    pos_pairs, neg_pairs = [], []
+    authors, keywords = [], []
+    for line in open('gold_data.txt'):
+        inputs = line.strip().split(',')
+        pos_pairs.append((inputs[0], inputs[1]))
+        authors.append(inputs[0])
+        keywords.append(inputs[1])
+    for _ in range(len(pos_pairs) * NEG_POS_RATIO):
+        author = random.choice(authors)
+        keyword = random.choice(keywords)
+        neg_pairs.append((author, keyword))
+    features = np.zeros((len(pos_pairs) + len(neg_pairs), 128 + 200), dtype = np.float32)
+    labels = np.concatenate((np.ones(len(pos_pairs)), np.zeros(len(neg_pairs))))
+    for i, pair in enumerate(pos_pairs + neg_pairs):
+        features[i, :] = np.concatenate((author_model[pair[0]], keyword_model[pair[1]]))
+    index = np.random.permutation(np.arange(features.shape[0]))
+    features = features[index]
+    labels = labels[index]
+    np.save('features', features)
+    np.save('labels', labels)
+
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
-    title_keywords, abs_keywords = load_keyword_dict()
+    # title_keywords, abs_keywords = load_keyword_dict()
     author_model = load_author_model()
     keyword_model = load_keyword_model()
-    gen_dataset(title_keywords, abs_keywords, author_model, keyword_model)
-
+    # gen_dataset(title_keywords, abs_keywords, author_model, keyword_model)
+    create_npy(author_model, keyword_model)
 
