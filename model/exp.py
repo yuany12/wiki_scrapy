@@ -7,7 +7,7 @@ import numpy as np
 import logging
 import random
 
-SAMPLE_RATE = 0.3
+SAMPLE_RATE = 0.2
 NEG_POS_RATIO = 10
 
 def load_author_model():
@@ -60,7 +60,7 @@ def gen_dataset(title_keywords, abs_keywords, author_model, keyword_model):
                     # cur_dist += np.linalg.norm(keyword_model[k1] - keyword_model[k2]) * keyword_cnt[k2]
                     cur_dist += keyword_model.similarity(k1, k2) * keyword_cnt[k2]
                 keyword_dist.append((k1, cur_dist))
-            keyword_dist.sort(key = lambda x: x[1])
+            keyword_dist.sort(key = lambda x: x[1], reverse = True)
             for keyword, _ in keyword_dist[:int(len(keyword_dist) * SAMPLE_RATE)]:
                 fout.write(author_str + ',' + keyword + '\n')
     fout.close()
