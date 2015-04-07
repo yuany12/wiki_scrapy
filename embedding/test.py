@@ -172,7 +172,7 @@ def test_ranking_5():
             for word2, _ in words:
                 dist += model.similarity(word, word2)
             word2dist[word] = dist
-        ret = sorted([(k, v) for k, v in word2dist.iteritems()], key = lambda x: x[1])
+        ret = sorted([(k, v) for k, v in word2dist.iteritems()], key = lambda x: x[1], reverse = True)
         fout.write(names + '\n')
         for r in ret:
             fout.write(r[0] + '\t' + str(r[1]) + '\n')
