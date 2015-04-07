@@ -48,9 +48,6 @@ def gen_dataset(title_keywords, abs_keywords, author_model, keyword_model):
                     if subrow[0] in title_keywords:
                         for keyword in title_keywords[subrow[0]]:
                             keyword_cnt[keyword] += 1
-                    if subrow[0] in abs_keywords:
-                        for keyword in abs_keywords[subrow[0]]:
-                            keyword_cnt[keyword] += 1
             keyword_dist = []
             for k1 in keyword_cnt.keys():
                 cur_dist = 0.0
