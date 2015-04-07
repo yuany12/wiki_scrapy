@@ -70,12 +70,12 @@ def sample_vectors():
                         if keyword not in model: continue
                         author2wordvec[aid].append((keyword, model[keyword]))
 
-    cPickle.dump(author2wordvec, open('vector_all.dump', 'wb'))
+    cPickle.dump(author2wordvec, open('vector_case_study.dump', 'wb'))
 
 def test_ranking():
     cur = arnet_conn().cursor()
-    author2wordvec = cPickle.load(open('vector_all.dump', 'rb'))
-    fout = open('ranking-all-1.out', 'w')
+    author2wordvec = cPickle.load(open('vector_case_study.dump', 'rb'))
+    fout = open('ranking-1.out', 'w')
     for author, words in author2wordvec.iteritems():
         cur.execute("select names from na_person where id = %s", author)
         names = cur.fetchone()[0]
@@ -95,8 +95,8 @@ def test_ranking():
 
 def test_ranking_2():
     cur = arnet_conn().cursor()
-    author2wordvec = cPickle.load(open('vector_all.dump', 'rb'))
-    fout = open('ranking-all-2.out', 'w')
+    author2wordvec = cPickle.load(open('vector_case_study.dump', 'rb'))
+    fout = open('ranking-2.out', 'w')
     for author, words in author2wordvec.iteritems():
         cur.execute("select names from na_person where id = %s", author)
         names = cur.fetchone()[0]
@@ -112,8 +112,8 @@ def test_ranking_2():
 
 def test_ranking_3():
     cur = arnet_conn().cursor()
-    author2wordvec = cPickle.load(open('vector_all.dump', 'rb'))
-    fout = open('ranking-all-3.out', 'w')
+    author2wordvec = cPickle.load(open('vector_case_study.dump', 'rb'))
+    fout = open('ranking-3.out', 'w')
     for author, words in author2wordvec.iteritems():
         cur.execute("select names from na_person where id = %s", author)
         names = cur.fetchone()[0]
@@ -132,8 +132,8 @@ def test_ranking_3():
 
 def test_ranking_4():
     cur = arnet_conn().cursor()
-    author2wordvec = cPickle.load(open('vector_all.dump', 'rb'))
-    fout = open('ranking-all-4.out', 'w')
+    author2wordvec = cPickle.load(open('vector_case_study.dump', 'rb'))
+    fout = open('ranking-4.out', 'w')
     for author, words in author2wordvec.iteritems():
         cur.execute("select names from na_person where id = %s", author)
         names = cur.fetchone()[0]
@@ -158,10 +158,32 @@ def test_ranking_4():
         fout.write('=' * 20 + '\n')
     fout.close()
 
+def test_ranking_5():
+    model = gensim.models.Word2Vec.load('keyword.model')
+    cur = arnet_conn().cursor()
+    author2wordvec = cPickle.load(open('vector_case_study.dump', 'rb'))
+    fout = open('ranking-5.out', 'w')
+    for author, words in author2wordvec.iteritems():
+        cur.execute("select names from na_person where id = %s", author)
+        names = cur.fetchone()[0]
+        word2dist= {}
+        for word, _ in words:
+            dist = 0.0
+            for word2, _ in words:
+                dist += model.similarity(word, word2)
+            word2dist[word] = dist
+        ret = sorted([(k, v) for k, v in word2dist.iteritems()], key = lambda x: x[1])
+        fout.write(names + '\n')
+        for r in ret:
+            fout.write(r[0] + '\t' + str(r[1]) + '\n')
+        fout.write('=' * 20 + '\n')
+    fout.close()
+
 
 if __name__ == '__main__':
     # test()
-    sample_vectors()
-    test_ranking_2()
-    test_ranking_3()
-    test_ranking_4()
+    # sample_vectors()
+    # test_ranking_2()
+    # test_ranking_3()
+    # test_ranking_4()
+    test_ranking_5()
