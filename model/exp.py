@@ -55,7 +55,7 @@ def gen_dataset(title_keywords, abs_keywords, author_model, keyword_model):
                 cur_dist = 0.0
                 if k1 not in keyword_model: continue
                 for k2 in keyword_cnt.keys():
-                    if k1 == k2: continue
+                    # if k1 == k2: continue
                     if k2 not in keyword_model: continue
                     # cur_dist += np.linalg.norm(keyword_model[k1] - keyword_model[k2]) * keyword_cnt[k2]
                     cur_dist += keyword_model.similarity(k1, k2) * keyword_cnt[k2]
