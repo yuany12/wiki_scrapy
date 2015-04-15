@@ -70,7 +70,7 @@ def sample_vectors():
                 #         if keyword not in model: continue
                 #         author2wordvec[aid].append((keyword, model[keyword]))
 
-    cPickle.dump(author2wordvec, open('vector_title.dump', 'wb'))
+    cPickle.dump(author2wordvec, open('vector_case_study.dump', 'wb'))
 
 def test_ranking():
     cur = arnet_conn().cursor()
@@ -161,8 +161,8 @@ def test_ranking_4():
 def test_ranking_5():
     model = gensim.models.Word2Vec.load('keyword.model')
     cur = arnet_conn().cursor()
-    author2wordvec = cPickle.load(open('vector_title.dump', 'rb'))
-    fout = open('ranking-5_title.out', 'w')
+    author2wordvec = cPickle.load(open('vector_case_study.dump', 'rb'))
+    fout = open('ranking-5.out', 'w')
     for author, words in author2wordvec.iteritems():
         cur.execute("select names from na_person where id = %s", author)
         names = cur.fetchone()[0]
@@ -182,7 +182,7 @@ def test_ranking_5():
 
 if __name__ == '__main__':
     # test()
-    sample_vectors()
+    # sample_vectors()
     # test_ranking_2()
     # test_ranking_3()
     # test_ranking_4()
