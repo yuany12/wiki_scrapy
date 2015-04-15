@@ -71,22 +71,41 @@ def gen_dataset(title_keywords, abs_keywords, author_model, keyword_model):
 def create_npy(author_model, keyword_model):
     pos_pairs, neg_pairs = [], []
     authors, keywords = [], []
+    cnt, tot = 0, 250000
     for line in open('gold_data.txt'):
+        if cnt % 10000 == 0:
+            logging.info('loading gold data %d/%d' % (cnt, tot))
+        cnt += 1
+
         inputs = line.strip().split(',')
         pos_pairs.append((inputs[0], inputs[1]))
         authors.append(inputs[0])
         keywords.append(inputs[1])
-    for _ in range(len(pos_pairs) * NEG_POS_RATIO):
+
+    tot = len(pos_pairs) * NEG_POS_RATIO
+    for i in range(tot):
+        if i % 10000 == 0:
+            logging.info('sampling negative instances %d/%d' % (i, tot))
+
         author = random.choice(authors)
         keyword = random.choice(keywords)
         neg_pairs.append((author, keyword))
+
     features = np.zeros((len(pos_pairs) + len(neg_pairs), 128 + 200), dtype = np.float32)
-    labels = np.concatenate((np.ones(len(pos_pairs)), np.zeros(len(neg_pairs))))
+    labels = np.concatenate((np.ones(len(pos_pairs), dtype = np.int32), np.zeros(len(neg_pairs), dtype = np.int32)))
+    
+    tot = len(pos_pairs) + len(neg_pairs)
     for i, pair in enumerate(pos_pairs + neg_pairs):
+        if i % 10000 == 0:
+            logging.info('creating features %d/%d' % (i, tot))
+
         features[i, :] = np.concatenate((author_model[pair[0]], keyword_model[pair[1]]))
     index = np.random.permutation(np.arange(features.shape[0]))
     features = features[index]
     labels = labels[index]
+
+    logging.info('saving npy')
+
     np.save('features', features)
     np.save('labels', labels)
 
@@ -95,6 +114,6 @@ if __name__ == '__main__':
     title_keywords, abs_keywords = load_keyword_dict()
     author_model = load_author_model()
     keyword_model = load_keyword_model()
-    gen_dataset(title_keywords, abs_keywords, author_model, keyword_model)
-    # create_npy(author_model, keyword_model)
+    # gen_dataset(title_keywords, abs_keywords, author_model, keyword_model)
+    create_npy(author_model, keyword_model)
 
