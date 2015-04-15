@@ -3,6 +3,7 @@ import gensim
 import cPickle
 from collections import defaultdict as dd
 import MySQLdb as mdb
+import logging
 
 def sample_vectors():
     model = gensim.models.Word2Vec.load('../embedding/keyword.model')
@@ -52,4 +53,5 @@ def load_keyword_model():
     return gensim.models.Word2Vec.load('../embedding/keyword.model')
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     sample_vectors()
