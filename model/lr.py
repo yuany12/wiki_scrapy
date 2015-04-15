@@ -19,8 +19,9 @@ def train_tensor_lr():
     features = np.load('features.npy')
     labels = np.load('labels.npy')
     new_features = np.zeros((features.shape[0], 128 + 200 + 128 * 200))
-    logging.info('trainsforming')
     for i in range(features.shape[0]):
+        if i == 1000:
+            logging.info('trainsforming %d' % i)
         new_features[i, : 328] = features[i, :]
         new_features[i, 328 :] = np.outer(features[i, :128], features[i, 128:]).flatten()
 
