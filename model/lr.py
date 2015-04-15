@@ -22,6 +22,7 @@ def test_lr():
 
     for aid in [1458619, 826096, 935753, 123223, 745329, 687715, 191749, 1152750, 534472, 549002, 534472, 1622, 386117, \
     1464342, 221919, 161041, 265966, 560995, 750943, 14169490]:
+        if aid not in authorvec or aid not in author2wordvec: continue
         names, a_vec = authorvec[aid]
         ret = []
         for keyword, w_vec in author2wordvec[aid]:
