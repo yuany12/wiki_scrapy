@@ -25,7 +25,7 @@ def train_tensor_lr():
         new_features[i, : 328] = features[i, :]
         new_features[i, 328 :] = np.outer(features[i, :128], features[i, 128:]).flatten()
 
-    np.save(new_features, 'tensor_features.npy')
+    np.save('tensor_features.npy', new_features)
 
     logging.info('training tensor lr')
     clf.fit(new_features, labels)
