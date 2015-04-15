@@ -25,7 +25,10 @@ def test_lr():
         if aid not in authorvec or aid not in author2wordvec: continue
         names, a_vec = authorvec[aid]
         ret = []
+        word_set = set()
         for keyword, w_vec in author2wordvec[aid]:
+            if keyword in word_set: continue
+            word_set.add(keyword)
             feature = np.concatenate((a_vec, w_vec))
             feature.reshape((1, feature.shape[0]))
             p = clf.predict_proba(feature)[0, 1]
