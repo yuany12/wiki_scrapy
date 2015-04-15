@@ -22,7 +22,7 @@ def train_tensor_lr():
     logging.info('trainsforming')
     for i in range(features.shape[0]):
         new_features[i, : 328] = features[i, :]
-        new_features[i, 328 :] = np.outer(features[i, :128], features[i, 128:])
+        new_features[i, 328 :] = np.outer(features[i, :128], features[i, 128:]).flatten()
 
     logging.info('training tensor lr')
     clf.fit(new_features, labels)
