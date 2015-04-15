@@ -18,7 +18,7 @@ def train_tensor_lr():
     clf = linear_model.LogisticRegression(C = 1.0, tol = 1e-6)
     features = np.load('features.npy')
     labels = np.load('labels.npy')
-    new_features = np.zeros((features.shape[0], 128 + 200 + 128 * 200))
+    new_features = np.zeros((features.shape[0], 128 + 200 + 128 * 200), dtype = np.float32)
     for i in range(features.shape[0]):
         if i % 1000 == 0:
             logging.info('trainsforming %d' % i)
