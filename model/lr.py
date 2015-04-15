@@ -14,6 +14,22 @@ def train_lr():
     logging.info('dumping lr')
     cPickle.dump(clf, open('lr_model.dump', 'wb'), protocol = 2)
 
+def train_tensor_lr():
+    clf = linear_model.LogisticRegression(C = 1.0, tol = 1e-6)
+    features = np.load('features.npy')
+    labels = np.load('labels.npy')
+    new_features = np.zeros((features.shape[0], 128 + 200 + 128 * 200))
+    logging.info('trainsforming')
+    for i in range(features.shape[0]):
+        new_features[i, : 328] = features[i, :]
+        new_features[i, 328 :] = np.outer(features[i, :128], features[i, 128:])
+
+    logging.info('training tensor lr')
+    clf.fit(new_features, labels)
+
+    logging.info('dumping tensor lr')
+    cPickle.dump(clf, open('tensor_lr_model.dump', 'wb'), protocol = 2)
+
 def test_lr():
     clf = cPickle.load(open('lr_model.dump', 'rb'))
     author2wordvec, authorvec = data.load_vectors()
@@ -43,4 +59,5 @@ def test_lr():
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     # train_lr()
-    test_lr()
+    # test_lr()
+    train_tensor_lr()
