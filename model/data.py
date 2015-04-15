@@ -38,7 +38,12 @@ def sample_vectors():
         vec = author_model[a_str]
         authorvec[aid] = (names, vec)
 
-    cPickle.dump(authorvec, open('authorvec', 'wb'), protocol = 2) 
+    cPickle.dump(authorvec, open('authorvec.dump', 'wb'), protocol = 2)
+
+def load_vectors():
+    author2wordvec = cPickle.load(open('author2wordvec.dump', 'rb'))
+    authorvec = cPickle.load(open('authorvec.dump', 'rb'))
+    return author2wordvec, authorvec
 
 def arnet_conn():
     password = open('password.txt').readline().strip()
