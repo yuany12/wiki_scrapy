@@ -36,6 +36,7 @@ def test_lr():
         ret.sort(key = lambda x: x[1], reverse = True)
         for keyword, p in ret:
             fout.write("%s,%s,%f\n" % (names, keyword, p))
+        fout.write("=" * 20 + '\n')
 
     fout.close()
 
