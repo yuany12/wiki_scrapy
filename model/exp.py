@@ -8,6 +8,7 @@ import logging
 import random
 
 SAMPLE_RATE = 0.2
+WORD_CNT_TH = 20
 NEG_POS_RATIO = 10
 
 def load_author_model():
@@ -50,11 +51,13 @@ def gen_dataset(title_keywords, abs_keywords, author_model, keyword_model):
                     if subrow[0] in title_keywords:
                         for keyword in title_keywords[subrow[0]]:
                             keyword_cnt[keyword] += 1
+            keys = keyword_cnt.keys()
+            if len(keys) < WORD_CNT_TH: continue
             keyword_dist = []
-            for k1 in keyword_cnt.keys():
+            for k1 in keys:
                 cur_dist = 0.0
                 if k1 not in keyword_model: continue
-                for k2 in keyword_cnt.keys():
+                for k2 in keys:
                     # if k1 == k2: continue
                     if k2 not in keyword_model: continue
                     # cur_dist += np.linalg.norm(keyword_model[k1] - keyword_model[k2]) * keyword_cnt[k2]
