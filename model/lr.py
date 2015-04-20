@@ -17,7 +17,7 @@ def train_lr():
     cPickle.dump(clf, open('lr_model.dump', 'wb'), protocol = 2)
 
 def train_tensor_lr():
-    clf = linear_model.LogisticRegression(solver = 'liblinear', verbose = 1, tol = 1e1)
+    clf = linear_model.LogisticRegression(solver = 'lbfgs', verbose = 1, max_iter = 50)
     # features = np.load('features.npy')
     labels = np.load('labels.npy')
     # selector = np.load('tensor_selector.npy')
