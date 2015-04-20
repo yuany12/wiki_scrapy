@@ -18,12 +18,15 @@ def train_tensor_lr():
     clf = linear_model.LogisticRegression()
     features = np.load('features.npy')
     labels = np.load('labels.npy')
+    selector = np.load('tensor_selector.npy')
     new_features = np.zeros((features.shape[0], 128 + 200 + 128 * 200), dtype = np.float32)
     for i in range(features.shape[0]):
         if i % 1000 == 0:
             logging.info('trainsforming %d' % i)
         new_features[i, : 328] = features[i, :]
         new_features[i, 328 :] = np.outer(features[i, :128], features[i, 128:]).flatten()
+    logging.info('selecting')
+    new_features = new_features[:, selector]
 
     np.save('tensor_features.npy', new_features)
 
@@ -68,5 +71,5 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     # train_lr()
     # test_lr()
-    # train_tensor_lr()
-    gen_tensor_selector()
+    train_tensor_lr()
+    # gen_tensor_selector()
