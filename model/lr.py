@@ -16,7 +16,7 @@ def train_lr():
     cPickle.dump(clf, open('lr_model.dump', 'wb'), protocol = 2)
 
 def train_tensor_lr():
-    clf = linear_model.LogisticRegression(solver = 'lbfgs', verbose = 1)
+    clf = linear_model.LogisticRegression(solver = 'liblinear', verbose = 1, tol = 0.01)
     # features = np.load('features.npy')
     labels = np.load('labels.npy')
     # selector = np.load('tensor_selector.npy')
@@ -66,7 +66,7 @@ def test_lr():
 def lr_verbose_test():
     features = np.random.random((100, 10))
     labels = np.random.randint(2, size = 100)
-    clf = linear_model.LogisticRegression(solver = 'lbfgs', verbose = 1)
+    clf = linear_model.LogisticRegression(solver = 'liblinear', verbose = 1)
     clf.fit(features, labels)
 
 def gen_tensor_selector():
@@ -82,5 +82,5 @@ if __name__ == '__main__':
     # train_lr()
     # test_lr()
     # gen_tensor_selector()
-    # train_tensor_lr()
-    lr_verbose_test()
+    train_tensor_lr()
+    # lr_verbose_test()
