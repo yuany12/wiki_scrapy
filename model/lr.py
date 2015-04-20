@@ -17,18 +17,19 @@ def train_lr():
 
 def train_tensor_lr():
     clf = linear_model.LogisticRegression(solver = 'lbfgs', verbose = 1)
-    features = np.load('features.npy')
+    # features = np.load('features.npy')
     labels = np.load('labels.npy')
-    selector = np.load('tensor_selector.npy')
-    dim = np.sum(selector)
-    new_features = np.zeros((features.shape[0], 128 + 200 + dim), dtype = np.float32)
-    for i in range(features.shape[0]):
-        if i % 1000 == 0:
-            logging.info('trainsforming %d' % i)
-        new_features[i, : 328] = features[i, :]
-        new_features[i, 328 :] = np.outer(features[i, :128], features[i, 128:]).flatten()[selector]
+    # selector = np.load('tensor_selector.npy')
+    # dim = np.sum(selector)
+    # new_features = np.zeros((features.shape[0], 128 + 200 + dim), dtype = np.float32)
+    # for i in range(features.shape[0]):
+    #     if i % 1000 == 0:
+    #         logging.info('trainsforming %d' % i)
+    #     new_features[i, : 328] = features[i, :]
+    #     new_features[i, 328 :] = np.outer(features[i, :128], features[i, 128:]).flatten()[selector]
 
-    np.save('tensor_features.npy', new_features)
+    # np.save('tensor_features.npy', new_features)
+    new_features = np.load('tensor_features.npy')
 
     logging.info('training tensor lr')
     clf.fit(new_features, labels)
