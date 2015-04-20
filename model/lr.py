@@ -64,14 +64,15 @@ def test_lr():
 
 def gen_tensor_selector():
     s = np.concatenate((np.ones(128 + 200, dtype = np.int32), np.zeros(128 * 200, dtype = np.int32)))
+    s = np.zeros(128 * 200, dtype = np.int32)
     for i in range(128 * 200):
         if random.random() < 0.1:
-            s[128 + 200 + i] = 1
+            s[i] = 1
     np.save('tensor_selector.npy', s)
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     # train_lr()
     # test_lr()
-    # gen_tensor_selector()
+    gen_tensor_selector()
     train_tensor_lr()
