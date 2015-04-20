@@ -64,10 +64,10 @@ def test_lr():
 
 def gen_tensor_selector():
     s = np.concatenate((np.ones(128 + 200, dtype = np.int32), np.zeros(128 * 200, dtype = np.int32)))
-    s = np.zeros(128 * 200, dtype = np.int32)
+    s = np.zeros(128 * 200, dtype = np.bool)
     for i in range(128 * 200):
         if random.random() < 0.1:
-            s[i] = 1
+            s[i] = True
     np.save('tensor_selector.npy', s)
 
 if __name__ == '__main__':
