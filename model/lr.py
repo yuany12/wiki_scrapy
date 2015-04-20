@@ -1,5 +1,6 @@
 
 from sklearn import linear_model
+from sklearn import preprocessing as prep
 import cPickle
 import numpy as np
 import logging
@@ -16,7 +17,7 @@ def train_lr():
     cPickle.dump(clf, open('lr_model.dump', 'wb'), protocol = 2)
 
 def train_tensor_lr():
-    clf = linear_model.LogisticRegression(solver = 'liblinear', verbose = 1, tol = 0.01)
+    clf = linear_model.LogisticRegression(solver = 'liblinear', verbose = 1, tol = 1e1)
     # features = np.load('features.npy')
     labels = np.load('labels.npy')
     # selector = np.load('tensor_selector.npy')
@@ -30,6 +31,7 @@ def train_tensor_lr():
 
     # np.save('tensor_features.npy', new_features)
     new_features = np.load('tensor_features.npy')
+    prep.normalize(new_features, copy = False)
 
     logging.info('training tensor lr')
     clf.fit(new_features, labels)
@@ -64,9 +66,9 @@ def test_lr():
     fout.close()
 
 def lr_verbose_test():
-    features = np.random.random((100, 10))
-    labels = np.random.randint(2, size = 100)
-    clf = linear_model.LogisticRegression(solver = 'liblinear', verbose = 1)
+    features = np.random.random((100000, 1000))
+    labels = np.random.randint(2, size = 100000)
+    clf = linear_model.SGDClassifier(verbose = 10)
     clf.fit(features, labels)
 
 def gen_tensor_selector():
