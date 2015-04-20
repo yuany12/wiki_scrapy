@@ -25,8 +25,6 @@ def train_tensor_lr():
             logging.info('trainsforming %d' % i)
         new_features[i, : 328] = features[i, :]
         new_features[i, 328 :] = np.outer(features[i, :128], features[i, 128:]).flatten()
-    logging.info('selecting')
-    new_features = new_features[:, selector]
 
     np.save('tensor_features.npy', new_features)
 
@@ -63,13 +61,15 @@ def test_lr():
     fout.close()
 
 def gen_tensor_selector():
-    s = np.concatenate((np.ones(128 + 200), np.zeros(128 * 200)))
-    s[128 + 200:] = np.random.randint(2, size = 128 * 200)
+    s = np.concatenate((np.ones(128 + 200, dtype = np.int32), np.zeros(128 * 200, dtype = np.int32)))
+    for i in range(128 * 200):
+        if random.random() < 0.1:
+            s[128 + 200 + i] = 1
     np.save('tensor_selector.npy', s)
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     # train_lr()
     # test_lr()
-    train_tensor_lr()
-    # gen_tensor_selector()
+    gen_tensor_selector()
+    # train_tensor_lr()
