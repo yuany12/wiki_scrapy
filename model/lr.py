@@ -63,6 +63,12 @@ def test_lr():
 
     fout.close()
 
+def lr_verbose_test():
+    features = np.random.random((100, 10))
+    labels = np.random.randint(2, size = 100)
+    clf = linear_model.LogisticRegression(solver = 'lbfgs', verbose = 1)
+    clf.fit(features, labels)
+
 def gen_tensor_selector():
     s = np.concatenate((np.ones(128 + 200, dtype = np.int32), np.zeros(128 * 200, dtype = np.int32)))
     s = np.zeros(128 * 200, dtype = np.bool)
@@ -76,4 +82,5 @@ if __name__ == '__main__':
     # train_lr()
     # test_lr()
     # gen_tensor_selector()
-    train_tensor_lr()
+    # train_tensor_lr()
+    lr_verbose_test()
