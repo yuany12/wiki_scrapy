@@ -17,7 +17,7 @@ def train_lr():
     cPickle.dump(clf, open('lr_model.dump', 'wb'), protocol = 2)
 
 def train_tensor_lr():
-    clf = linear_model.LogisticRegression(solver = 'lbfgs', verbose = 1, max_iter = 50)
+    clf = linear_model.LogisticRegression(solver = 'liblinear', verbose = 1, max_iter = 50)
     # features = np.load('features.npy')
     labels = np.load('labels.npy')
     # selector = np.load('tensor_selector.npy')
@@ -40,10 +40,11 @@ def train_tensor_lr():
     cPickle.dump(clf, open('tensor_lr_model.dump', 'wb'), protocol = 2)
 
 def test_lr():
-    clf = cPickle.load(open('lr_model.dump', 'rb'))
+    clf = cPickle.load(open('tensor_lr_model.dump', 'rb'))
     author2wordvec, authorvec = data.load_vectors()
+    selector = np.load('tensor_selector.npy')
 
-    fout = open('test_lr.out', 'w')
+    fout = open('test_tensor_lr.out', 'w')
 
     for aid in [1458619, 826096, 935753, 123223, 745329, 687715, 191749, 1152750, 534472, 549002, 534472, 1622, 386117, \
     1464342, 221919, 161041, 265966, 560995, 750943, 14169490]:
@@ -56,6 +57,7 @@ def test_lr():
             word_set.add(keyword)
             feature = np.concatenate((a_vec, w_vec))
             feature.reshape((1, feature.shape[0]))
+            feature = np.concatenate((feature, np.outer(a_vec, w_vec).flatten()[selector]))
             p = clf.predict_proba(feature)[0, 1]
             ret.append((keyword, p))
         ret.sort(key = lambda x: x[1], reverse = True)
@@ -68,7 +70,7 @@ def test_lr():
 def lr_verbose_test():
     features = np.random.random((100000, 1000))
     labels = np.random.randint(2, size = 100000)
-    clf = linear_model.SGDClassifier(verbose = 10)
+    clf = linear_model.LogisticRegression(solver = 'liblinear', verbose = 10, tol = 1e-10, max_iter = 200)
     clf.fit(features, labels)
 
 def gen_tensor_selector():
@@ -82,7 +84,7 @@ def gen_tensor_selector():
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     # train_lr()
-    # test_lr()
+    test_lr()
     # gen_tensor_selector()
-    train_tensor_lr()
+    # train_tensor_lr()
     # lr_verbose_test()
