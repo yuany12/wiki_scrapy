@@ -7,14 +7,10 @@ import multiprocessing
 
 def get_mongodb():
     password = open('password_mongo.txt').readline().strip()
-    client = pymongo.MongoClient(host = 'localhost', port = 30017)
+    client = pymongo.MongoClient(host = 'localhost', port = 30019)
     db = client.bigsci
     db.authenticate('kegger_bigsci', password)
     return db
-
-def get_db(database):
-    password = open('password.txt').readline().strip()
-    return mdb.connect('localhost', 'root', password, database).cursor()
 
 def extract_all(bulk_info = (80000000, 0)):
     bulk_size, bulk_no = bulk_info
@@ -29,7 +25,8 @@ def extract_all(bulk_info = (80000000, 0)):
     cnt, tot = 0, pubs.count()
     for doc in pubs.find(skip = bulk_size * bulk_no, limit = bulk_size):
         if cnt % 100 == 0 and bulk_no == 0:
-            logging.info("loading abstract %d/%d" % (cnt, tot))
+            logging.info("loading title %d/%d" % (cnt, tot))
+            # logging.info("loading abstract %d/%d" % (cnt, tot))
         cnt += 1
 
         if 'lang' in doc and doc['lang'] == 'zh': continue
