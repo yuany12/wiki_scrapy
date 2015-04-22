@@ -4,7 +4,7 @@ import MySQLdb as mdb
 
 def dump_wiki():
     password = open('password.txt').readline().strip()
-    cur = mdb.connect('localhost', 'root', password, database).cursor()
+    cur = mdb.connect('localhost', 'root', password, 'arnet_db').cursor()
 
     cur.execute("select page_title from page")
     fout = open('wiki_dump.txt', 'w')
