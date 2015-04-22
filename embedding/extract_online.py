@@ -7,7 +7,7 @@ import multiprocessing
 
 def get_mongodb():
     password = open('password_mongo.txt').readline().strip()
-    client = pymongo.MongoClient(host = 'localhost', port = 30019)
+    client = pymongo.MongoClient(host = 'localhost', port = 30017)
     db = client.bigsci
     db.authenticate('kegger_bigsci', password)
     return db
@@ -39,7 +39,6 @@ def extract_all(bulk_info = (80000000, 0)):
 
         title_keywords = ext.extract_str(title)
         # abstract_keywords = ext.extract_str(abs)
-        if len(title_keywords) > 0: print 'yes'
 
         word_colls.update_one({'_id': doc['_id']}, {'$set': {'title_keywords': title_keywords}}, upsert = True)
         # pubs.update_one({'_id': doc['_id']}, {'$set': {'abstract_keywords': abstract_keywords}})

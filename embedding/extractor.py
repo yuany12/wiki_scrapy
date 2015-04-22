@@ -20,7 +20,7 @@ class extractor:
         else:
             self.entities = []
             for line in open(cur):
-                self.entities.append(line.strip())
+                self.entities.append(line.strip().lower())
             self.entities = set(self.entities)
 
     def pos_rule(self, tokens):
