@@ -14,6 +14,7 @@ WINDOW = 5
 # NEGATIVE = 10
 RAN_TIMES = 200
 LENGTH = 15
+MIN_COUNT = 3
 
 class author_embedding:
 
@@ -29,7 +30,7 @@ class author_embedding:
 
     def build_graph(self):
         db = self.conn_db()
-        pubs = db.publication
+        pubs = db.publication_dupl
         self.vertices = collections.defaultdict(list)
         self.vocab = []
         cnt, tot = 0, pubs.count()
@@ -68,7 +69,7 @@ class author_embedding:
             yield path
 
     def train_model(self):
-        model = gensim.models.Word2Vec(None, size = SIZE, window = WINDOW, min_count = 0, \
+        model = gensim.models.Word2Vec(None, size = SIZE, window = WINDOW, min_count = MIN_COUNT, \
              workers = multiprocessing.cpu_count())
         model.build_vocab(self.vocab)
         for i in range(RAN_TIMES):
