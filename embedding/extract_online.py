@@ -19,7 +19,7 @@ def extract_all():
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
     # ext = extractor.extractor(get_db('wikipedia'))
-    ext = extractor.extractor('wiki_dump.txt')
+    ext = extractor.extractor('wiki_dump.txt', db = False)
 
     mongodb = get_mongodb()
     pubs = mongodb.publication
