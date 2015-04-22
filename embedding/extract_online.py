@@ -47,6 +47,6 @@ def extract_all(bulk_info = (80000000, 0)):
     # cPickle.dump(abs_keywords, open('abs_keywords.dump', 'wb'), protocol = 2)
 
 if __name__ == '__main__':
-    # pool = multiprocessing.Pool(processes = 4)
-    # pool.map(extract_all, [(15070000, i) for i in range(4)])
-    extract_all()
+    pool = multiprocessing.Pool(processes = 4)
+    pool.map(extract_all, [(15070000, i) for i in range(4)])
+    # extract_all()
