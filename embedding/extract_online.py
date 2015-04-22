@@ -25,12 +25,14 @@ def extract_all():
     mongodb = get_mongodb()
     pubs = mongodb.publication
     cnt, tot = 0, pubs.count()
-    for doc in pubs.find(filter = {'_id', 'title', 'abstract'}):
+    for doc in pubs.find():
         if cnt % 100 == 0:
             logging.info("loading %d/%d" % (cnt, tot))
         cnt += 1
 
-        id, title, abs = str(doc['_id']), doc['title'], doc['abstract']
+        id = str(doc['_id'])
+        title = doc['title'] if 'title' in doc else ''
+        abs = doc['abstract'] if 'abstract' in doc else ''
 
         if title != '':
             keywords = ext.extract_str(title)
