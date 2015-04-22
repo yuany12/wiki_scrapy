@@ -35,7 +35,7 @@ class author_embedding:
         self.vocab = []
         cnt, tot = 0, pubs.count()
         rds = self.get_rds_client()
-        for doc in pubs.find():
+        for doc in pubs.find(limit = 1000):
             if cnt % 10000 == 0:
                 logging.info('building graph %d/%d' % (cnt, tot))
             cnt += 1
