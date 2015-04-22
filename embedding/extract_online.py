@@ -34,17 +34,17 @@ def extract_all():
 
         if title != '':
             keywords = ext.extract_str(title)
-            if len(keywords) > 0: title_keywords[id] = keywords
+            pubs.update_one({'_id': doc['_id']}, {'title_keywords': keywords})
 
         if abs != '':
             keywords = ext.extract_str(abs)
-            if len(keywords) > 0: abs_keywords[id] = keywords
+            pubs.update_one({'_id': doc['_id']}, {'abstract_keywords': keywords})
 
-    logging.info('dumping title_keywords')
-    cPickle.dump(title_keywords, open('title_keywords.dump', 'wb'), protocol = 2)
+    # logging.info('dumping title_keywords')
+    # cPickle.dump(title_keywords, open('title_keywords.dump', 'wb'), protocol = 2)
 
-    logging.info('dumping abs_keywords')
-    cPickle.dump(abs_keywords, open('abs_keywords.dump', 'wb'), protocol = 2)
+    # logging.info('dumping abs_keywords')
+    # cPickle.dump(abs_keywords, open('abs_keywords.dump', 'wb'), protocol = 2)
 
 if __name__ == '__main__':
     extract_all()
