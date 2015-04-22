@@ -1,4 +1,7 @@
 
+import logging
+import MySQLdb as mdb
+
 def dump_wiki():
     password = open('password.txt').readline().strip()
     cur = mdb.connect('localhost', 'root', password, database).cursor()
@@ -14,4 +17,5 @@ def dump_wiki():
     fout.close()
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     dump_wiki()
