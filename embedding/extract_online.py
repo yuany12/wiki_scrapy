@@ -18,9 +18,8 @@ def get_db(database):
 def extract_all():
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
-    title_keywords = {}
-    abs_keywords = {}
-    ext = extractor.extractor(get_db('wikipedia'))
+    # ext = extractor.extractor(get_db('wikipedia'))
+    ext = extractor.extractor('wiki_dump.txt')
 
     mongodb = get_mongodb()
     pubs = mongodb.publication
@@ -32,13 +31,13 @@ def extract_all():
 
         id = str(doc['_id'])
         title = doc['title'] if 'title' in doc else ''
-        abs = doc['abstract'] if 'abstract' in doc else ''
+        # abs = doc['abstract'] if 'abstract' in doc else ''
 
         title_keywords = ext.extract_str(title)
-        abstract_keywords = ext.extract_str(abs)
+        # abstract_keywords = ext.extract_str(abs)
 
-        pubs.update_one({'_id': doc['_id']}, {'$set': {'title_keywords': title_keywords,\
-         'abstract_keywords': abstract_keywords}})
+        pubs.update_one({'_id': doc['_id']}, {'$set': {'title_keywords': title_keywords}})#,\
+         # 'abstract_keywords': abstract_keywords}})
 
     # logging.info('dumping title_keywords')
     # cPickle.dump(title_keywords, open('title_keywords.dump', 'wb'), protocol = 2)
