@@ -31,6 +31,8 @@ def extract_all(bulk_info = (80000000, 0)):
             logging.info("loading title %d/%d" % (cnt, tot))
         cnt += 1
 
+        if 'lang' in doc and doc['lang'] == 'zh': continue
+
         id = str(doc['_id'])
         title = doc['title'] if 'title' in doc else ''
         # abs = doc['abstract'] if 'abstract' in doc else ''

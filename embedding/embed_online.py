@@ -40,6 +40,8 @@ class author_embedding:
                 logging.info('building graph %d/%d' % (cnt, tot))
             cnt += 1
 
+            if 'lang' in doc and doc['lang'] == 'zh': continue
+
             keywords = []
             if 'authors' not in doc: continue
             author_cnt = len(doc['authors'])
