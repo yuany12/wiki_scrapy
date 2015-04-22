@@ -7,6 +7,7 @@ import multiprocessing
 import logging
 import random
 import rds
+import pymongo
 
 SIZE = 128
 WINDOW = 5
