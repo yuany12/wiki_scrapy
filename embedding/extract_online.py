@@ -34,13 +34,11 @@ def extract_all():
         title = doc['title'] if 'title' in doc else ''
         abs = doc['abstract'] if 'abstract' in doc else ''
 
-        if title != '':
-            keywords = ext.extract_str(title)
-            pubs.update_one({'_id': doc['_id']}, {'title_keywords': keywords})
+        title_keywords = ext.extract_str(title)
+        abstract_keywords = ext.extract_str(abs)
 
-        if abs != '':
-            keywords = ext.extract_str(abs)
-            pubs.update_one({'_id': doc['_id']}, {'abstract_keywords': keywords})
+        pubs.update_one({'_id': doc['_id']}, {'$set': {'title_keywords': title_keywords,\
+         'abstract_keywords': abstract_keywords}})
 
     # logging.info('dumping title_keywords')
     # cPickle.dump(title_keywords, open('title_keywords.dump', 'wb'), protocol = 2)
