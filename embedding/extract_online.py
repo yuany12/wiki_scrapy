@@ -38,7 +38,7 @@ def extract_all(bulk_info = (80000000, 0)):
         abstract_keywords = ext.extract_str(abs)
 
         # word_colls.update_one({'_id': doc['_id']}, {'$set': {'title_keywords': title_keywords}}, upsert = True)
-        pubs.update_one({'_id': doc['_id']}, {'$set': {'abstract_keywords': abstract_keywords}})
+        word_colls.update_one({'_id': doc['_id']}, {'$set': {'abstract_keywords': abstract_keywords}}, upsert = True)
 
     # logging.info('dumping title_keywords')
     # cPickle.dump(title_keywords, open('title_keywords.dump', 'wb'), protocol = 2)
