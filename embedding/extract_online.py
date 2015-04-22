@@ -25,20 +25,20 @@ def extract_all(bulk_info = (80000000, 0)):
     cnt, tot = 0, pubs.count()
     for doc in pubs.find(skip = bulk_size * bulk_no, limit = bulk_size):
         if cnt % 100 == 0 and bulk_no == 0:
-            logging.info("loading title %d/%d" % (cnt, tot))
-            # logging.info("loading abstract %d/%d" % (cnt, tot))
+            # logging.info("loading title %d/%d" % (cnt, tot))
+            logging.info("loading abstract %d/%d" % (cnt, tot))
         cnt += 1
 
         if 'lang' in doc and doc['lang'] == 'zh': continue
 
-        title = doc['title'] if 'title' in doc else ''
-        # abs = doc['abstract'] if 'abstract' in doc else ''
+        # title = doc['title'] if 'title' in doc else ''
+        abs = doc['abstract'] if 'abstract' in doc else ''
 
-        title_keywords = ext.extract_str(title)
-        # abstract_keywords = ext.extract_str(abs)
+        # title_keywords = ext.extract_str(title)
+        abstract_keywords = ext.extract_str(abs)
 
-        word_colls.update_one({'_id': doc['_id']}, {'$set': {'title_keywords': title_keywords}}, upsert = True)
-        # pubs.update_one({'_id': doc['_id']}, {'$set': {'abstract_keywords': abstract_keywords}})
+        # word_colls.update_one({'_id': doc['_id']}, {'$set': {'title_keywords': title_keywords}}, upsert = True)
+        pubs.update_one({'_id': doc['_id']}, {'$set': {'abstract_keywords': abstract_keywords}})
 
     # logging.info('dumping title_keywords')
     # cPickle.dump(title_keywords, open('title_keywords.dump', 'wb'), protocol = 2)
