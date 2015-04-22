@@ -34,12 +34,12 @@ def extract_all(bulk_info = (80000000, 0)):
 
         if 'lang' in doc and doc['lang'] == 'zh': continue
 
-        id = str(doc['_id'])
         title = doc['title'] if 'title' in doc else ''
         # abs = doc['abstract'] if 'abstract' in doc else ''
 
         title_keywords = ext.extract_str(title)
         # abstract_keywords = ext.extract_str(abs)
+        if len(title_keywords) > 0: print 'yes'
 
         word_colls.update_one({'_id': doc['_id']}, {'$set': {'title_keywords': title_keywords}}, upsert = True)
         # pubs.update_one({'_id': doc['_id']}, {'$set': {'abstract_keywords': abstract_keywords}})
