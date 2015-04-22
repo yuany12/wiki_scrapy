@@ -2,7 +2,7 @@ import extractor
 import logging
 import cPickle
 import pymongo
-import MySQLdb as mdb
+# import MySQLdb as mdb
 
 def get_mongodb():
     password = open('password_mongo.txt').readline().strip()
