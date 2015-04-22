@@ -3,7 +3,7 @@ __author__ = 'yutao'
 import redis
 from bs4 import UnicodeDammit
 
-from CoDA.utils import Utils
+# from CoDA.utils import Utils
 
 
 SUBJECT_CLASSIFICATION_PREFIX = {1: "SUBJECT_CLASSIFICATION_PREFIX::ZH8::",
