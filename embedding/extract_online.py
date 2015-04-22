@@ -8,7 +8,7 @@ def get_mongodb():
     password = open('password_mongo.txt').readline().strip()
     client = pymongo.MongoClient(host = '166.111.7.105', port = 30017)
     db = client.bigsci
-    db.authenticate('keggger_bigsci', password)
+    db.authenticate('kegger_bigsci', password)
     return db
 
 def get_db(database):
