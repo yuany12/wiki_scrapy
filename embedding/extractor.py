@@ -6,16 +6,22 @@ class extractor:
     tagger = English()
     forbidden = {'PRP','PRP$','VBZ', '.', ':', '``', "''", 'DT'}
 
-    def __init__(self, cur):
-        cur.execute("select page_title from page")
-        self.entities = []
-        cnt, tot = 0, cur.rowcount
-        for row in cur.fetchall():
-            if cnt % 10000 == 0:
-                logging.info('loading wikipedia %d/%d' % (cnt, tot))
-            cnt += 1
-            self.entities.append(row[0].lower())
-        self.entities = set(self.entities)
+    def __init__(self, cur, db = True):
+        if db:
+            cur.execute("select page_title from page")
+            self.entities = []
+            cnt, tot = 0, cur.rowcount
+            for row in cur.fetchall():
+                if cnt % 10000 == 0:
+                    logging.info('loading wikipedia %d/%d' % (cnt, tot))
+                cnt += 1
+                self.entities.append(row[0].lower())
+            self.entities = set(self.entities)
+        else:
+            self.entities = []
+            for line in open(cur):
+                self.entities.append(line.strip())
+            self.entities = set(self.entities)
 
     def pos_rule(self, tokens):
         tags = [e.tag_ for e in tokens]

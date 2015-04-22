@@ -84,7 +84,7 @@ def gen_tensor_selector():
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     # train_lr()
-    test_lr()
+    # test_lr()
     # gen_tensor_selector()
-    # train_tensor_lr()
+    train_tensor_lr()
     # lr_verbose_test()
