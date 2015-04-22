@@ -41,6 +41,7 @@ class author_embedding:
             cnt += 1
 
             keywords = []
+            if 'authors' not in doc: continue
             author_cnt = len(doc['authors'])
             for i in range(author_cnt):
                 keywords.append(rds.get_author_id(str(doc['_id']), i))
