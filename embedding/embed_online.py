@@ -20,7 +20,7 @@ class author_embedding:
 
     def conn_db(self):
         password = open('password_mongo.txt').readline().strip()
-        client = pymongo.MongoClient(host = 'localhost', port = 30017)
+        client = pymongo.MongoClient(host = 'localhost', port = 30017, socketKeepAlive = True, connectTimeoutMS = None)
         db = client.bigsci
         db.authenticate('kegger_bigsci', password)
         return db
