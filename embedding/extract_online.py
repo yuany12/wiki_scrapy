@@ -16,7 +16,8 @@ def get_db(database):
     password = open('password.txt').readline().strip()
     return mdb.connect('localhost', 'root', password, database).cursor()
 
-def extract_all(bulk_size = 80000000, bulk_no = 0):
+def extract_all(bulk_info = (80000000, 0)):
+    bulk_size, bulk_no = bulk_info
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
     # ext = extractor.extractor(get_db('wikipedia'))
