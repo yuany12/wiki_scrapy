@@ -46,7 +46,10 @@ class author_embedding:
             if 'authors' not in doc: continue
             author_cnt = len(doc['authors'])
             for i in range(author_cnt):
-                keywords.append(rds.get_author_id(str(doc['_id']), i))
+                aid = rds.get_author_id(str(doc['_id']), i)
+                print aid
+                if aid is not None:
+                    keywords.append(aid)
             for i in range(len(keywords)):
                 for j in range(i + 1, len(keywords)):
                     self.vertices[keywords[i]].append(keywords[j])
