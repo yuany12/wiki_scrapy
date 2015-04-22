@@ -23,13 +23,13 @@ class author_embedding:
         client = pymongo.MongoClient(host = 'localhost', port = 30017, socketKeepAlive = True, connectTimeoutMS = None)
         db = client.bigsci
         db.authenticate('kegger_bigsci', password)
-        return db
+        return db, client
 
     def get_rds_client(self):
         return rds.RdsClient('localhost', 6383)
 
     def build_graph(self):
-        db = self.conn_db()
+        db, client = self.conn_db()
         pubs = db.publication_dupl
         self.vertices = collections.defaultdict(list)
         self.vocab = []
@@ -52,6 +52,7 @@ class author_embedding:
                     self.vertices[keywords[i]].append(keywords[j])
                     self.vertices[keywords[j]].append(keywords[i])
             self.vocab.append(keywords)
+        client.close()
         logging.info('vocab size = %d' % len(self.vocab))
 
     def save_graph(self):
