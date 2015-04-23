@@ -3,6 +3,7 @@ from collections import defaultdict as dd
 import multiprocessing
 import logging
 from bson.objectid import ObjectId
+import time
 
 def get_mongodb():
     password = open('password_mongo.txt').readline().strip()
@@ -19,6 +20,8 @@ def count_word(bulk_info = (39000000, 0)):
     keywords = db.keywords
     author_keywords = db.author_keywords
     cnt, tot = 0, people.count()
+
+    time.sleep(20 * bulk_no)
 
     for doc in people.find(skip = bulk_size * bulk_no, limit = bulk_size):
         if cnt % 100 == 0 and bulk_no == 0:
