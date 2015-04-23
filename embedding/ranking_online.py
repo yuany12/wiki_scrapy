@@ -2,6 +2,7 @@ import pymongo
 from collections import defaultdict as dd
 import multiprocessing
 import logging
+from pymongo import objectid
 
 def get_mongodb():
     password = open('password_mongo.txt').readline().strip()
@@ -28,7 +29,7 @@ def count_word(bulk_info = (39000000, 0)):
         word_cnt = dd(int)
         for pub in doc['pubs']:
             if 'i' not in pub: continue
-            pid = pymongo.ObjectId(pub['i'])
+            pid = objectid.ObjectId(pub['i'])
             k_doc = keywords.find_one({'_id': pid})
             if k_doc is not None and 'title_keywords' in k_doc:
                 for keyword_ in k_doc['title_keywords']:
