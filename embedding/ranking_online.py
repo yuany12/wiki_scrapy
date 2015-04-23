@@ -34,7 +34,7 @@ def count_word(bulk_info = (39000000, 0)):
             if k_doc is not None and 'title_keywords' in k_doc:
                 for keyword_ in k_doc['title_keywords']:
                     word_cnt[keyword_] += 1
-        author_keywords.update_one({'_id': doc['_id']}, {'$set': {'title_keywords': dict(word_cnt)}})
+        author_keywords.insert_one({'_id': doc['_id']}, {'$set': {'title_keywords': dict(word_cnt)}})
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
