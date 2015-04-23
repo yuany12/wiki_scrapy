@@ -36,6 +36,7 @@ def count_word(bulk_info = (39000000, 0)):
             k_doc = keywords.find_one({'_id': pid})
             if k_doc is not None and 'title_keywords' in k_doc:
                 for keyword_ in k_doc['title_keywords']:
+                    if '.' in keyword_ or '$' in keyword_: continue
                     word_cnt[keyword_] += 1
         author_keywords.update_one({'_id': doc['_id']}, {'$set': {'title_keywords': dict(word_cnt)}}, upsert = True)
 
