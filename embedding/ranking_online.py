@@ -1,5 +1,6 @@
 import pymongo
 from collections import defaultdict as dd
+import multiprocessing
 
 def get_mongodb():
     password = open('password_mongo.txt').readline().strip()
@@ -8,13 +9,16 @@ def get_mongodb():
     db.authenticate('kegger_bigsci', password)
     return db
 
-def count_word():
+def count_word(bulk_info = (39000000, 0)):
+    bulk_size, bulk_no = bulk_info
+
     db = get_mongodb()
     people = db.people
     keywords = db.keywords
     author_keywords = db.author_keywords
     cnt, tot = 0, people.count()
-    for doc in people.find():
+    
+    for doc in people.find(skip = bulk_size * bulk_no, limit = bulk_size):
         if cnt % 1000 == 0:
             logging.info('word counting %d/%d' % (cnt, tot))
         cnt += 1
@@ -32,4 +36,5 @@ def count_word():
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
-    count_word()
+    pool = multiprocessing.Pool(processes = 4)
+    pool.map(count_word, [(10000000, i) for i in range(4)])
