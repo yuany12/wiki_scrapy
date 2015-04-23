@@ -21,7 +21,7 @@ def count_word(bulk_info = (39000000, 0)):
     cnt, tot = 0, people.count()
 
     for doc in people.find(skip = bulk_size * bulk_no, limit = bulk_size):
-        if cnt % 1000 == 0:
+        if cnt % 100 == 0 and bulk_no == 0:
             logging.info('word counting %d/%d' % (cnt, tot))
         cnt += 1
 
