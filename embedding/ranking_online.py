@@ -1,6 +1,7 @@
 import pymongo
 from collections import defaultdict as dd
 import multiprocessing
+import logging
 
 def get_mongodb():
     password = open('password_mongo.txt').readline().strip()
@@ -17,7 +18,7 @@ def count_word(bulk_info = (39000000, 0)):
     keywords = db.keywords
     author_keywords = db.author_keywords
     cnt, tot = 0, people.count()
-    
+
     for doc in people.find(skip = bulk_size * bulk_no, limit = bulk_size):
         if cnt % 1000 == 0:
             logging.info('word counting %d/%d' % (cnt, tot))
