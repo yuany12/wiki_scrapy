@@ -1,6 +1,7 @@
 
 import gensim
 import pymongo
+import multiprocessing
 
 TH_WORD_CNT = 15
 
