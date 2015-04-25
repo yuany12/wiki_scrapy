@@ -21,7 +21,12 @@ def create_tags(bulk_info = (80000000, 0)):
     people = db.people
     author_keywords = db.author_keywords
 
+    cnt, tot = 0, author_keywords.count()
     for doc in author_keywords.find(skip = bulk_size * bulk_no, limit = bulk_size):
+        if cnt % 1000 == 0:
+            logging.info('processing %d/%d' % (cnt, tot))
+        cnt += 1
+
         if 'title_keywords' not in doc: continue
         keywords = doc['title_keywords'].keys()
         word2score = []
@@ -37,5 +42,7 @@ def create_tags(bulk_info = (80000000, 0)):
         people.find_one_and_update({'_id': doc['_id']}, {'$set': {'new_tags': word2score}})
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+
     pool = multiprocessing.Pool(processes = 4)
     pool.map(create_tags, [(10000000, i) for i in range(4)])
