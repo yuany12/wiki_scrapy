@@ -38,4 +38,4 @@ def create_tags(bulk_info = (80000000, 0)):
 
 if __name__ == '__main__':
     pool = multiprocessing.Pool(processes = 4)
-    pool.map(extract_all, [(10000000, i) for i in range(4)])
+    pool.map(create_tags, [(10000000, i) for i in range(4)])
