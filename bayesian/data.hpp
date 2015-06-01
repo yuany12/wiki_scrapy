@@ -26,7 +26,7 @@ void read_data(int & D, int & W, document * docs, double ** f_r, double ** f_k) 
 
     fclose(fin);
 
-    printf("data main done\n");
+    printf("loading data main done\n");
 
     fin = fopen("data.embedding.researcher.txt", "r");
     f_r = new double*[D];
@@ -39,7 +39,7 @@ void read_data(int & D, int & W, document * docs, double ** f_r, double ** f_k) 
     }
     fclose(fin);
 
-    printf("researcher done\n");
+    printf("loading researcher done\n");
 
     fin = fopen("data.embedding.keyword.txt", "r");
     f_k = new double*[W];
@@ -51,4 +51,6 @@ void read_data(int & D, int & W, document * docs, double ** f_r, double ** f_k) 
             fscanf(fin, "%lf\n", &f_k[i][j]);
     }
     fclose(fin);
+
+    printf("loading keyword done\n");
 }
