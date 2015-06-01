@@ -13,6 +13,8 @@ void read_data(int & D, int & W, document * docs, double ** f_r, double ** f_k) 
 
     docs = new document[D];
 
+    printf("addr = %d\n", docs);
+
     for (int i = 0; i < D; i ++) {
         int r_id, w_cnt;
         fscanf(fin, "%d %d\n", &r_id, &w_cnt);
@@ -25,6 +27,8 @@ void read_data(int & D, int & W, document * docs, double ** f_r, double ** f_k) 
             fscanf(fin, "%d %d\n", &(docs[i].w_id[j]), &(docs[i].w_freq[j]));
         }
     }
+
+    printf("addr = %d\n", docs);
 
     fclose(fin);
 
