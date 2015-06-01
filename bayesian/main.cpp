@@ -11,6 +11,7 @@ int main() {
 
     printf("D = %d\n", D);
     for (int i = 0; i < D; i ++) {
+        printf("i = %d\n", i);
         int x = docs[i].w_cnt;
     }
     printf("check done\n");
