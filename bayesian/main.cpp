@@ -11,5 +11,7 @@ int main() {
 
     model m(docs, D, W, f_r, f_k);
 
+    printf("init done\n");
+
     m.learn();
 }
