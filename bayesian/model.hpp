@@ -134,14 +134,20 @@ public:
 
         alpha = 1.0 * 50 / T;
 
+        printf("point 1\n");
+
         theta_d_t = new double*[D];
         for (int i = 0; i < D; i ++) {
             theta_d_t[i] = new double[T];
             memset(theta_d_t[i], 0, sizeof(double) * T);
         }
 
+        printf("point 2\n");
+
         M = new int[D];
         for (int i = 0; i < D; i ++) M[i] = docs[i].w_cnt;
+
+        printf("point 3\n");
 
         z_d_m = new int*[D];
         for (int i = 0; i < D; i ++) {
@@ -151,10 +157,14 @@ public:
             }
         }
 
+        printf("point 4\n");
+
         y_d = new int[D];
         for (int i = 0; i < D; i ++) {
             y_d[i] = rand() % T;
         }
+
+        printf("point 5\n");
 
         mu_0 = kappa_0 = alpha_0 = beta_0 = 0.0;
 
@@ -164,11 +174,16 @@ public:
             memset(mu_k_t[i], 0, sizeof(double) * E_k);
         }
 
+        printf("point 6\n");
+
         lambda_k_t = new double * [T];
         for (int i = 0; i < T; i ++) {
             lambda_k_t[i] = new double[E_k];
             memset(lambda_k_t[i], 0, sizeof(double) * E_k);
         }
+
+
+        printf("point 7\n");
 
         mu_r_t = new double * [T];
         for (int i = 0; i < T; i ++) {
@@ -176,11 +191,15 @@ public:
             memset(mu_r_t[i], 0, sizeof(double) * E_r);
         }
 
+        printf("point 8\n");
+
         lambda_r_t = new double * [T];
         for (int i = 0; i < T; i ++) {
             lambda_r_t[i] = new double[E_r];
             memset(lambda_r_t[i], 0, sizeof(double) * E_r);
         }
+
+        printf("point 9\n");
 
         n_d_t = new int*[D];   
         for (int i = 0; i < D; i ++) {
@@ -188,17 +207,25 @@ public:
             memset(n_d_t[i], 0, sizeof(int) * T);
         }
 
+        printf("point 10\n");
+
         n_w_t = new int*[W];
         for (int i = 0; i < W; i ++) {
             n_w_t[i] = new int[T];
             memset(n_w_t[i], 0, sizeof(int) * T);
         }
 
+        printf("point 11\n");
+
         n_k_t = new int[T];
         memset(n_k_t, 0, sizeof(int) * T);
 
+        printf("point 12\n");
+
         n_r_t = new int[T];
         memset(n_r_t, 0, sizeof(int) * T);
+
+        printf("point 13\n");
 
         sqr_k = new double*[T]; sum_k = new double*[T];
         sqr_r = new double*[T]; sum_r = new double*[T];
@@ -213,6 +240,8 @@ public:
             memset(sqr_r[i], 0, sizeof(double) * E_r);
             memset(sum_r[i], 0, sizeof(double) * E_r);
         }
+
+        printf("point 14\n");
 
         for (int i = 0; i < D; i ++) {
             int topic = y_d[i];
@@ -233,6 +262,8 @@ public:
                 n_w_t[w_id][topic] += w_freq;
             }
         }
+
+        printf("point 15\n");
 
         read_out_cnt = 0;
     }
