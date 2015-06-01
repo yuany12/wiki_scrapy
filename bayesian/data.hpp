@@ -24,6 +24,10 @@ void read_data(int & D, int & W, document * docs, double ** f_r, double ** f_k) 
         }
     }
 
+    for (int i = 0; i < D; i ++) {
+        int x = docs[i].w_cnt;
+    }
+
     fclose(fin);
 
     printf("loading data main done\n");
