@@ -52,6 +52,7 @@ def count_abs_word(bulk_info = (39000000, 0)):
     for doc in people.find(skip = bulk_size * bulk_no, limit = bulk_size):
         if cnt % 100 == 0 and bulk_no == 0:
             logging.info('word abs counting %d/%d' % (cnt, tot))
+        cnt += 1
 
         if 'pubs' not in doc: continue
         word_cnt = dd(int)
@@ -67,5 +68,5 @@ def count_abs_word(bulk_info = (39000000, 0)):
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
-    pool = multiprocessing.Pool(processes = 4)
-    pool.map(count_abs_word, [(10000000, i) for i in range(4)])
+    pool = multiprocessing.Pool(processes = 8)
+    pool.map(count_abs_word, [(5000000, i) for i in range(4)])
