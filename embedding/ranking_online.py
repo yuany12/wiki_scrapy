@@ -68,4 +68,4 @@ def count_abs_word(bulk_info = (39000000, 0)):
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     pool = multiprocessing.Pool(processes = 4)
-    pool.map(count_word, [(10000000, i) for i in range(4)])
+    pool.map(count_abs_word, [(10000000, i) for i in range(4)])
