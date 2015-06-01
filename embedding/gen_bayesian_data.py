@@ -59,6 +59,7 @@ def gen_pair(bulk_info = (39000000, 0)):
         fout.close()
 
 def indexing():
+    model = gensim.models.Word2Vec.load('online.author_word.model')
     authors, keywords = set(), set()
     cnt = 0
     for i in range(8):
@@ -68,6 +69,7 @@ def indexing():
             cnt += 1
 
             inputs = line.strip().split(';')
+            if inputs[0] not in model: continue
             authors.add(inputs[0])
             for j in range(1, len(inputs)):
                 keywords.add(inputs[j].split(',')[0])
@@ -102,6 +104,7 @@ def format():
             cnt += 1
 
             inputs = line.strip().split(';')
+            if inputs[0] not in author2id: continue
             fout.write("%d %d\n" % (author2id[inputs[0]], len(inputs) - 1))
             for j in range(1, len(inputs)):
                 in_inputs = inputs[j].split(',')
@@ -134,5 +137,5 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     # pool = multiprocessing.Pool(processes = 8)
     # pool.map(gen_pair, [(5000000, i) for i in range(8)])
-    # indexing()
+    indexing()
     format()
