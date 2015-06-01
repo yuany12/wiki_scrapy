@@ -9,6 +9,12 @@ int main() {
 
     read_data(D, W, docs, f_r, f_k);
 
+    printf("D = %d\n", D);
+    for (int i = 0; i < D; i ++) {
+        int x = docs[i].w_cnt;
+    }
+    printf("check done\n");
+
     model m(docs, D, W, f_r, f_k);
 
     printf("init done\n");
