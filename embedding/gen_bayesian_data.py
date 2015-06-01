@@ -110,7 +110,10 @@ def format():
 
     model = gensim.models.Word2Vec.load('keyword.model')
     fout = open('../bayesian/data.embedding.keyword.txt', 'w')
-    for keyword in keywords:
+    for i, keyword in enumerate(keywords):
+        if i % 10000 == 0:
+            logging.info('printing keyword %d/%d' % (i, len(keywords)))
+
         vec = model[keyword]
         for ele in vec:
             fout.write("%.8f\n" % ele)
@@ -118,7 +121,10 @@ def format():
 
     model = gensim.models.Word2Vec.load('online.author_word.model')
     fout = open('../bayesian/data.embedding.researcher.txt', 'w')
-    for author in authors:
+    for i, author in enumerate(authors):
+        if i % 10000 == 0:
+            logging.info('printing author %d/%d' % (i, len(authors)))
+
         vec = model[author]
         for ele in vec:
             fout.write("%.8f\n" % ele)
