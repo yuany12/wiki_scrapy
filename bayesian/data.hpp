@@ -9,6 +9,8 @@ void read_data(int & D, int & W, document * docs, double ** f_r, double ** f_k) 
     FILE * fin = fopen("data.main.txt", "r");
     fscanf(fin, "%d %d\n", &D, &W);
 
+    printf("addr = %d\n", docs);
+
     docs = new document[D];
 
     for (int i = 0; i < D; i ++) {
@@ -23,8 +25,6 @@ void read_data(int & D, int & W, document * docs, double ** f_r, double ** f_k) 
             fscanf(fin, "%d %d\n", &(docs[i].w_id[j]), &(docs[i].w_freq[j]));
         }
     }
-
-    printf("add = %d\n", docs);
 
     fclose(fin);
 
