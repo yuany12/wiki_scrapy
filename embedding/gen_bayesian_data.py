@@ -133,9 +133,18 @@ def format():
             fout.write("%.8f\n" % ele)
     fout.close()
 
+def cnt_pair():
+    cnt = 0
+    for i in range(8):
+        for line in open('gen_pair.%d.out' % i):
+            inputs = line.strip().split(';')
+            cnt += len(inputs) - 1
+    print cnt
+
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     # pool = multiprocessing.Pool(processes = 8)
     # pool.map(gen_pair, [(5000000, i) for i in range(8)])
-    indexing()
-    format()
+    # indexing()
+    # format()
+    cnt_pair()
