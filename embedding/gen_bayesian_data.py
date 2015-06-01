@@ -71,11 +71,11 @@ def indexing():
             authors.add(inputs[0])
             for j in range(1, len(inputs)):
                 keywords.add(inputs[j].split(',')[0])
-    fout = open('author_index.out')
+    fout = open('author_index.out', 'w')
     for i, author in enumerate(authors):
         fout.write(author + '\n')
     fout.close()
-    fout = open('keyword_index.out')
+    fout = open('keyword_index.out', 'w')
     for i, keyword in enumerate(keywords):
         fout.write(keyword + '\n')
     fout.close()
