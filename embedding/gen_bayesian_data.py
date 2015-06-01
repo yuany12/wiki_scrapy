@@ -80,8 +80,53 @@ def indexing():
         fout.write(keyword + '\n')
     fout.close()
 
+def format():
+    authors, keywords = [], []
+    author2id, keyword2id = {}, {}
+    for i, line in enumerate(open('author_index.out')):
+        author = line.strip()
+        authors.append(author)
+        author2id[author] = i
+    for i, line in enumerate(open('keyword_index.out')):
+        keyword = line.strip()
+        keywords.append(keyword)
+        keyword2id[keyword] = i
+
+    fout = open('../bayesian/data.main.txt', 'w')
+    fout.write("%d %d\n" % (len(authors), len(keywords)))
+    cnt = 0
+    for i in range(8):
+        for line in open('gen_pair.%d.out' % i):
+            if cnt % 10000 == 0:
+                logging.info('printing author %d' % cnt)
+            cnt += 1
+
+            inputs = line.strip().split(';')
+            fout.write("%d %d\n" % (author2id[inputs[0]], len(inputs) - 1))
+            for j in range(1, len(inputs)):
+                in_inputs = inputs[j].split(',')
+                fout.write("%d %d\n" % (keyword2id[in_inputs[0]], int(in_inputs[1])))
+    fout.close()
+
+    model = gensim.models.Word2Vec.load('keyword.model')
+    fout = open('../bayesian/data.embedding.keyword.txt', 'w')
+    for keyword in keywords:
+        vec = model[keyword]
+        for ele in vec:
+            fout.write("%.8f\n" % ele)
+    fout.close()
+
+    model = gensim.models.Word2Vec.load('online.author_word.model')
+    fout = open('../bayesian/data.embedding.researcher.txt', 'w')
+    for author in authors:
+        vec = model[author]
+        for ele in vec:
+            fout.write("%.8f\n" % ele)
+    fout.close()
+
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     # pool = multiprocessing.Pool(processes = 8)
     # pool.map(gen_pair, [(5000000, i) for i in range(8)])
-    indexing()
+    # indexing()
+    format()
