@@ -20,7 +20,7 @@ void read_data(int & D, int & W, document * docs, double ** f_r, double ** f_k) 
         docs[i].w_freq = new int[w_cnt];
 
         for (int j = 0; j < w_cnt; j ++) {
-            fscanf(fin, "%d %d\n", &docs[i].w_id[j], &docs[i].w_freq[j]);
+            fscanf(fin, "%d %d\n", &(docs[i].w_id[j]), &(docs[i].w_freq[j]));
         }
     }
 
