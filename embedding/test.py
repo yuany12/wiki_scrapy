@@ -182,7 +182,7 @@ def test_ranking_5():
 
 if __name__ == '__main__':
     # test()
-    # sample_vectors()
+    sample_vectors()
     # test_ranking_2()
     # test_ranking_3()
     # test_ranking_4()
