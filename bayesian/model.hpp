@@ -380,12 +380,13 @@ public:
 
     double g(int t, int e, double f, int * n_r_t, double ** sum_r, double ** sqr_r, int dn) {
         double ret = 1.0;
-        ret *= gamma_ratio(n_r_t[t] + dn, n_r_t[t]);
+        int n = n_r_t[t];
+        ret *= gamma_ratio(n + dn, n);
         double beta_n_pr = n > 0 ? 0.5 * (sqr_r[t][e] - sum_r[t][e] * sum_r[t][e] / n) : 0;
         double t_sum = sum_r[t][e] + f * dn;
         double beta_n = 0.5 * (sqr_r[t][e] + f * f * dn - t_sum * t_sum / (n + dn));
-        ret *= fast_pow(beta_n_pr, n_r_t[t]) / fast_pow(beta_n, n_r_t[t] + dn);
-        ret *= fast_pow(n_r_t[t] / (n_r_t[t] + dn), 0.5);
+        ret *= fast_pow(beta_n_pr, n) / fast_pow(beta_n, n + dn);
+        ret *= fast_pow(n / (n + dn), 0.5);
         ret *= fast_pow(_2_PI, dn * 0.5);
         return ret;
 
