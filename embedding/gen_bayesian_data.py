@@ -58,21 +58,46 @@ def gen_pair(bulk_info = (39000000, 0)):
             fout.write('\n')
         fout.close()
 
+def merge_and_select():
+    model = gensim.models.Word2Vec.load('keyword.model')
+    SAMPLE_RATE = 0.2
+
+    fout = open('pair.select.txt', 'w')
+    for i in range(8):
+        for line in open('gen_pair.%d.out' % i):
+            inputs = line.strip().split(';')
+            rid = inputs[0]
+            keywords = []
+            for j in range(1, len(inputs)):
+                in_inputs = inputs[j].split(',')
+                keywords.append((in_inputs[0], int(in_inputs[1])))
+            stats = []
+            for j in range(len(keywords)):
+                score = 0.0
+                for k in range(len(keywords)):
+                    score += model.similarity(keywords[j][0], keywords[k][0]) * keywords[k][1]
+                stats.append((keywords[j][0], keywords[j][1], score))
+            stats.sort(key = lambda x: x[2], reverse = True)
+            fout.write(rid)
+            for j in range(int(len(stats) * SAMPLE_RATE)):
+                fout.wrte(';%s,%d' % (stats[j][0], stats[j][1]))
+            fout.write('\n')
+    fout.close()
+
 def indexing():
     model = gensim.models.Word2Vec.load('online.author_word.model')
     authors, keywords = set(), set()
     cnt = 0
-    for i in range(8):
-        for line in open('gen_pair.%d.out' % i):
-            if cnt % 10000 == 0:
-                logging.info('indexing %d' % cnt)
-            cnt += 1
+    for line in open('pair.select.txt'):
+        if cnt % 10000 == 0:
+            logging.info('indexing %d' % cnt)
+        cnt += 1
 
-            inputs = line.strip().split(';')
-            if inputs[0] not in model: continue
-            authors.add(inputs[0])
-            for j in range(1, len(inputs)):
-                keywords.add(inputs[j].split(',')[0])
+        inputs = line.strip().split(';')
+        if inputs[0] not in model: continue
+        authors.add(inputs[0])
+        for j in range(1, len(inputs)):
+            keywords.add(inputs[j].split(',')[0])
     fout = open('author_index.out', 'w')
     for i, author in enumerate(authors):
         fout.write(author + '\n')
@@ -97,18 +122,17 @@ def format():
     fout = open('../bayesian/data.main.txt', 'w')
     fout.write("%d %d\n" % (len(authors), len(keywords)))
     cnt = 0
-    for i in range(8):
-        for line in open('gen_pair.%d.out' % i):
-            if cnt % 10000 == 0:
-                logging.info('printing author %d' % cnt)
-            cnt += 1
+    for line in open('pair.select.txt'):
+        if cnt % 10000 == 0:
+            logging.info('printing author %d' % cnt)
+        cnt += 1
 
-            inputs = line.strip().split(';')
-            if inputs[0] not in author2id: continue
-            fout.write("%d %d\n" % (author2id[inputs[0]], len(inputs) - 1))
-            for j in range(1, len(inputs)):
-                in_inputs = inputs[j].split(',')
-                fout.write("%d %d\n" % (keyword2id[in_inputs[0]], int(in_inputs[1])))
+        inputs = line.strip().split(';')
+        if inputs[0] not in author2id: continue
+        fout.write("%d %d\n" % (author2id[inputs[0]], len(inputs) - 1))
+        for j in range(1, len(inputs)):
+            in_inputs = inputs[j].split(',')
+            fout.write("%d %d\n" % (keyword2id[in_inputs[0]], int(in_inputs[1])))
     fout.close()
 
     model = gensim.models.Word2Vec.load('keyword.model')
@@ -145,6 +169,7 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     # pool = multiprocessing.Pool(processes = 8)
     # pool.map(gen_pair, [(5000000, i) for i in range(8)])
-    # indexing()
-    # format()
+    merge_and_select()
+    indexing()
+    format()
     cnt_pair()
