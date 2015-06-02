@@ -431,7 +431,7 @@ public:
             sprintf(temp, "sampling topics #%d log-likelihood = %0.8f\n", i, log_likelihood());
             logging(temp);
 
-            #pragma omp parallel for num_threads(32)
+            #pragma omp parallel for num_threads(64)
             for (int j = 0; j < D; j ++) {
                 if (j % 10000 == 0) {
                     sprintf(temp, "sampling researcher %d", j);
@@ -459,7 +459,7 @@ public:
                 set_r_topic(j, topics[j], false);
             }
 
-            #pragma omp parallel for num_threads(32)
+            #pragma omp parallel for num_threads(64) schedule(dynamic, 100)
             for (int j = 0; j < D; j ++) {
                 if (j % 10000 == 0) {
                     sprintf(temp, "sampling keyword %d", j);
