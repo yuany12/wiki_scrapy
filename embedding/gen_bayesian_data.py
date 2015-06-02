@@ -99,6 +99,13 @@ def select_():
     pool = multiprocessing.Pool(processes = CORE_NUM)
     pool.map(select, [(i, bulk_size) for i in range(CORE_NUM)])
 
+def merge():
+    fout = open('pair.select.txt', 'w')
+    for i in range(16):
+        for line in open('pair.select.%d.txt' % i):
+            fout.write(line)
+    fout.close()
+
 
 def indexing():
     model = gensim.models.Word2Vec.load('online.author_word.model')
@@ -185,7 +192,8 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     # pool = multiprocessing.Pool(processes = 8)
     # pool.map(gen_pair, [(5000000, i) for i in range(8)])
-    select_()
-    # indexing()
-    # format()
-    # cnt_pair()
+    # select_()
+    merge()
+    indexing()
+    format()
+    cnt_pair()
