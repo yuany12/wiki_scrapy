@@ -375,7 +375,7 @@ public:
         ret += log_gamma_ratio(n + dn, n);
         if (t == 0 && dn == 1) cout << "log_gamma_ratio = " << log_gamma_ratio(n + dn, n) << endl;
         ret += 0.5 * log2(n / (n + dn));
-        if (t == 0 && dn == 1) cout << "log2 = " << log2(n / (n + dn)) << endl;
+        if (t == 0 && dn == 1) cout << "log2 = " << 0.5 * (log2(n) - log(n + dn)) << endl;
         ret += 0.5 * dn * LOG_2_PI;
         if (t == 0 && dn == 1) cout << "log 2 pi = " << 0.5 * dn * LOG_2_PI << endl;
         return ret;
