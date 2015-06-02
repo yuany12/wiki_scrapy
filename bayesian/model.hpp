@@ -245,11 +245,6 @@ public:
     double log_likelihood() {
         double llh = 0.0;
         for (int i = 0; i < D; i ++) {
-            if (i % 10000 == 0) {
-                sprintf(temp, "calc log_likelihood for researcher %d", i);
-                logging(temp);
-            }
-
             for (int j = 0; j < E_r; j ++) {
                 int topic = y_d[i];
                 llh += log_gaussian(f_r_d[i][j], mu_r_t[topic][j], lambda_r_t[topic][j]);
@@ -407,6 +402,11 @@ public:
             logging(temp);
 
             for (int j = 0; j < D; j ++) {
+                if (j % 100 == 0) {
+                    sprintf(temp, "sampling researcher %d", j);
+                    logging(temp);
+                }
+
                 for (int k = 0; k < T; k ++) {
                     set_r_topic(j, k);
                     p[k] = 1.0 * n_d_t[j][k];
@@ -419,6 +419,11 @@ public:
             }
 
             for (int j = 0; j < D; j ++) {
+                if (j % 100 == 0) {
+                    sprintf(temp, "sampling keyword %d", j);
+                    logging(temp);
+                }
+
                 for (int k = 0; k < M[j]; k ++) {
                     int w_id = docs[j].w_id[k], w_freq = docs[j].w_freq[k];
                     for (int l = 0; l < T; l ++) {
