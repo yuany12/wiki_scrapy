@@ -3,6 +3,7 @@
 #include <iostream>
 #include <iomanip>
 #include <ctime>
+#include <cstring>
 
 using namespace std;
 
