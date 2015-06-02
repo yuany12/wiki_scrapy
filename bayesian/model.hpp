@@ -439,7 +439,7 @@ public:
                     if (p[k] == 0) continue;
 
                     for (int l = 0; l < E_r; l ++) {
-                        print = j == 0 : true ? false;
+                        print = j == 0 ? true : false;
                         p[k] *= g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1, print);
                     }
                 }
