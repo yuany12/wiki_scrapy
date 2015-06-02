@@ -448,7 +448,7 @@ public:
                 set_r_topic(j, topics[j]);
             }
 
-            #pragma omp parallel for num_threads(64) schedule(dynamic, 1000)
+            #pragma omp parallel for num_threads(64) schedule(dynamic, 10000)
             for (int j = 0; j < D; j ++) {
                 if (j % 10000 == 0) {
                     sprintf(temp, "sampling keyword %d", j);
