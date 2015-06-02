@@ -386,6 +386,8 @@ public:
         ret *= fast_pow(n / (n + dn), 0.5);
         ret *= fast_pow(_2_PI, dn * 0.5);
         if (print) {
+            cout << "n = " << n << " dn = " << dn << endl;
+            cout << "beta_n_pr = " << beta_n_pr << " beta_n = " << beta_n << endl;
             cout << "gamma_ratio = " << gamma_ratio(n + dn, n) << endl;
             cout << "beat ^ alpha = " << fast_pow(beta_n_pr, n) / fast_pow(beta_n, n + dn) << endl;
             cout << "kappa ratio  = " << fast_pow(n / (n + dn), 0.5) << endl;
