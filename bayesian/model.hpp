@@ -421,7 +421,7 @@ public:
         for (int i = 0; i < D; i ++) k_topics[i] = new int[M[i]];
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
-            sprintf(temp, "sampling topics #%d log-likelihood = %0.8f\n", i, log_likelihood());
+            sprintf(temp, "sampling topics #%d log-likelihood = %lf", i, log_likelihood());
             logging(temp);
 
             #pragma omp parallel for num_threads(64)
@@ -435,6 +435,7 @@ public:
                     for (int l = 0; l < E_r; l ++) {
                         p[k] *= g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
                     }
+                    if (j == 0) cout << k << ' ' << p[k] << endl;
                 }
 
                 topics[j] = uni_sample(p, T);
@@ -485,7 +486,7 @@ public:
 
     void embedding_update() {
         for (int tt = 0; tt < emb_max_iter; tt ++) {
-            sprintf(temp, "updating embeddings #%d log-likelihood = %0.8f\n", tt, log_likelihood());
+            sprintf(temp, "updating embeddings #%d log-likelihood = %lf", tt, log_likelihood());
             logging(temp);
 
             for (int i = 0; i < D; i ++) {
@@ -517,7 +518,7 @@ public:
 
     void learn() {
         for (int i = 0; i < learning_max_iter; i ++) {
-            sprintf(temp, "##### learning #%d #####\n", i);
+            sprintf(temp, "##### learning #%d #####", i);
             logging(temp);
 
             sample_topics();
