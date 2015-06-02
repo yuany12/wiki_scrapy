@@ -13,8 +13,6 @@ using namespace std;
 
 char temp[200];
 
-#define P_THREAD 16
-
 const double LOG_2_PI = log(atan(1)*4 * 2);
 const double _2_PI = atan(1) * 8;
 
@@ -419,21 +417,25 @@ public:
     }
 
     void sample_topics() {
-        double * p = new double[T];
+        // double * p = new double[T];
+        int topics[D];
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
             sprintf(temp, "sampling topics #%d log-likelihood = %0.8f\n", i, log_likelihood());
             logging(temp);
 
+            #pragma omp parallel for num_threads(32)
             for (int j = 0; j < D; j ++) {
                 if (j % 1000 == 0) {
                     sprintf(temp, "sampling researcher %d", j);
                     logging(temp);
                 }
 
-                set_r_topic(j, y_d[j], true);
+                // set_r_topic(j, y_d[j], true);
 
-                #pragma omp parallel for num_threads(P_THREAD)
+                double p[T];
+
+                #pragma omp parallel for num_threads(16)
                 for (int k = 0; k < T; k ++) {
                     p[k] = n_d_t[j][k];
 
@@ -442,9 +444,13 @@ public:
                     }
                 }
 
-                int topic = uni_sample(p, T);
+                topics[j] = uni_sample(p, T);
+                // set_r_topic(j, topic, false);
+            }
 
-                set_r_topic(j, topic, false);
+            for (int j = 0; j < D; j ++) {
+                set_r_topic(j, topics[j], true);
+                set_r_topic(j, topics[j], false);
             }
 
             for (int j = 0; j < D; j ++) {
@@ -457,7 +463,7 @@ public:
                     int w_id = docs[j].w_id[k], w_freq = docs[j].w_freq[k];
                     set_k_topic(j, k, z_d_m[j][k], true);
 
-                    #pragma omp parallel for num_threads(P_THREAD)
+                    #pragma omp parallel for num_threads(16)
                     for (int l = 0; l < T; l ++) {
                         p[l] = n_d_t[j][y_d[j]] + (l == y_d[j]);
 
@@ -477,7 +483,7 @@ public:
 
         norm_read_out();
 
-        delete [] p;
+        // delete [] p;
     }
 
     void embedding_update() {
