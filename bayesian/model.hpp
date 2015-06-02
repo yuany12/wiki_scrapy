@@ -26,7 +26,7 @@ public:
     int * w_freq;
 };
 
-double gamma_ratio(double x1, double x2) {
+inline double gamma_ratio(double x1, double x2) {
     double u = x1 - x2;
     double n = x1 - 0.5 - u * 0.5;
     return fast_pow(n * n + (1 - u * u) / 12, u / 2);
@@ -379,39 +379,42 @@ public:
     }
 
     double g(int t, int e, double f, int * n_r_t, double ** sum_r, double ** sqr_r, int dn) {
-        int n = n_r_t[t];
-        double mean = n > 0 ? sum_r[t][e] / n : 0;
-        double variance = n > 0 ? sqr_r[t][e] - sum_r[t][e] * sum_r[t][e] / n : 0;
-
-        double alpha_n_pr = alpha_0 + 0.5 * n;
-        double beta_n_pr = beta_0 + 0.5 * variance +
-            kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
-        double kappa_n_pr = kappa_0 + n;
-        // double mu_n_pr = kappa_0 + n > 0 ? (kappa_0 + mu_0 + n * mean) / (kappa_0 + n) : 0;
-
-        n += dn;
-        double sum = sum_r[t][e] + f * dn;
-        double sqr = sqr_r[t][e] + f * f * dn;
-        mean = sum / n;
-        variance = sqr - sum * sum / n;
-
-        double alpha_n = alpha_0 + 0.5 * n;
-        double beta_n = beta_0 + 0.5 * variance + 
-            kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
-        double kappa_n = kappa_0 + n;
-        // double mu_n = (kappa_0 * mu_0 + n * mean) / (kappa_0 + n);
-
         double ret = 1.0;
-        ret *= gamma_ratio(alpha_n, alpha_n_pr);
-        ret *= fast_pow(beta_n_pr, alpha_n_pr) / fast_pow(beta_n, alpha_n);
-        ret *= fast_pow(kappa_n_pr / kappa_n, 0.5);
+        ret *= gamma_ratio(n_r_t[t] + dn, n_r_t[t]);
+        double beta_n_pr = n > 0 ? 0.5 * (sqr_r[t][e] - sum_r[t][e] * sum_r[t][e] / n) : 0;
+        double t_sum = sum_r[t][e] + f * dn;
+        double beta_n = 0.5 * (sqr_r[t][e] + f * f * dn - t_sum * t_sum / (n + dn));
+        ret *= fast_pow(beta_n_pr, n_r_t[t]) / fast_pow(beta_n, n_r_t[t] + dn);
+        ret *= fast_pow(n_r_t[t] / (n_r_t[t] + dn), 0.5);
         ret *= fast_pow(_2_PI, dn * 0.5);
-
-        // ret += log_gamma_ratio(alpha_n, alpha_n_pr);
-        // ret += alpha_n_pr * log(beta_n_pr) - alpha_n * log(beta_n);
-        // ret += 0.5 * log(kappa_n_pr / kappa_n);
-        // ret += LOG_2_PI * dn * 0.5;
         return ret;
+
+        // int n = n_r_t[t];
+        // double mean = n > 0 ? sum_r[t][e] / n : 0;
+        // double variance = n > 0 ? sqr_r[t][e] - sum_r[t][e] * sum_r[t][e] / n : 0;
+
+        // double alpha_n_pr = alpha_0 + 0.5 * n;
+        // double beta_n_pr = beta_0 + 0.5 * variance +
+        //     kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
+        // double kappa_n_pr = kappa_0 + n;
+
+        // n += dn;
+        // double sum = sum_r[t][e] + f * dn;
+        // double sqr = sqr_r[t][e] + f * f * dn;
+        // mean = sum / n;
+        // variance = sqr - sum * sum / n;
+
+        // double alpha_n = alpha_0 + 0.5 * n;
+        // double beta_n = beta_0 + 0.5 * variance + 
+        //     kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
+        // double kappa_n = kappa_0 + n;
+
+        // double ret = 1.0;
+        // ret *= gamma_ratio(alpha_n, alpha_n_pr);
+        // ret *= fast_pow(beta_n_pr, alpha_n_pr) / fast_pow(beta_n, alpha_n);
+        // ret *= fast_pow(kappa_n_pr / kappa_n, 0.5);
+        // ret *= fast_pow(_2_PI, dn * 0.5);
+        // return ret;
     }
 
     void sample_topics() {

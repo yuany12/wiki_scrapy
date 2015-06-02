@@ -7,7 +7,7 @@
 
 using namespace std;
 
-void logging(const char* s) {
+inline void logging(const char* s) {
     auto t = time(NULL);
     auto tm = *localtime(&t);
     char * ctime = asctime(&tm);
