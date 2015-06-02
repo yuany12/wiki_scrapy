@@ -92,6 +92,8 @@ public:
 
     const int learning_max_iter = 10;
 
+    int max_M;
+
     ~model() {
         for (int i = 0; i < D; i ++) delete [] theta_d_t[i];
         delete [] theta_d_t;
@@ -154,6 +156,9 @@ public:
 
         M = new int[D];
         for (int i = 0; i < D; i ++) M[i] = docs[i].w_cnt;
+
+        max_M = 0;
+        for (int i = 0; i < D; i ++) max_M = max(max_M, M[i]);
 
         z_d_m = new int*[D];
         for (int i = 0; i < D; i ++) {
@@ -334,7 +339,7 @@ public:
         }
     }
 
-    void set_k_topic(int d, int m, int t, bool del) {
+    inline void set_k_topic(int d, int m, int t, bool del) {
         int topic = z_d_m[d][m], w_id = docs[d].w_id[m], w_freq = docs[d].w_freq[m];
         if (del) {
             for (int i = 0; i < E_k; i ++) {
@@ -357,7 +362,7 @@ public:
         }
     }
 
-    void set_r_topic(int d, int t, bool del) {
+    inline void set_r_topic(int d, int t, bool del) {
         if (del) {
             int topic = y_d[d];
             for (int i = 0; i < E_r; i ++) {
@@ -419,6 +424,7 @@ public:
     void sample_topics() {
         // double * p = new double[T];
         int topics[D];
+        int k_topics[D][max_M];
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
             sprintf(temp, "sampling topics #%d log-likelihood = %0.8f\n", i, log_likelihood());
@@ -426,7 +432,7 @@ public:
 
             #pragma omp parallel for num_threads(32)
             for (int j = 0; j < D; j ++) {
-                if (j % 1000 == 0) {
+                if (j % 10000 == 0) {
                     sprintf(temp, "sampling researcher %d", j);
                     logging(temp);
                 }
@@ -453,8 +459,9 @@ public:
                 set_r_topic(j, topics[j], false);
             }
 
+            #pragma omp parallel for num_threads(32)
             for (int j = 0; j < D; j ++) {
-                if (j % 1000 == 0) {
+                if (j % 10000 == 0) {
                     sprintf(temp, "sampling keyword %d", j);
                     logging(temp);
                 }
@@ -463,9 +470,8 @@ public:
                     int w_id = docs[j].w_id[k], w_freq = docs[j].w_freq[k];
                     double p[T];
 
-                    set_k_topic(j, k, z_d_m[j][k], true);
+                    // set_k_topic(j, k, z_d_m[j][k], true);
 
-                    #pragma omp parallel for num_threads(16)
                     for (int l = 0; l < T; l ++) {
                         p[l] = n_d_t[j][y_d[j]] + (l == y_d[j]);
 
@@ -473,8 +479,14 @@ public:
                             p[l] *= g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
                         }
                     }
-                    int topic = uni_sample(p, T);
-                    set_k_topic(j, k, topic, false);
+                    topics[j][k] = uni_sample(p, T);
+                    // set_k_topic(j, k, topic, false);
+                }
+            }
+            for (int j = 0; j < D; j ++) {
+                for (int k = 0; k < M[j]; k ++) {
+                    set_k_topic(j, k, topics[j][k], true);
+                    set_k_topic(j, k, topics[j][k], false);
                 }
             }
 
