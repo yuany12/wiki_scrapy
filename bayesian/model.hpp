@@ -424,6 +424,8 @@ public:
         float g_r_t[T];
         float g_k_t[T][max_con + 1];
 
+        read_out();
+
         for (int i = 0; i < samp_topic_max_iter; i ++) {
             sprintf(temp, "sampling topics #%d log-likelihood = %f", i, log_likelihood());
             logging(temp);
@@ -447,7 +449,6 @@ public:
                     }
 
                     p[k] *= fastpow2(temp);
-                    if (j == 0) cout << k << ' ' << temp << ' ' << p[k] << endl;
                 }
 
                 topics[j] = uni_sample(p, T);
@@ -498,10 +499,10 @@ public:
 
             logging("sampling keywords done");
 
-            // if (i > 0 && i % time_lag == 0) {
-            read_out();
-            norm_read_out();
-            // }
+            if (i > 0 && i % time_lag == 0) {
+                read_out();
+                norm_read_out();
+            }
         }
 
         norm_read_out();
