@@ -8,7 +8,6 @@
 #include <cstdio>
 #include <cstring>
 #include "utils.hpp"
-#include "fast.hpp"
 
 using namespace std;
 
@@ -446,7 +445,7 @@ public:
                         temp += g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
                     }
 
-                    p[k] *= pow2(temp);
+                    p[k] *= fastpow2(temp);
                 }
 
                 topics[j] = uni_sample(p, T);
@@ -484,7 +483,7 @@ public:
                             temp += g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
                         }
 
-                        p[l] *= pow2(temp);
+                        p[l] *= fastpow2(temp);
                     }
                     k_topics[j][k] = uni_sample(p, T);
                 }
