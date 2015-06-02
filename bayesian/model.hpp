@@ -7,7 +7,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstring>
-#include "logging.hpp"
+#include "utils.hpp"
 
 using namespace std;
 
@@ -24,7 +24,7 @@ public:
 double gamma_ratio(double x1, double x2) {
     double u = x1 - x2;
     double n = x1 - 0.5 - u * 0.5;
-    return pow(pow(n, 2) + (1 - pow(u, 2)) / 12, u / 2);
+    return fast_pow(fast_pow(n, 2) + (1 - fast_pow(u, 2)) / 12, u / 2);
 }
 
 int uni_sample(double * p, int len) {
@@ -39,11 +39,11 @@ int uni_sample(double * p, int len) {
 }
 
 double gaussian(double x, double mu, double lambda) {
-    return pow(lambda, 0.5) * exp(- lambda * 0.5 * pow(x - mu, 2));
+    return fast_pow(lambda, 0.5) * exp(- lambda * 0.5 * fast_pow(x - mu, 2));
 }
 
 double log_gaussian(double x, double mu, double lambda) {
-    return 0.5 * lambda * (-lambda * 0.5 * pow(x - mu, 2));
+    return 0.5 * lambda * (-lambda * 0.5 * fast_pow(x - mu, 2));
 }
 
 class model {
@@ -220,7 +220,7 @@ public:
         for (int i = 0; i < D; i ++) {
             int topic = y_d[i];
             for (int j = 0; j < E_r; j ++) {
-                sqr_r[topic][j] += pow(f_r_d[i][j], 2);
+                sqr_r[topic][j] += fast_pow(f_r_d[i][j], 2);
                 sum_r[topic][j] += f_r_d[i][j];
             }
             n_r_t[topic] ++;
@@ -228,7 +228,7 @@ public:
             for (int j = 0; j < M[i]; j ++) {
                 int topic = z_d_m[i][j], w_id = docs[i].w_id[j], w_freq = docs[i].w_freq[j];
                 for (int k = 0; k < E_k; k ++) {
-                    sqr_k[topic][k] += pow(f_k_w[w_id][k], 2) * w_freq;
+                    sqr_k[topic][k] += fast_pow(f_k_w[w_id][k], 2) * w_freq;
                     sum_k[topic][k] += f_k_w[w_id][k] * w_freq;
                 }
                 n_k_t[topic] += w_freq;
@@ -281,11 +281,11 @@ public:
 
                 int n = n_r_t[i];
                 double mean = n > 0 ? sum_r[i][j] / n : 0;
-                double variance = sqr_r[i][j] - (n > 0 ? pow(sum_r[i][j], 2) / n : 0);
+                double variance = sqr_r[i][j] - (n > 0 ? fast_pow(sum_r[i][j], 2) / n : 0);
 
                 double alpha_n = alpha_0 + 0.5 * n;
                 double beta_n = beta_0 + 0.5 * variance + 
-                    kappa_0 * n * pow(mean - mu_0, 2) * 0.5 * (kappa_0 + n);
+                    kappa_0 * n * fast_pow(mean - mu_0, 2) * 0.5 * (kappa_0 + n);
 
                 lambda_r_t[i][j] += alpha_n / beta_n;
             }
@@ -297,11 +297,11 @@ public:
 
                 int n = n_k_t[i];
                 double mean = n > 0 ? sum_k[i][j] / n : 0;
-                double variance = sqr_k[i][j] - (n > 0 ? pow(sum_k[i][j], 2) / n : 0);
+                double variance = sqr_k[i][j] - (n > 0 ? fast_pow(sum_k[i][j], 2) / n : 0);
 
                 double alpha_n = alpha_0 + 0.5 * n;
                 double beta_n = beta_0 + 0.5 * variance +
-                    kappa_0 * n * pow(mean - mu_0, 2) * 0.5 * (kappa_0 + n);
+                    kappa_0 * n * fast_pow(mean - mu_0, 2) * 0.5 * (kappa_0 + n);
 
                 lambda_k_t[i][j] += alpha_n / beta_n;
             }
@@ -333,7 +333,7 @@ public:
     void set_k_topic(int d, int m, int t) {
         int topic = z_d_m[d][m], w_id = docs[d].w_id[m], w_freq = docs[d].w_freq[m];
         for (int i = 0; i < E_k; i ++) {
-            sqr_k[topic][i] -= pow(f_k_w[w_id][i], 2) * w_freq;
+            sqr_k[topic][i] -= fast_pow(f_k_w[w_id][i], 2) * w_freq;
             sum_k[topic][i] -= f_k_w[w_id][i] * w_freq;
         }
         n_k_t[topic] -= w_freq;
@@ -342,7 +342,7 @@ public:
 
         z_d_m[d][m] = t;
         for (int i = 0; i < E_k; i ++) {
-            sqr_k[t][i] += pow(f_k_w[w_id][i], 2) * w_freq;
+            sqr_k[t][i] += fast_pow(f_k_w[w_id][i], 2) * w_freq;
             sum_k[t][i] += f_k_w[w_id][i] * w_freq;
         }
         n_k_t[t] += w_freq;
@@ -353,14 +353,14 @@ public:
     void set_r_topic(int d, int t) {
         int topic = y_d[d];
         for (int i = 0; i < E_r; i ++) {
-            sqr_r[topic][i] -= pow(f_r_d[d][i], 2);
+            sqr_r[topic][i] -= fast_pow(f_r_d[d][i], 2);
             sum_r[topic][i] -= f_r_d[d][i];
         }
         n_r_t[topic] --;
 
         y_d[d] = t;
         for (int i = 0; i < E_r; i ++) {
-            sqr_r[t][i] += pow(f_r_d[d][i], 2);
+            sqr_r[t][i] += fast_pow(f_r_d[d][i], 2);
             sum_r[t][i] += f_r_d[d][i];
         }
         n_r_t[t] ++;
@@ -369,28 +369,28 @@ public:
     double g(int t, int e, double f, int * n_r_t, double ** sum_r, double ** sqr_r, int dn) {
         int n = n_r_t[t];
         double mean = sum_r[t][e] / n;
-        double variance = sqr_r[t][e] - pow(sum_r[t][e], 2) / n;
+        double variance = sqr_r[t][e] - fast_pow(sum_r[t][e], 2) / n;
 
         double alpha_n = alpha_0 + 0.5 * n;
         double beta_n = beta_0 + 0.5 * variance + 
-            kappa_0 * n * pow(mean - mu_0, 2) * 0.5 * (kappa_0 + n);
+            kappa_0 * n * fast_pow(mean - mu_0, 2) * 0.5 * (kappa_0 + n);
         double kappa_n = kappa_0 + n;
         double mu_n = (kappa_0 * mu_0 + n * mean) / (kappa_0 + n);
 
         n -= dn;
         mean = n > 0 ? (sum_r[t][e] - f) / n : 0.0;
-        variance = n > 0 ? sqr_r[t][e] - pow(f, 2) - pow(sum_r[t][e] - f, 2) / n : 0.0;
+        variance = n > 0 ? sqr_r[t][e] - fast_pow(f, 2) - fast_pow(sum_r[t][e] - f, 2) / n : 0.0;
 
         double alpha_n_pr = alpha_0 + 0.5 * n;
         double beta_n_pr = beta_0 + 0.5 * variance + 
-            (kappa_0 + n > 0 ? kappa_0 * n * pow(mean - mu_0, 2) * 0.5 * (kappa_0 + n) : 0.0);
+            (kappa_0 + n > 0 ? kappa_0 * n * fast_pow(mean - mu_0, 2) * 0.5 * (kappa_0 + n) : 0.0);
         double kappa_n_pr = kappa_0 + n;
         double mu_n_pr = kappa_0 + n > 0 ? (kappa_0 * mu_0 + n * mean) / (kappa_0 + n) : 0.0;
 
         double ret = 1.0;
         ret *= gamma_ratio(alpha_n, alpha_n_pr);
-        ret *= pow(beta_n_pr, alpha_n_pr) / pow(beta_n, alpha_n);
-        ret *= pow(kappa_n_pr / kappa_n, 0.5);
+        ret *= fast_pow(beta_n_pr, alpha_n_pr) / fast_pow(beta_n, alpha_n);
+        ret *= fast_pow(kappa_n_pr / kappa_n, 0.5);
         return ret;
     }
 
