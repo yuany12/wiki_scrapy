@@ -494,6 +494,8 @@ public:
                 }
             }
 
+            logging("sampling keywords done");
+
             if (i > 0 && i % time_lag == 0) {
                 read_out();
             }
