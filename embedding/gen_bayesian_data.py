@@ -58,36 +58,52 @@ def gen_pair(bulk_info = (39000000, 0)):
             fout.write('\n')
         fout.close()
 
+def select(bulk_info):
+    strs, bulk_size, bulk_no, ret = bulk_info
+    cnt = 0
+    for i in range(bulk_size * bulk_no, min(bulk_size * (bulk_no + 1), len(strs))):
+        if cnt % 1000 == 0:
+            logging.info('selecting %d in thread %d' % (cnt, bulk_no))
+        cnt += 1
+
+        inputs = strs[i].split(';')
+        rid = inputs[0]
+        keywords = []
+        for j in range(1, len(inputs)):
+            in_inputs = inputs[j].split(',')
+            keywords.append((in_inputs[0], int(in_inputs[1])))
+        stats = []
+        for j in range(len(keywords)):
+            score = 0.0
+            for k in range(len(keywords)):
+                score += model.similarity(keywords[j][0], keywords[k][0]) * keywords[k][1]
+            stats.append((keywords[j][0], keywords[j][1], score))
+        stats.sort(key = lambda x: x[2], reverse = True)
+        ret[i] = rid
+        for j in range(int(len(stats) * 0.2)):
+            ret[i] += ';%s,%d' % (stats[j][0], stats[j][1])
+
 def merge_and_select():
     model = gensim.models.Word2Vec.load('keyword.model')
     SAMPLE_RATE = 0.2
 
-    fout = open('pair.select.txt', 'w')
-    cnt = 0
+    strs = []
     for i in range(8):
         for line in open('gen_pair.%d.out' % i):
-            if cnt % 10000 == 0:
-                logging.info('merging %d' % cnt)
-            cnt += 1
+            strs.append(line.strip())
 
-            inputs = line.strip().split(';')
-            rid = inputs[0]
-            keywords = []
-            for j in range(1, len(inputs)):
-                in_inputs = inputs[j].split(',')
-                keywords.append((in_inputs[0], int(in_inputs[1])))
-            stats = []
-            for j in range(len(keywords)):
-                score = 0.0
-                for k in range(len(keywords)):
-                    score += model.similarity(keywords[j][0], keywords[k][0]) * keywords[k][1]
-                stats.append((keywords[j][0], keywords[j][1], score))
-            stats.sort(key = lambda x: x[2], reverse = True)
-            fout.write(rid)
-            for j in range(int(len(stats) * SAMPLE_RATE)):
-                fout.write(';%s,%d' % (stats[j][0], stats[j][1]))
-            fout.write('\n')
+    CORE_NUM = 16
+    bulk_size = len(strs) / CORE_NUM + 1
+    ret = [None for _ in range(len(strs))]
+
+    pool = multiprocessing.Pool(processes = CORE_NUM)
+    pool.map(select, [(strs, bulk_size, i, ret) for i in range(CORE_NUM)])
+
+    fout = open('pair.select.txt', 'w')
+    for r in ret:
+        fout.write(r + '\n')
     fout.close()
+
 
 def indexing():
     model = gensim.models.Word2Vec.load('online.author_word.model')
