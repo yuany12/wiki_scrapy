@@ -85,7 +85,7 @@ def merge_and_select():
             stats.sort(key = lambda x: x[2], reverse = True)
             fout.write(rid)
             for j in range(int(len(stats) * SAMPLE_RATE)):
-                fout.wrte(';%s,%d' % (stats[j][0], stats[j][1]))
+                fout.write(';%s,%d' % (stats[j][0], stats[j][1]))
             fout.write('\n')
     fout.close()
 
