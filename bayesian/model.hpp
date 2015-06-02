@@ -347,42 +347,47 @@ public:
         n_w_t[w_id][t] += w_freq;
     }
 
-    void set_r_topic(int d, int t) {
-        int topic = y_d[d];
-        for (int i = 0; i < E_r; i ++) {
-            sqr_r[topic][i] -= f_r_d[d][i] * f_r_d[d][i];
-            sum_r[topic][i] -= f_r_d[d][i];
+    void set_r_topic(int d, int t, bool del) {
+        if (del) {
+            int topic = y_d[d];
+            for (int i = 0; i < E_r; i ++) {
+                sqr_r[topic][i] -= f_r_d[d][i] * f_r_d[d][i];
+                sum_r[topic][i] -= f_r_d[d][i];
+            }
+            n_r_t[topic] --;
         }
-        n_r_t[topic] --;
-
-        y_d[d] = t;
-        for (int i = 0; i < E_r; i ++) {
-            sqr_r[t][i] += f_r_d[d][i] * f_r_d[d][i];
-            sum_r[t][i] += f_r_d[d][i];
+        else {
+            y_d[d] = t;
+            for (int i = 0; i < E_r; i ++) {
+                sqr_r[t][i] += f_r_d[d][i] * f_r_d[d][i];
+                sum_r[t][i] += f_r_d[d][i];
+            }
+            n_r_t[t] ++;
         }
-        n_r_t[t] ++;
     }
 
     double g(int t, int e, double f, int * n_r_t, double ** sum_r, double ** sqr_r, int dn) {
         int n = n_r_t[t];
-        double mean = sum_r[t][e] / n;
-        double variance = sqr_r[t][e] - sum_r[t][e] * sum_r[t][e] / n;
+        double mean = n > 0 ? sum_r[t][e] / n : 0;
+        double variance = n > 0 ? sqr_r[t][e] - sum_r[t][e] * sum_r[t][e] / n : 0;
+
+        double alpha_n_pr = alpha_0 + 0.5 * n;
+        double beta_n_pr = beta_0 + 0.5 * variance +
+            kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
+        double kappa_n_pr = kappa_0 + n;
+        double mu_n_pr = kappa_0 + n > 0 ? (kappa_0 + mu_0 + n * mean) / (kappa_0 + n) : 0;
+
+        n += dn;
+        double sum = sum_r[t][e] + f * dn;
+        double sqr = sqr_r[t][e] + f * f * dn;
+        double mean = sum / n;
+        double variance = sqr - sum * sum / n;
 
         double alpha_n = alpha_0 + 0.5 * n;
         double beta_n = beta_0 + 0.5 * variance + 
             kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
         double kappa_n = kappa_0 + n;
         double mu_n = (kappa_0 * mu_0 + n * mean) / (kappa_0 + n);
-
-        n -= dn;
-        mean = n > 0 ? (sum_r[t][e] - f) / n : 0.0;
-        variance = n > 0 ? sqr_r[t][e] - f * f - (sum_r[t][e] - f) * (sum_r[t][e] - f) / n : 0.0;
-
-        double alpha_n_pr = alpha_0 + 0.5 * n;
-        double beta_n_pr = beta_0 + 0.5 * variance + 
-            (kappa_0 + n > 0 ? kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n) : 0.0);
-        double kappa_n_pr = kappa_0 + n;
-        double mu_n_pr = kappa_0 + n > 0 ? (kappa_0 * mu_0 + n * mean) / (kappa_0 + n) : 0.0;
 
         double ret = 1.0;
         ret *= gamma_ratio(alpha_n, alpha_n_pr);
@@ -393,7 +398,6 @@ public:
 
     void sample_topics() {
         double * p = new double[T];
-        double * g_store = new double[E_r + E_k];
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
             sprintf(temp, "sampling topics #%d log-likelihood = %0.8f\n", i, log_likelihood());
@@ -405,21 +409,20 @@ public:
                     logging(temp);
                 }
 
+                set_r_topic(j, y_d[j], true);
+
+                #pragma omp parallel for num_threads(P_THREAD)
                 for (int k = 0; k < T; k ++) {
-                    set_r_topic(j, k);
                     p[k] = 1.0 * n_d_t[j][k];
 
-                    #pragma omp parallel for num_threads(P_THREAD)
                     for (int l = 0; l < E_r; l ++) {
-                        g_store[l] = g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
-                    }
-
-                    for (int l = 0; l < E_r; l ++) {
-                        p[k] *= g_store[l];
+                        p[k] *= g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
                     }
                 }
+
                 int topic = uni_sample(p, T);
-                set_r_topic(j, topic);
+
+                set_r_topic(j, topic, false);
             }
 
             for (int j = 0; j < D; j ++) {
