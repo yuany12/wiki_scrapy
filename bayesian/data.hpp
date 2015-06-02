@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include "model.hpp"
+#include "logging.hpp"
 
 using namespace std;
 
@@ -26,7 +27,7 @@ void read_data(int & D, int & W, document * & docs, double ** & f_r, double ** &
 
     fclose(fin);
 
-    printf("loading data main done\n");
+    logging("loading data main done");
 
     fin = fopen("data.embedding.researcher.txt", "r");
     f_r = new double*[D];
@@ -39,7 +40,7 @@ void read_data(int & D, int & W, document * & docs, double ** & f_r, double ** &
     }
     fclose(fin);
 
-    printf("loading researcher done\n");
+    logging("loading researcher done");
 
     fin = fopen("data.embedding.keyword.txt", "r");
     f_k = new double*[W];
@@ -52,5 +53,5 @@ void read_data(int & D, int & W, document * & docs, double ** & f_r, double ** &
     }
     fclose(fin);
 
-    printf("loading keyword done\n");
+    logging("loading keyword done");
 }
