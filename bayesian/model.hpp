@@ -15,7 +15,8 @@ char temp[200];
 
 #define P_THREAD 16
 
-const double LOG_2_PI = log(atan(1)*4);
+const double LOG_2_PI = log(atan(1)*4 * 2);
+const double 2_PI = atan(1) * 8;
 
 class document {
 public:
@@ -400,15 +401,16 @@ public:
         double kappa_n = kappa_0 + n;
         // double mu_n = (kappa_0 * mu_0 + n * mean) / (kappa_0 + n);
 
-        double ret = 0.0;
-        // ret *= gamma_ratio(alpha_n, alpha_n_pr);
-        // ret *= fast_pow(beta_n_pr, alpha_n_pr) / fast_pow(beta_n, alpha_n);
-        // ret *= fast_pow(kappa_n_pr / kappa_n, 0.5);
+        double ret = 1.0;
+        ret *= gamma_ratio(alpha_n, alpha_n_pr);
+        ret *= fast_pow(beta_n_pr, alpha_n_pr) / fast_pow(beta_n, alpha_n);
+        ret *= fast_pow(kappa_n_pr / kappa_n, 0.5);
+        ret *= fast_pow(2_PI, dn * 0.5);
 
-        ret += log_gamma_ratio(alpha_n, alpha_n_pr);
-        ret += alpha_n_pr * log(beta_n_pr) - alpha_n * log(beta_n);
-        ret += 0.5 * log(kappa_n_pr / kappa_n);
-        ret += LOG_2_PI * dn * 0.5;
+        // ret += log_gamma_ratio(alpha_n, alpha_n_pr);
+        // ret += alpha_n_pr * log(beta_n_pr) - alpha_n * log(beta_n);
+        // ret += 0.5 * log(kappa_n_pr / kappa_n);
+        // ret += LOG_2_PI * dn * 0.5;
         return ret;
     }
 
@@ -429,13 +431,11 @@ public:
 
                 #pragma omp parallel for num_threads(P_THREAD)
                 for (int k = 0; k < T; k ++) {
-                    p[k] = 0.0;
+                    p[k] = n_d_t[j][k];
 
                     for (int l = 0; l < E_r; l ++) {
-                        p[k] += g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
+                        p[k] *= g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
                     }
-
-                    p[k] = exp(p[k]) * n_d_t[j][k];
                 }
 
                 int topic = uni_sample(p, T);
@@ -455,12 +455,11 @@ public:
 
                     #pragma omp parallel for num_threads(P_THREAD)
                     for (int l = 0; l < T; l ++) {
-                        p[l] = 0.0;
+                        p[l] = n_d_t[j][y_d[j]] + (l == y_d[j]);
 
                         for (int m = 0; m < E_k; m ++) {
-                            p[l] += g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
+                            p[l] *= g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
                         }
-                        p[l] = exp(p[l]) * (n_d_t[j][y_d[j]] + (l == y_d[j]));
                     }
                     int topic = uni_sample(p, T);
                     set_k_topic(j, k, topic, false);
