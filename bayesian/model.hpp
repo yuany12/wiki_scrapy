@@ -441,7 +441,6 @@ public:
 
                 double p[T];
 
-                #pragma omp parallel for num_threads(16)
                 for (int k = 0; k < T; k ++) {
                     p[k] = n_d_t[j][k];
 
