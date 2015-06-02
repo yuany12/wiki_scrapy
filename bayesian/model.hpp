@@ -373,8 +373,11 @@ public:
         float ret = 0.0;
         int n = n_r_t[t];
         ret += log_gamma_ratio(n + dn, n);
+        if (t == 0 && dn == 1) cout << "log_gamma_ratio = " << log_gamma_ratio(n + dn, n) << endl;
         ret += 0.5 * log2(n / (n + dn));
+        if (t == 0 && dn == 1) cout << "log2 = " << log2(n / (n + dn)) << endl;
         ret += 0.5 * dn * LOG_2_PI;
+        if (t == 0 && dn == 1) cout << "log 2 pi = " << 0.5 * dn * LOG_2_PI << endl;
         return ret;
     }
 
@@ -429,7 +432,6 @@ public:
 
             for (int j = 0; j < T; j ++) {
                 g_r_t[j] = g_t(j, n_r_t, 1);
-                cout << j << ' ' << g_r_t[j] << endl;
             }
 
             #pragma omp parallel for num_threads(64)
