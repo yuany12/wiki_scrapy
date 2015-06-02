@@ -251,11 +251,6 @@ public:
             }
         }
         for (int i = 0; i < D; i ++) {
-            if (i % 10000 == 0) {
-                sprintf(temp, "calc log_likelihood for keyword %d", i);
-                logging(temp);
-            }
-
             for (int j = 0; j < M[i]; j ++) {
                 int topic = z_d_m[i][j], w_id = docs[i].w_id[j], w_freq = docs[i].w_freq[j];
                 for (int k = 0; k < E_k; k ++) {
