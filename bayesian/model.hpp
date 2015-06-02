@@ -339,7 +339,7 @@ public:
         }
     }
 
-    inline void set_k_topic(int d, int m, int t, bool del) {
+    inline void set_k_topic(int d, int m, int t) {
         int topic = z_d_m[d][m], w_id = docs[d].w_id[m], w_freq = docs[d].w_freq[m];
         for (int i = 0; i < E_k; i ++) {
             sqr_k[topic][i] -= f_k_w[w_id][i] * f_k_w[w_id][i] * w_freq;
@@ -348,7 +348,7 @@ public:
         n_k_t[topic] -= w_freq;
         n_d_t[d][topic] -= w_freq;
         n_w_t[w_id][topic] -= w_freq;
-        
+
         z_d_m[d][m] = t;
         for (int i = 0; i < E_k; i ++) {
             sqr_k[t][i] += f_k_w[w_id][i] * f_k_w[w_id][i] * w_freq;
