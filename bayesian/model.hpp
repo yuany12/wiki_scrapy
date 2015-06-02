@@ -31,6 +31,12 @@ double gamma_ratio(double x1, double x2) {
     return fast_pow(n * n + (1 - u * u) / 12, u / 2);
 }
 
+double log_gamma_ratio(double x1, double x2) {
+    double u = x1 - x2;
+    double n = x1 - 0.5 - u * 0.5;
+    return u * 0.5 * log(n * n + (1 - u * u) / 12);
+}
+
 int uni_sample(double * p, int len) {
     double sum = 0;
     for (int i = 0; i < len; i ++) sum += p[i];
