@@ -251,6 +251,8 @@ public:
     }
 
     float log_likelihood() {
+        parameter_update();
+
         float llh = 0.0;
         for (int i = 0; i < D; i ++) {
             for (int j = 0; j < E_r; j ++) {
@@ -307,6 +309,46 @@ public:
                     kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
 
                 lambda_k_t[i][j] += alpha_n / beta_n;
+            }
+        }
+    }
+
+    void parameter_update() {
+        for (int i = 0; i < D; i ++) {
+            float sum = 0;
+            for (int j = 0; j < T; j ++) sum += n_d_t[i][j] + alpha;
+            for (int j = 0; j < T; j ++) theta_d_t[i][j] = (n_d_t[i][j] + alpha) / sum;
+        }
+
+        for (int i = 0; i < T; i ++) {
+            for (int j = 0; j < E_r; j ++) {
+                mu_r_t[i][j] = kappa_0 + (n_r_t[i] > 0 ? (mu_0 * kappa_0 + sum_r[i][j]) / (kappa_0 + n_r_t[i]) : 0);
+
+                int n = n_r_t[i];
+                float mean = n > 0 ? sum_r[i][j] / n : 0;
+                float variance = sqr_r[i][j] - (n > 0 ? sum_r[i][j] * sum_r[i][j] / n : 0);
+
+                float alpha_n = alpha_0 + 0.5 * n;
+                float beta_n = beta_0 + 0.5 * variance + 
+                    kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
+
+                lambda_r_t[i][j] = alpha_n / beta_n;
+            }
+        }
+
+        for (int i = 0; i < T; i ++) {
+            for (int j = 0; j < E_k; j ++) {
+                mu_k_t[i][j] = kappa_0 + (n_k_t[i] > 0 ? (mu_0 * kappa_0 + sum_k[i][j]) / (kappa_0 + n_k_t[i]) : 0);
+
+                int n = n_k_t[i];
+                float mean = n > 0 ? sum_k[i][j] / n : 0;
+                float variance = sqr_k[i][j] - (n > 0 ? sum_k[i][j] * sum_k[i][j] / n : 0);
+
+                float alpha_n = alpha_0 + 0.5 * n;
+                float beta_n = beta_0 + 0.5 * variance +
+                    kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
+
+                lambda_k_t[i][j] = alpha_n / beta_n;
             }
         }
     }
@@ -423,8 +465,6 @@ public:
 
         float g_r_t[T];
         float g_k_t[T][max_con + 1];
-
-        read_out();
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
             sprintf(temp, "sampling topics #%d log-likelihood = %f", i, log_likelihood());
