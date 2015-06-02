@@ -46,7 +46,7 @@ float gaussian(float x, float mu, float lambda) {
 }
 
 float log_gaussian(float x, float mu, float lambda) {
-    return 0.5 * log(lambda) * (-lambda * 0.5 * (x - mu) * (x - mu));
+    return 0.5 * log(lambda) + (-lambda * 0.5 * (x - mu) * (x - mu));
 }
 
 class model {
