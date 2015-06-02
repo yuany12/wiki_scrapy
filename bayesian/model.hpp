@@ -11,6 +11,8 @@
 
 using namespace std;
 
+char temp[200];
+
 class document {
 public:
     int r_id;
@@ -243,12 +245,22 @@ public:
     double log_likelihood() {
         double llh = 0.0;
         for (int i = 0; i < D; i ++) {
+            if (i % 10000 == 0) {
+                sprintf(temp, "calc log_likelihood for researcher %d", i);
+                logging(temp);
+            }
+
             for (int j = 0; j < E_r; j ++) {
                 int topic = y_d[i];
                 llh += log_gaussian(f_r_d[i][j], mu_r_t[topic][j], lambda_r_t[topic][j]);
             }
         }
         for (int i = 0; i < D; i ++) {
+            if (i % 10000 == 0) {
+                sprintf(temp, "calc log_likelihood for keyword %d", i);
+                logging(temp);
+            }
+
             for (int j = 0; j < M[i]; j ++) {
                 int topic = z_d_m[i][j], w_id = docs[i].w_id[j], w_freq = docs[i].w_freq[j];
                 for (int k = 0; k < E_k; k ++) {
@@ -391,7 +403,7 @@ public:
         double * p = new double[T];
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
-            printf("sampling topics #%d log-likelihood = %0.8f\n", i, log_likelihood());
+            logging("sampling topics #%d log-likelihood = %0.8f\n", i, log_likelihood());
 
             for (int j = 0; j < D; j ++) {
                 for (int k = 0; k < T; k ++) {
@@ -432,7 +444,8 @@ public:
 
     void embedding_update() {
         for (int tt = 0; tt < emb_max_iter; tt ++) {
-            printf("updating embeddings #%d log-likelihood = %0.8f\n", tt, log_likelihood());
+            sprintf(temp, "updating embeddings #%d log-likelihood = %0.8f\n", tt, log_likelihood());
+            logging(temp);
 
             for (int i = 0; i < D; i ++) {
                 for (int j = 0; j < E_r; j ++) {
@@ -463,7 +476,8 @@ public:
 
     void learn() {
         for (int i = 0; i < learning_max_iter; i ++) {
-            printf("##### learning #%d #####\n", i);
+            sprintf(temp, "##### learning #%d #####\n", i);
+            logging(temp);
 
             sample_topics();
             embedding_update();
