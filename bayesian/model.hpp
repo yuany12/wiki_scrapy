@@ -466,27 +466,28 @@ public:
                     logging(temp);
                 }
 
+                double p[T];
+
                 for (int k = 0; k < M[j]; k ++) {
                     int w_id = docs[j].w_id[k], w_freq = docs[j].w_freq[k];
-                    double p[T];
 
                     // set_k_topic(j, k, z_d_m[j][k], true);
 
                     for (int l = 0; l < T; l ++) {
-                        p[l] = n_d_t[j][y_d[j]] + (l == y_d[j]);
+                        p[l] = n_d_t[j][y_d[j]] + ((l == y_d[j]) - (z_d_m[j][k] == y_d[j])) * w_freq;
 
                         for (int m = 0; m < E_k; m ++) {
                             p[l] *= g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
                         }
                     }
-                    topics[j][k] = uni_sample(p, T);
+                    k_topics[j][k] = uni_sample(p, T);
                     // set_k_topic(j, k, topic, false);
                 }
             }
             for (int j = 0; j < D; j ++) {
                 for (int k = 0; k < M[j]; k ++) {
-                    set_k_topic(j, k, topics[j][k], true);
-                    set_k_topic(j, k, topics[j][k], false);
+                    set_k_topic(j, k, k_topics[j][k], true);
+                    set_k_topic(j, k, k_topics[j][k], false);
                 }
             }
 
