@@ -331,7 +331,7 @@ public:
                 lambda_k_t[i][j] /= read_out_cnt;
             }
         }
-        read_out_cnt = 0;
+        read_out_cnt = 1;
     }
 
     inline void set_k_topic(int d, int m, int t) {
