@@ -327,24 +327,27 @@ public:
         }
     }
 
-    void set_k_topic(int d, int m, int t) {
+    void set_k_topic(int d, int m, int t, bool del) {
         int topic = z_d_m[d][m], w_id = docs[d].w_id[m], w_freq = docs[d].w_freq[m];
-        for (int i = 0; i < E_k; i ++) {
-            sqr_k[topic][i] -= f_k_w[w_id][i] * f_k_w[w_id][i] * w_freq;
-            sum_k[topic][i] -= f_k_w[w_id][i] * w_freq;
+        if (del) {
+            for (int i = 0; i < E_k; i ++) {
+                sqr_k[topic][i] -= f_k_w[w_id][i] * f_k_w[w_id][i] * w_freq;
+                sum_k[topic][i] -= f_k_w[w_id][i] * w_freq;
+            }
+            n_k_t[topic] -= w_freq;
+            n_d_t[d][topic] -= w_freq;
+            n_w_t[w_id][topic] -= w_freq;
         }
-        n_k_t[topic] -= w_freq;
-        n_d_t[d][topic] -= w_freq;
-        n_w_t[w_id][topic] -= w_freq;
-
-        z_d_m[d][m] = t;
-        for (int i = 0; i < E_k; i ++) {
-            sqr_k[t][i] += f_k_w[w_id][i] * f_k_w[w_id][i] * w_freq;
-            sum_k[t][i] += f_k_w[w_id][i] * w_freq;
+        else {
+            z_d_m[d][m] = t;
+            for (int i = 0; i < E_k; i ++) {
+                sqr_k[t][i] += f_k_w[w_id][i] * f_k_w[w_id][i] * w_freq;
+                sum_k[t][i] += f_k_w[w_id][i] * w_freq;
+            }
+            n_k_t[t] += w_freq;
+            n_d_t[d][t] += w_freq;
+            n_w_t[w_id][t] += w_freq;
         }
-        n_k_t[t] += w_freq;
-        n_d_t[d][t] += w_freq;
-        n_w_t[w_id][t] += w_freq;
     }
 
     void set_r_topic(int d, int t, bool del) {
@@ -404,7 +407,7 @@ public:
             logging(temp);
 
             for (int j = 0; j < D; j ++) {
-                if (j % 100 == 0) {
+                if (j % 1000 == 0) {
                     sprintf(temp, "sampling researcher %d", j);
                     logging(temp);
                 }
@@ -426,22 +429,23 @@ public:
             }
 
             for (int j = 0; j < D; j ++) {
-                if (j % 100 == 0) {
+                if (j % 1000 == 0) {
                     sprintf(temp, "sampling keyword %d", j);
                     logging(temp);
                 }
 
                 for (int k = 0; k < M[j]; k ++) {
                     int w_id = docs[j].w_id[k], w_freq = docs[j].w_freq[k];
+                    set_k_topic(j, k, z_d_m[j][k], true);
+                    #pragma omp parallel for num_threads(P_THREAD)
                     for (int l = 0; l < T; l ++) {
-                        set_k_topic(j, k, l);
                         p[l] = 1.0 * n_d_t[j][l];
                         for (int m = 0; m < E_k; m ++) {
                             p[l] *= g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
                         }
                     }
                     int topic = uni_sample(p, T);
-                    set_k_topic(j, k, topic);
+                    set_k_topic(j, k, topic, false);
                 }
             }
 
