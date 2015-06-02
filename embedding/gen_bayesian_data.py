@@ -182,10 +182,9 @@ def format():
 
 def cnt_pair():
     cnt = 0
-    for i in range(8):
-        for line in open('gen_pair.%d.out' % i):
-            inputs = line.strip().split(';')
-            cnt += len(inputs) - 1
+    for line in open('pair.select.txt' % i):
+        inputs = line.strip().split(';')
+        cnt += len(inputs) - 1
     print cnt
 
 if __name__ == '__main__':
@@ -193,7 +192,7 @@ if __name__ == '__main__':
     # pool = multiprocessing.Pool(processes = 8)
     # pool.map(gen_pair, [(5000000, i) for i in range(8)])
     # select_()
-    merge()
-    indexing()
-    format()
+    # merge()
+    # indexing()
+    # format()
     cnt_pair()
