@@ -59,12 +59,18 @@ def gen_pair(bulk_info = (39000000, 0)):
         fout.close()
 
 def select(bulk_info):
-    strs, bulk_size, bulk_no, ret, model = bulk_info
-    cnt = 0
-    for i in range(bulk_size * bulk_no, min(bulk_size * (bulk_no + 1), len(strs))):
-        if cnt % 1000 == 0:
-            logging.info('selecting %d in thread %d' % (cnt, bulk_no))
-        cnt += 1
+    model = gensim.models.Word2Vec.load('keyword.model')
+
+    strs = []
+    for i in range(8):
+        for line in open('gen_pair.%d.out' % i):
+            strs.append(line.strip())
+
+    bulk_no, bulk_size = bulk_info
+    fout = open('pair.select.%d.txt' % bulk_no, 'w')
+    for i in range(bulk_size * bulk_no, min(len(strs), bulk_size * (bulk_no + 1))):
+        if i % 1000 == 0:
+            logging.info('selecting %d/%d in thread %d' % (i, bulk_size, bulk_no))
 
         inputs = strs[i].split(';')
         rid = inputs[0]
@@ -79,30 +85,19 @@ def select(bulk_info):
                 score += model.similarity(keywords[j][0], keywords[k][0]) * keywords[k][1]
             stats.append((keywords[j][0], keywords[j][1], score))
         stats.sort(key = lambda x: x[2], reverse = True)
-        ret[i] = rid
+
+        fout.write(rid)
         for j in range(int(len(stats) * 0.2)):
-            ret[i] += ';%s,%d' % (stats[j][0], stats[j][1])
+            fout.write(';%s,%d' % (stats[j][0], stats[j][1]))
+        fout.write('\n')
+    fout.close()
 
-def merge_and_select():
-    model = gensim.models.Word2Vec.load('keyword.model')
-    SAMPLE_RATE = 0.2
-
-    strs = []
-    for i in range(8):
-        for line in open('gen_pair.%d.out' % i):
-            strs.append(line.strip())
-
+def select_():
     CORE_NUM = 16
-    bulk_size = len(strs) / CORE_NUM + 1
-    ret = [None for _ in range(len(strs))]
+    bulk_size = 650000 / CORE_NUM
 
     pool = multiprocessing.Pool(processes = CORE_NUM)
-    pool.map(select, [(strs, bulk_size, i, ret, model) for i in range(CORE_NUM)])
-
-    fout = open('pair.select.txt', 'w')
-    for r in ret:
-        fout.write(r + '\n')
-    fout.close()
+    pool.map(select, [(i, bulk_size) for i in range(CORE_NUM)])
 
 
 def indexing():
@@ -190,7 +185,7 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     # pool = multiprocessing.Pool(processes = 8)
     # pool.map(gen_pair, [(5000000, i) for i in range(8)])
-    merge_and_select()
-    indexing()
-    format()
-    cnt_pair()
+    select_()
+    # indexing()
+    # format()
+    # cnt_pair()
