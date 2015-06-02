@@ -63,8 +63,13 @@ def merge_and_select():
     SAMPLE_RATE = 0.2
 
     fout = open('pair.select.txt', 'w')
+    cnt = 0
     for i in range(8):
         for line in open('gen_pair.%d.out' % i):
+            if cnt % 10000 == 0:
+                logging.info('merging %d' % cnt)
+            cnt += 1
+
             inputs = line.strip().split(';')
             rid = inputs[0]
             keywords = []
