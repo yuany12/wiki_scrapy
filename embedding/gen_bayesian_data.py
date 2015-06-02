@@ -182,7 +182,7 @@ def format():
 
 def cnt_pair():
     cnt = 0
-    for line in open('pair.select.txt' % i):
+    for line in open('pair.select.txt'):
         inputs = line.strip().split(';')
         cnt += len(inputs) - 1
     print cnt
