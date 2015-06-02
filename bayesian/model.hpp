@@ -424,7 +424,7 @@ public:
             sprintf(temp, "sampling topics #%d log-likelihood = %lf", i, log_likelihood());
             logging(temp);
 
-            #pragma omp parallel for num_threads(64)
+            // #pragma omp parallel for num_threads(64)
             for (int j = 0; j < D; j ++) {
                 double p[T];
 
@@ -433,9 +433,10 @@ public:
                     if (p[k] == 0) continue;
 
                     for (int l = 0; l < E_r; l ++) {
-                        p[k] *= g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
+                        temp = g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
+                        p[k] *= temp;
+                        cout << temp << ' ' << p[k] << endl;
                     }
-                    if (j == 0) cout << k << ' ' << p[k] << endl;
                 }
 
                 topics[j] = uni_sample(p, T);
@@ -445,7 +446,7 @@ public:
                 set_r_topic(j, topics[j]);
             }
 
-            #pragma omp parallel for num_threads(64) schedule(dynamic, 1000)
+            // #pragma omp parallel for num_threads(64) schedule(dynamic, 1000)
             for (int j = 0; j < D; j ++) {
                 if (j % 100000 == 0) {
                     sprintf(temp, "sampling keyword %d", j);
