@@ -331,6 +331,7 @@ public:
                 lambda_k_t[i][j] /= read_out_cnt;
             }
         }
+        read_out_cnt = 0;
     }
 
     inline void set_k_topic(int d, int m, int t) {
@@ -497,9 +498,10 @@ public:
 
             logging("sampling keywords done");
 
-            if (i > 0 && i % time_lag == 0) {
-                read_out();
-            }
+            // if (i > 0 && i % time_lag == 0) {
+            read_out();
+            norm_read_out();
+            // }
         }
 
         norm_read_out();
