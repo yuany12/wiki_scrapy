@@ -5,7 +5,7 @@
 int main() {
     int D, W;
     document * docs;
-    double ** f_r, ** f_k;
+    float ** f_r, ** f_k;
 
     read_data(D, W, docs, f_r, f_k);
 
