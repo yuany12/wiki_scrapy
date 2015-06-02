@@ -16,7 +16,7 @@ char temp[200];
 #define P_THREAD 16
 
 const double LOG_2_PI = log(atan(1)*4 * 2);
-const double 2_PI = atan(1) * 8;
+const double _2_PI = atan(1) * 8;
 
 class document {
 public:
@@ -405,7 +405,7 @@ public:
         ret *= gamma_ratio(alpha_n, alpha_n_pr);
         ret *= fast_pow(beta_n_pr, alpha_n_pr) / fast_pow(beta_n, alpha_n);
         ret *= fast_pow(kappa_n_pr / kappa_n, 0.5);
-        ret *= fast_pow(2_PI, dn * 0.5);
+        ret *= fast_pow(_2_PI, dn * 0.5);
 
         // ret += log_gamma_ratio(alpha_n, alpha_n_pr);
         // ret += alpha_n_pr * log(beta_n_pr) - alpha_n * log(beta_n);
