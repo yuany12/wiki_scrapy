@@ -461,6 +461,8 @@ public:
 
                 for (int k = 0; k < M[j]; k ++) {
                     int w_id = docs[j].w_id[k], w_freq = docs[j].w_freq[k];
+                    double p[T];
+
                     set_k_topic(j, k, z_d_m[j][k], true);
 
                     #pragma omp parallel for num_threads(16)
