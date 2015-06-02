@@ -59,7 +59,7 @@ def gen_pair(bulk_info = (39000000, 0)):
         fout.close()
 
 def select(bulk_info):
-    strs, bulk_size, bulk_no, ret = bulk_info
+    strs, bulk_size, bulk_no, ret, model = bulk_info
     cnt = 0
     for i in range(bulk_size * bulk_no, min(bulk_size * (bulk_no + 1), len(strs))):
         if cnt % 1000 == 0:
@@ -97,7 +97,7 @@ def merge_and_select():
     ret = [None for _ in range(len(strs))]
 
     pool = multiprocessing.Pool(processes = CORE_NUM)
-    pool.map(select, [(strs, bulk_size, i, ret) for i in range(CORE_NUM)])
+    pool.map(select, [(strs, bulk_size, i, ret, model) for i in range(CORE_NUM)])
 
     fout = open('pair.select.txt', 'w')
     for r in ret:
