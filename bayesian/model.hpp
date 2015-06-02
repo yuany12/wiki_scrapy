@@ -73,7 +73,7 @@ public:
 
     document * docs;
 
-    const int time_lag = 1;   // time lag of parameter read out
+    const int time_lag = 10;   // time lag of parameter read out
     const int samp_topic_max_iter = 100; // max iteration
     int read_out_cnt;
 
