@@ -424,7 +424,8 @@ public:
     void sample_topics() {
         // double * p = new double[T];
         int topics[D];
-        int k_topics[D][max_M];
+        int ** k_topics = new int * [D];
+        for (int i = 0; i < D; i ++) k_topics[i] = new int[M[i]];
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
             sprintf(temp, "sampling topics #%d log-likelihood = %0.8f\n", i, log_likelihood());
