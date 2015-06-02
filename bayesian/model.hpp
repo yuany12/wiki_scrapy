@@ -446,6 +446,7 @@ public:
                     }
 
                     p[k] *= fastpow2(temp);
+                    if (j == 0) cout << k << ' ' << temp << ' ' << p[k] << endl;
                 }
 
                 topics[j] = uni_sample(p, T);
