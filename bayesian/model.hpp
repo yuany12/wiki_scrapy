@@ -381,7 +381,7 @@ public:
         }
     }
 
-    double g(int t, int e, double f, int * n_r_t, double ** sum_r, double ** sqr_r, int dn) {
+    inline double g(int t, int e, double f, int * n_r_t, double ** sum_r, double ** sqr_r, int dn) {
         double ret = 1.0;
         int n = n_r_t[t];
         ret *= gamma_ratio(n + dn, n);
