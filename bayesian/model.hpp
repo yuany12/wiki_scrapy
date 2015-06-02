@@ -403,7 +403,8 @@ public:
         double * p = new double[T];
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
-            logging("sampling topics #%d log-likelihood = %0.8f\n", i, log_likelihood());
+            sprintf(temp, "sampling topics #%d log-likelihood = %0.8f\n", i, log_likelihood());
+            logging(temp);
 
             for (int j = 0; j < D; j ++) {
                 for (int k = 0; k < T; k ++) {
