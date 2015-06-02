@@ -39,7 +39,7 @@ int uni_sample(double * p, int len) {
 }
 
 double gaussian(double x, double mu, double lambda) {
-    return fast_pow(lambda, 0.5) * exp(- lambda * 0.5 * (x - mu) * (x - mu)));
+    return fast_pow(lambda, 0.5) * exp(- lambda * 0.5 * (x - mu) * (x - mu));
 }
 
 double log_gaussian(double x, double mu, double lambda) {
