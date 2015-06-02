@@ -433,7 +433,7 @@ public:
                     if (p[k] == 0) continue;
 
                     for (int l = 0; l < E_r; l ++) {
-                        temp = g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
+                        double temp = g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
                         p[k] *= temp;
                         cout << temp << ' ' << p[k] << endl;
                     }
