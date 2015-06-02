@@ -375,7 +375,7 @@ public:
         n_r_t[t] ++;
     }
 
-    inline double g(int t, int e, double f, int * n_r_t, double ** sum_r, double ** sqr_r, int dn, print = false) {
+    inline double g(int t, int e, double f, int * n_r_t, double ** sum_r, double ** sqr_r, int dn, bool print = false) {
         double ret = 1.0;
         int n = n_r_t[t];
         ret *= gamma_ratio(n + dn, n);
@@ -439,7 +439,7 @@ public:
                     if (p[k] == 0) continue;
 
                     for (int l = 0; l < E_r; l ++) {
-                        print = j == 0 ? true : false;
+                        bool print = j == 0 ? true : false;
                         p[k] *= g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1, print);
                     }
                 }
