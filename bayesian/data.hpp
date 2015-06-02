@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void read_data(int & D, int & W, document * & docs, double ** & f_r, double ** & f_k) {
+void read_data(int & D, int & W, document * & docs, float ** & f_r, float ** & f_k) {
     FILE * fin = fopen("data.main.txt", "r");
     fscanf(fin, "%d %d\n", &D, &W);
 
@@ -30,26 +30,26 @@ void read_data(int & D, int & W, document * & docs, double ** & f_r, double ** &
     logging("loading data main done");
 
     fin = fopen("data.embedding.researcher.txt", "r");
-    f_r = new double*[D];
+    f_r = new float *[D];
     for (int i = 0; i < D; i ++) {
-        f_r[i] = new double[model::E_r];
+        f_r[i] = new float[model::E_r];
     }
     for (int i = 0; i < D; i ++) {
         for (int j = 0; j < model::E_r; j ++)
-            fscanf(fin, "%lf\n", &f_r[i][j]);
+            fscanf(fin, "%f\n", &f_r[i][j]);
     }
     fclose(fin);
 
     logging("loading researcher done");
 
     fin = fopen("data.embedding.keyword.txt", "r");
-    f_k = new double*[W];
+    f_k = new float*[W];
     for (int i = 0; i < W; i ++) {
-        f_k[i] = new double[model::E_k];
+        f_k[i] = new float[model::E_k];
     }
     for (int i = 0; i < W; i ++) {
         for (int j = 0; j < model::E_k; j ++)
-            fscanf(fin, "%lf\n", &f_k[i][j]);
+            fscanf(fin, "%f\n", &f_k[i][j]);
     }
     fclose(fin);
 
