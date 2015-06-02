@@ -375,7 +375,7 @@ public:
         n_r_t[t] ++;
     }
 
-    inline double g(int t, int e, double f, int * n_r_t, double ** sum_r, double ** sqr_r, int dn) {
+    inline double g(int t, int e, double f, int * n_r_t, double ** sum_r, double ** sqr_r, int dn, print = false) {
         double ret = 1.0;
         int n = n_r_t[t];
         ret *= gamma_ratio(n + dn, n);
@@ -385,6 +385,12 @@ public:
         ret *= fast_pow(beta_n_pr, n) / fast_pow(beta_n, n + dn);
         ret *= fast_pow(n / (n + dn), 0.5);
         ret *= fast_pow(_2_PI, dn * 0.5);
+        if (print) {
+            cout << "gamma_ratio = " << gamma_ratio(n + dn, n) << endl;
+            cout << "beat ^ alpha = " << fast_pow(beta_n_pr, n) / fast_pow(beta_n, n + dn) << endl;
+            cout << "kappa ratio  = " << fast_pow(n / (n + dn), 0.5) << endl;
+            cout << "2 PI ratio = " << fast_pow(_2_PI, dn * 0.5) << endl;
+        }
         return ret;
 
         // int n = n_r_t[t];
@@ -433,9 +439,8 @@ public:
                     if (p[k] == 0) continue;
 
                     for (int l = 0; l < E_r; l ++) {
-                        double temp = g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
-                        p[k] *= temp;
-                        cout << temp << ' ' << p[k] << endl;
+                        print = j == 0 : true ? false;
+                        p[k] *= g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1, print);
                     }
                 }
 
