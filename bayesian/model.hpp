@@ -380,8 +380,8 @@ public:
         n += dn;
         double sum = sum_r[t][e] + f * dn;
         double sqr = sqr_r[t][e] + f * f * dn;
-        double mean = sum / n;
-        double variance = sqr - sum * sum / n;
+        mean = sum / n;
+        variance = sqr - sum * sum / n;
 
         double alpha_n = alpha_0 + 0.5 * n;
         double beta_n = beta_0 + 0.5 * variance + 
