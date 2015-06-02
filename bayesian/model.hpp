@@ -429,6 +429,7 @@ public:
 
             for (int j = 0; j < T; j ++) {
                 g_r_t[j] = g_t(j, n_r_t, 1);
+                cout << j << ' ' << g_r_t[j] << endl;
             }
 
             #pragma omp parallel for num_threads(64)
@@ -446,7 +447,6 @@ public:
                     }
 
                     p[k] *= fastpow2(temp);
-                    if (j == 0) cout << k << ' ' << p[k] << ' ' << temp << endl;
                 }
 
                 topics[j] = uni_sample(p, T);
