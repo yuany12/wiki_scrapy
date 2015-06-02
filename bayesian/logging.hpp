@@ -9,5 +9,5 @@ using namespace std;
 void logging(const char* s) {
     auto t = time(NULL);
     auto tm = *localtime(&t);
-    cout << put_time(&tm, "%d-%m-%Y %H-%M-%S") << s << endl;
+    cout << asctime(&tm) << s << endl;
 }
