@@ -13,6 +13,8 @@ using namespace std;
 
 char temp[200];
 
+#define P_THREAD 64
+
 class document {
 public:
     int r_id;
@@ -391,6 +393,7 @@ public:
 
     void sample_topics() {
         double * p = new double[T];
+        double * g_store = new double[E_r + E_k];
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
             sprintf(temp, "sampling topics #%d log-likelihood = %0.8f\n", i, log_likelihood());
@@ -402,11 +405,18 @@ public:
                     logging(temp);
                 }
 
+                #pragma omp parallel
                 for (int k = 0; k < T; k ++) {
                     set_r_topic(j, k);
                     p[k] = 1.0 * n_d_t[j][k];
+
+                    #pragma omp parallel for num_threads(P_THREAD)
                     for (int l = 0; l < E_r; l ++) {
-                        p[k] *= g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
+                        g_store[l] = g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
+                    }
+
+                    for (int l = 0; l < E_r; l ++) {
+                        p[k] *= g_store[l];
                     }
                 }
                 int topic = uni_sample(p, T);
