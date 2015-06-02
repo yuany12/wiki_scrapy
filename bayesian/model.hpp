@@ -79,7 +79,7 @@ public:
 
     document * docs;
 
-    const int time_lag = 10;   // time lag of parameter read out
+    const int time_lag = 1;   // time lag of parameter read out
     const int samp_topic_max_iter = 100; // max iteration
     int read_out_cnt;
 
@@ -426,11 +426,6 @@ public:
 
             #pragma omp parallel for num_threads(64)
             for (int j = 0; j < D; j ++) {
-                if (j % 10000 == 0) {
-                    sprintf(temp, "sampling researcher %d", j);
-                    logging(temp);
-                }
-
                 double p[T];
 
                 for (int k = 0; k < T; k ++) {
@@ -451,7 +446,7 @@ public:
 
             #pragma omp parallel for num_threads(64) schedule(dynamic, 1000)
             for (int j = 0; j < D; j ++) {
-                if (j % 10000 == 0) {
+                if (j % 100000 == 0) {
                     sprintf(temp, "sampling keyword %d", j);
                     logging(temp);
                 }
@@ -463,7 +458,6 @@ public:
 
                     for (int l = 0; l < T; l ++) {
                         p[l] = n_d_t[j][y_d[j]] + ((l == y_d[j]) - (z_d_m[j][k] == y_d[j])) * w_freq;
-                        if (p[l] == 0) continue;
 
                         for (int m = 0; m < E_k; m ++) {
                             p[l] *= g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
