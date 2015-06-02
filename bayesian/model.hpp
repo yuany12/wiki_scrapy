@@ -13,7 +13,7 @@ using namespace std;
 
 char temp[200];
 
-#define P_THREAD 64
+#define P_THREAD 32
 
 class document {
 public:
@@ -405,7 +405,6 @@ public:
                     logging(temp);
                 }
 
-                #pragma omp parallel
                 for (int k = 0; k < T; k ++) {
                     set_r_topic(j, k);
                     p[k] = 1.0 * n_d_t[j][k];
