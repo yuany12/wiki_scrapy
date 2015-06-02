@@ -435,6 +435,7 @@ public:
 
                 for (int k = 0; k < T; k ++) {
                     p[k] = n_d_t[j][k];
+                    if (p[k] == 0) continue;
 
                     for (int l = 0; l < E_r; l ++) {
                         p[k] *= g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
@@ -448,7 +449,7 @@ public:
                 set_r_topic(j, topics[j]);
             }
 
-            #pragma omp parallel for num_threads(64) schedule(dynamic, 10000)
+            #pragma omp parallel for num_threads(64) schedule(dynamic, 1000)
             for (int j = 0; j < D; j ++) {
                 if (j % 10000 == 0) {
                     sprintf(temp, "sampling keyword %d", j);
@@ -462,6 +463,7 @@ public:
 
                     for (int l = 0; l < T; l ++) {
                         p[l] = n_d_t[j][y_d[j]] + ((l == y_d[j]) - (z_d_m[j][k] == y_d[j])) * w_freq;
+                        if (p[l] == 0) continue;
 
                         for (int m = 0; m < E_k; m ++) {
                             p[l] *= g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
