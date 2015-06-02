@@ -341,44 +341,38 @@ public:
 
     inline void set_k_topic(int d, int m, int t, bool del) {
         int topic = z_d_m[d][m], w_id = docs[d].w_id[m], w_freq = docs[d].w_freq[m];
-        if (del) {
-            for (int i = 0; i < E_k; i ++) {
-                sqr_k[topic][i] -= f_k_w[w_id][i] * f_k_w[w_id][i] * w_freq;
-                sum_k[topic][i] -= f_k_w[w_id][i] * w_freq;
-            }
-            n_k_t[topic] -= w_freq;
-            n_d_t[d][topic] -= w_freq;
-            n_w_t[w_id][topic] -= w_freq;
+        for (int i = 0; i < E_k; i ++) {
+            sqr_k[topic][i] -= f_k_w[w_id][i] * f_k_w[w_id][i] * w_freq;
+            sum_k[topic][i] -= f_k_w[w_id][i] * w_freq;
         }
-        else {
-            z_d_m[d][m] = t;
-            for (int i = 0; i < E_k; i ++) {
-                sqr_k[t][i] += f_k_w[w_id][i] * f_k_w[w_id][i] * w_freq;
-                sum_k[t][i] += f_k_w[w_id][i] * w_freq;
-            }
-            n_k_t[t] += w_freq;
-            n_d_t[d][t] += w_freq;
-            n_w_t[w_id][t] += w_freq;
+        n_k_t[topic] -= w_freq;
+        n_d_t[d][topic] -= w_freq;
+        n_w_t[w_id][topic] -= w_freq;
+        
+        z_d_m[d][m] = t;
+        for (int i = 0; i < E_k; i ++) {
+            sqr_k[t][i] += f_k_w[w_id][i] * f_k_w[w_id][i] * w_freq;
+            sum_k[t][i] += f_k_w[w_id][i] * w_freq;
         }
+        n_k_t[t] += w_freq;
+        n_d_t[d][t] += w_freq;
+        n_w_t[w_id][t] += w_freq;
     }
 
-    inline void set_r_topic(int d, int t, bool del) {
-        if (del) {
-            int topic = y_d[d];
-            for (int i = 0; i < E_r; i ++) {
-                sqr_r[topic][i] -= f_r_d[d][i] * f_r_d[d][i];
-                sum_r[topic][i] -= f_r_d[d][i];
-            }
-            n_r_t[topic] --;
+    inline void set_r_topic(int d, int t) {
+        int topic = y_d[d];
+        for (int i = 0; i < E_r; i ++) {
+            sqr_r[topic][i] -= f_r_d[d][i] * f_r_d[d][i];
+            sum_r[topic][i] -= f_r_d[d][i];
         }
-        else {
-            y_d[d] = t;
-            for (int i = 0; i < E_r; i ++) {
-                sqr_r[t][i] += f_r_d[d][i] * f_r_d[d][i];
-                sum_r[t][i] += f_r_d[d][i];
-            }
-            n_r_t[t] ++;
+        n_r_t[topic] --;
+
+        y_d[d] = t;
+        for (int i = 0; i < E_r; i ++) {
+            sqr_r[t][i] += f_r_d[d][i] * f_r_d[d][i];
+            sum_r[t][i] += f_r_d[d][i];
         }
+        n_r_t[t] ++;
     }
 
     inline double g(int t, int e, double f, int * n_r_t, double ** sum_r, double ** sqr_r, int dn) {
@@ -422,7 +416,6 @@ public:
     }
 
     void sample_topics() {
-        // double * p = new double[T];
         int topics[D];
         int ** k_topics = new int * [D];
         for (int i = 0; i < D; i ++) k_topics[i] = new int[M[i]];
@@ -438,8 +431,6 @@ public:
                     logging(temp);
                 }
 
-                // set_r_topic(j, y_d[j], true);
-
                 double p[T];
 
                 for (int k = 0; k < T; k ++) {
@@ -451,12 +442,10 @@ public:
                 }
 
                 topics[j] = uni_sample(p, T);
-                // set_r_topic(j, topic, false);
             }
 
             for (int j = 0; j < D; j ++) {
-                set_r_topic(j, topics[j], true);
-                set_r_topic(j, topics[j], false);
+                set_r_topic(j, topics[j]);
             }
 
             #pragma omp parallel for num_threads(64) schedule(dynamic, 1000)
@@ -471,8 +460,6 @@ public:
                 for (int k = 0; k < M[j]; k ++) {
                     int w_id = docs[j].w_id[k], w_freq = docs[j].w_freq[k];
 
-                    // set_k_topic(j, k, z_d_m[j][k], true);
-
                     for (int l = 0; l < T; l ++) {
                         p[l] = n_d_t[j][y_d[j]] + ((l == y_d[j]) - (z_d_m[j][k] == y_d[j])) * w_freq;
 
@@ -481,13 +468,11 @@ public:
                         }
                     }
                     k_topics[j][k] = uni_sample(p, T);
-                    // set_k_topic(j, k, topic, false);
                 }
             }
             for (int j = 0; j < D; j ++) {
                 for (int k = 0; k < M[j]; k ++) {
-                    set_k_topic(j, k, k_topics[j][k], true);
-                    set_k_topic(j, k, k_topics[j][k], false);
+                    set_k_topic(j, k, k_topics[j][k]);
                 }
             }
 
@@ -498,7 +483,8 @@ public:
 
         norm_read_out();
 
-        // delete [] p;
+        for (int i = 0; i < D; i ++) delete [] k_topics[i];
+        delete [] k_topics;
     }
 
     void embedding_update() {
