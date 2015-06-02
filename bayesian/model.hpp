@@ -13,7 +13,7 @@ using namespace std;
 
 char temp[200];
 
-#define P_THREAD 64
+#define P_THREAD 16
 
 class document {
 public:
