@@ -16,8 +16,6 @@ void logging(const char* s) {
 }
 
 inline double fast_pow(double a, double b) {
-    if (b == 2.0) return a * a;
-
     union {
         double d;
         int x[2];
