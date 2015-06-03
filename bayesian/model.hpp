@@ -107,7 +107,7 @@ public:
     int * n_k_t, * n_r_t;
     float ** sqr_k, ** sum_k, ** sqr_r, ** sum_r;
 
-    float lr = 1e-2; // learning rate for embedding update
+    float lr_r = 1e-2, lr_k = 1.0; // learning rate for embedding update
     const int emb_max_iter = 5;
 
     const int learning_max_iter = 10;
@@ -630,7 +630,7 @@ public:
                         gd += cur;
                     }
                     if (i == 0 && j == 0) cout << "gd r = " << gd << endl;
-                    f_r_d[i][j] += gd * lr;
+                    f_r_d[i][j] += gd * lr_r;
                 }
             }
 
@@ -650,11 +650,11 @@ public:
                     if (sum_ == 0) continue;
                     gd /= float(sum_);
                     if (i < 10 && k == 0) cout << "gd k = " << gd << endl;
-                    f_k_w[i][k] += gd * lr;
+                    f_k_w[i][k] += gd * lr_k;
                 }
             }
 
-            lr = lr > 1e-3 ? lr / 10.0 : lr;
+            lr_r /= 10;
         }
     }
 
