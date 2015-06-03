@@ -659,6 +659,8 @@ public:
 
             sample_topics();
 
+            stat_k_update();
+            stat_r_update();
             parameter_update();
 
             embedding_update();
