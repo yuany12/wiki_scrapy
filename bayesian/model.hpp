@@ -481,7 +481,7 @@ public:
         float ret = 0.0;
         int n = n_r_t[t];
         ret += log_gamma_ratio(n + dn, n);
-        ret += 0.5 * (log2((kappa_0 + n) / (kappa_0 + n + dn));
+        ret += 0.5 * (log2((kappa_0 + n) / (kappa_0 + n + dn)));
         ret += 0.5 * dn * LOG_2_PI;
         ASSERT_VALNUM(ret);
         return ret;
