@@ -542,7 +542,7 @@ public:
     void sample_topics() {
 
         float p[T];
-        const SMALL_FLOAT = -100f;
+        const float SMALL_FLOAT = -100.0f;
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
             sprintf(temp, "sampling topics #%d log-likelihood = %f", i, log_likelihood());
