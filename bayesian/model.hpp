@@ -211,7 +211,7 @@ public:
         }
 
         mu_0 = alpha_0 = beta_0 = 0.0;
-        kappa_0 = 0.00;
+        kappa_0 = 1e-5;
 
         mu_k_t = new float * [T];
         for (int i = 0; i < T; i ++) {
