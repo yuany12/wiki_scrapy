@@ -629,6 +629,7 @@ public:
                         ASSERT_VALNUM(cur);
                         gd += cur;
                     }
+                    if (i == 0 && j == 0) cout << "gd r = " << gd << endl;
                     f_r_d[i][j] += gd * lr;
                 }
             }
@@ -646,11 +647,12 @@ public:
                         gd += cur;
                     }
                     gd /= float(sum_);
+                    if (i == 0) cout << "gd k = " << gd << endl;
                     f_k_w[i][k] += gd * lr;
                 }
             }
 
-            lr /= 10.0;
+            // lr /= 10.0;
         }
     }
 
