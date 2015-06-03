@@ -210,7 +210,7 @@ public:
             y_d[i] = rand() % T;
         }
 
-        mu_0 = = beta_0 = 0.0;
+        mu_0 = beta_0 = 0.0;
         kappa_0 = 1e-6;
         alpha_0 = 1e-2;
 
