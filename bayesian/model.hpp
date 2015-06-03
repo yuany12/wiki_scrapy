@@ -283,7 +283,7 @@ public:
         memset(visited, 0, sizeof(int) * D);
 
         float llh = 0.0;
-        #pragma omp parallel for num_threads(64)
+        // #pragma omp parallel for num_threads(64)
         for (int i = 0; i < D; i ++) {
             visited[i] = 1;
             temp[i] = 0.0;
