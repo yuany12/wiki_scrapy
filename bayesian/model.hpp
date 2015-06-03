@@ -14,7 +14,7 @@ using namespace std;
 
 char temp[200];
 
-#define ASSERT(x) assert(! isnan(x) && ! isinf(x));
+#define ASSERT_VALNUM(x) assert(! isnan(x) && ! isinf(x));
 
 const float LOG_2_PI = log2(atan(1) * 8);
 const float _2_PI = atan(1) * 8;
@@ -42,6 +42,22 @@ int uni_sample(float * p, int len) {
         if (cur >= th) return i;
     }
     return len - 1;
+}
+
+int log_uni_sample(float * p, int len) {
+    static const float MIN_FLOAT = -1e30;
+    static const float BIG_FLOAT = 100.0f;
+    static const float MAX_GAP = 4.0f;
+    float max_ = MIN_FLOAT;
+    for (int i = 0; i < len; i ++) max_ = max(max_, p[i]);
+    for (int i = 0; i < len; i ++) {
+        if (max_ - p[i] > MAX_GAP) p[i] = 0.0;
+        else {
+            p[i] = BIG_FLOAT / fastpow2(max_ - p[i]);
+            ASSERT_VALNUM(p[i]);
+        }
+    }
+    return uni_sample(p, len);
 }
 
 float gaussian(float x, float mu, float lambda) {
@@ -421,6 +437,7 @@ public:
         ret += log_gamma_ratio(n + dn, n);
         ret += 0.5 * (log2(n) - log2(n + dn));
         ret += 0.5 * dn * LOG_2_PI;
+        ASSERT_VALNUM(ret);
         return ret;
     }
 
@@ -429,7 +446,9 @@ public:
         float beta_n_pr = n > 0 ? 0.5 * (sqr_r[t][e] - sum_r[t][e] * sum_r[t][e] / n) : 0;
         float t_sum = sum_r[t][e] + f * dn;
         float beta_n = 0.5 * (sqr_r[t][e] + f * f * dn - t_sum * t_sum / (n + dn));
-        return n * fasterlog2(beta_n_pr) - (n + dn) * fasterlog2(beta_n);
+        float ret = n * fasterlog2(beta_n_pr) - (n + dn) * fasterlog2(beta_n);
+        ASSERT_VALNUM(ret);
+        return ret;
 
         // int n = n_r_t[t];
         // float mean = n > 0 ? sum_r[t][e] / n : 0;
@@ -484,19 +503,20 @@ public:
                 for (int k = 0; k < T; k ++) {
                     p[k] = n_d_t[j][k];
                     if (p[k] == 0) continue;
+                    p[k] = log2(p[k]);
 
                     float temp = g_r_t[j] * E_r;
 
                     for (int l = 0; l < E_r; l ++) {
                         temp += g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
-                        ASSERT(temp);
+                        ASSERT_VALNUM(temp);
                     }
 
-                    p[k] *= fastpow2(temp);
-                    ASSERT(p[k]);
+                    p[k] += temp;
+                    ASSERT_VALNUM(p[k]);
                 }
 
-                topics[j] = uni_sample(p, T);
+                topics[j] = log_uni_sample(p, T);
             }
 
             for (int j = 0; j < D; j ++) {
@@ -523,19 +543,20 @@ public:
 
                     for (int l = 0; l < T; l ++) {
                         p[l] = n_d_t[j][y_d[j]] + ((l == y_d[j]) - (z_d_m[j][k] == y_d[j])) * w_freq;
+                        p[l] = log2(p[l]);
 
                         float temp = w_freq <= max_con ? g_k_t[l][w_freq] : g_t(l, n_k_t, w_freq);
                         temp *= E_k;
 
                         for (int m = 0; m < E_k; m ++) {
                             temp += g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
-                            ASSERT(temp);
+                            ASSERT_VALNUM(temp);
                         }
 
-                        p[l] *= fastpow2(temp);
-                        ASSERT(p[l]);
+                        p[l] += temp;
+                        ASSERT_VALNUM(p[l]);
                     }
-                    k_topics[j][k] = uni_sample(p, T);
+                    k_topics[j][k] = log_uni_sample(p, T);
                 }
             }
             for (int j = 0; j < D; j ++) {
