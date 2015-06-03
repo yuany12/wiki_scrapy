@@ -7,11 +7,14 @@
 #include <cmath>
 #include <cstdio>
 #include <cstring>
+#include <cassert>
 #include "utils.hpp"
 
 using namespace std;
 
 char temp[200];
+
+#define ASSERT(x) assert(! isnan(x) && ! isinf(x));
 
 const float LOG_2_PI = log2(atan(1) * 8);
 const float _2_PI = atan(1) * 8;
@@ -138,7 +141,7 @@ public:
     model(document * docs, int D, int W, float ** f_r_d, float ** f_k_w):
         docs(docs), D(D), W(W), f_r_d(f_r_d), f_k_w(f_k_w) {
 
-        srand(1);
+        srand(0);
 
         alpha = 1.0 * 50 / T;
 
@@ -489,6 +492,7 @@ public:
                     }
 
                     p[k] *= fastpow2(temp);
+                    ASSERT(p[k]);
                 }
 
                 topics[j] = uni_sample(p, T);
@@ -527,6 +531,7 @@ public:
                         }
 
                         p[l] *= fastpow2(temp);
+                        ASSERT(p[l]);
                     }
                     k_topics[j][k] = uni_sample(p, T);
                 }
