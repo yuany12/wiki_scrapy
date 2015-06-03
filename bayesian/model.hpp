@@ -548,15 +548,13 @@ public:
 
             #pragma omp parallel num_threads(64)
             for (int b = 0; b < BATCH; b ++) {
+                int size = D / BATCH + 1;
+                int start = b * size;
+                int end = min(b * size + size, D);
+                
                 #pragma omp master
-                {
-                    int size = D / BATCH + 1;
-                    int start = b * size;
-                    int end = min(b * size + size, D);
-
-                    for (int j = start; j < end; j ++) {
-                        set_r_topic(j, y_d[j], false, true);
-                    }
+                for (int j = start; j < end; j ++) {
+                    set_r_topic(j, y_d[j], false, true);
                 }
 
                 #pragma omp for
