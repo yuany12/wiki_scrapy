@@ -548,7 +548,7 @@ public:
             logging(temp);
 
             for (int b = 0; b < BATCH; b ++) {
-                int size = D / b + 1;
+                int size = D / BATCH + 1;
                 int start = b * size;
                 int end = min(b * size + size, D);
 
