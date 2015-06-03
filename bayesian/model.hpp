@@ -629,7 +629,6 @@ public:
                         ASSERT_VALNUM(cur);
                         gd += cur;
                     }
-                    if (i == 0 && j == 0) cout << "gd r = " << gd << endl;
                     f_r_d[i][j] += gd * lr;
                 }
             }
@@ -643,20 +642,17 @@ public:
                         if (n_w_t[i][l] == 0) continue;
                         sum_ += n_w_t[i][l];
                         float cur = n_w_t[i][l];
-                        ASSERT_VALNUM(cur);
                         float temp_d = gaussian_pr(f_k_w[i][k], mu_k_t[l][k], lambda_k_t[l][k]);
-                        ASSERT_VALNUM(temp_d);
                         cur *= temp_d;
-                        ASSERT_VALNUM(cur);
                         gd += cur;
                     }
+                    if (sum_ == 0) continue;
                     gd /= float(sum_);
-                    if (i == 0 && k == 0) cout << "gd k = " << gd << endl;
                     f_k_w[i][k] += gd * lr;
                 }
             }
 
-            // lr /= 10.0;
+            lr = lr > 1e-3 ? lr / 10.0 : lr;
         }
     }
 
