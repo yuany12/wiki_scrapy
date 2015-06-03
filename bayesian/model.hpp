@@ -541,46 +541,82 @@ public:
 
     void sample_topics() {
         const int BATCH = 1000;
-        float p[T];
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
             sprintf(temp, "sampling topics #%d log-likelihood = %f", i, log_likelihood());
             logging(temp);
 
             #pragma omp parallel num_threads(64)
-            for (int j = 0; j < D; j ++) {
-                #pragma omp master
-                {
+            {
+                int * n_r_t_my = new int[T];
+                memcpy(n_r_t_my, n_r_t, sizeof(int) * T);
+
+                float ** sum_r_my = new float * [T];
+                for (int j = 0; j < T; j ++) {
+                    sum_r_my[j] = new float[E_r];
+                    memcpy(sum_r_my[j], sum_r[j], sizeof(float) * E_r);
+                }
+
+                float ** sqr_r_my = new float * [T];
+                for (int j = 0; j < T; j ++) {
+                    sqr_r_my[j] = new float[E_r];
+                    memcpy(sqr_r_my[j], sqr_r[j], sizeof(float) * E_r);
+                }
+
+                float p[T];
+
+                #pragma omp for
+                for (int j = 0; j < D; j ++) {
                     if (j % 100000 == 0) {
-                        sprintf(temp, "samping researcher %d", j);
+                        sprintf(temp, "sampling researcher %d", j);
                         logging(temp);
                     }
 
-                    set_r_topic(j, 0, false, true);
-                }
-
-                #pragma omp for
-                for (int k = 0; k < T; k ++) {
-                    p[k] = n_d_t[j][k] + laplace;
-                    p[k] = log2(p[k]);
-
-                    float temp = g_t(k, n_r_t, 1) * E_r;
-
-                    for (int l = 0; l < E_r; l ++) {
-                        temp += g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
-                        ASSERT_VALNUM(temp);
+                    // set_r_topic(j, 0, false, true);
+                    int topic_ = y_d[j];
+                    n_r_t_my[topic_] --;
+                    for (int k = 0; k < E_r; k ++) {
+                        sqr_r_my[topic_][k] -= f_r_d[j][k] * f_r_d[j][k];
+                        sum_r_my[topic_][k] -= f_r_d[j][k];
                     }
 
-                    p[k] += temp;
-                    ASSERT_VALNUM(p[k]);
+                    for (int k = 0; k < T; k ++) {
+                        p[k] = n_d_t[j][k] + laplace;
+                        p[k] = log2(p[k]);
+
+                        // float temp = g_t(k, n_r_t, 1) * E_r;
+                        float temp = g_t(k, n_r_t_my, 1) * E_r;
+
+                        for (int l = 0; l < E_r; l ++) {
+                            // temp += g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
+                            temp += g(k, l, f_r_d[j][l], n_r_t_my, sum_r_my, sqr_r_my, 1);
+                            ASSERT_VALNUM(temp);
+                        }
+
+                        p[k] += temp;
+                        ASSERT_VALNUM(p[k]);
+                    }
+
+                    y_d[j] = log_uni_sample(p, T);
+                    // set_r_topic(j, y_d[j], true, false);
+                    topic_ = y_d[j];
+                    n_r_t_my[topic_] ++;
+                    for (int k = 0; k < E_r; k ++) {
+                        sqr_r_my[topic_][k] += f_r_d[j][k] * f_r_d[j][k];
+                        sum_r_my[topic_][k] += f_r_d[j][k];
+                    }
                 }
 
-                #pragma omp master 
-                {
-                    y_d[j] = log_uni_sample(p, T);
-                    set_r_topic(j, y_d[j], true, false);
+                delete [] n_r_t_my;
+                for (int j = 0; j < T; j ++) {
+                    delete [] sum_r_my[j];
+                    delete [] sqr_r_my[j];
                 }
+                delete [] sum_r_my;
+                delete [] sqr_r_my;
             }
+
+            stat_r_update();
 
             for (int j = 0; j < T; j ++) {
                 cout << ' ' << n_r_t[j];
@@ -595,6 +631,8 @@ public:
 
                 for (int k = 0; k < M[j]; k ++) {
                     int w_id = docs[j].w_id[k], w_freq = docs[j].w_freq[k];
+                    
+                    float p[T];
 
                     set_k_topic(j, k, 0, false, true);
 
