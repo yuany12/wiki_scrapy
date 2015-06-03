@@ -69,7 +69,9 @@ float gaussian(float x, float mu, float lambda) {
 }
 
 float log_gaussian(float x, float mu, float lambda) {
-    return 0.5 * log(lambda) + (-lambda * 0.5 * (x - mu) * (x - mu));
+    float ret = 0.5 * log(lambda) + (-lambda * 0.5 * (x - mu) * (x - mu));
+    ASSERT_VALNUM(ret);
+    return ret;
 }
 
 class model {
@@ -276,21 +278,26 @@ public:
     float log_likelihood() {
         parameter_update();
 
+        static float temp[D];
+
         float llh = 0.0;
+        #pragma omp parallel for num_threads(64)
         for (int i = 0; i < D; i ++) {
+            temp[i] = 0.0;
             for (int j = 0; j < E_r; j ++) {
                 int topic = y_d[i];
-                llh += log_gaussian(f_r_d[i][j], mu_r_t[topic][j], lambda_r_t[topic][j]);
+                temp[i] += log_gaussian(f_r_d[i][j], mu_r_t[topic][j], lambda_r_t[topic][j]);
             }
-        }
-        for (int i = 0; i < D; i ++) {
+
             for (int j = 0; j < M[i]; j ++) {
                 int topic = z_d_m[i][j], w_id = docs[i].w_id[j], w_freq = docs[i].w_freq[j];
                 for (int k = 0; k < E_k; k ++) {
-                    llh += log_gaussian(f_k_w[w_id][k], mu_k_t[topic][k], lambda_k_t[topic][k]) * w_freq;
+                    temp[i] += log_gaussian(f_k_w[w_id][k], mu_k_t[topic][k], lambda_k_t[topic][k]) * w_freq;
                 }
             }
         }
+
+        for (int i = 0; i < D; i ++) llh += temp[i];
         return llh;
     }
 
