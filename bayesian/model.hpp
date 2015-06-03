@@ -543,7 +543,9 @@ public:
 
                     for (int l = 0; l < T; l ++) {
                         p[l] = n_d_t[j][y_d[j]] + ((l == y_d[j]) - (z_d_m[j][k] == y_d[j])) * w_freq;
+                        if (p[l] == 0) continue;
                         p[l] = log2(p[l]);
+                        ASSERT_VALNUM(p[l]);
 
                         float temp = w_freq <= max_con ? g_k_t[l][w_freq] : g_t(l, n_k_t, w_freq);
                         temp *= E_k;
