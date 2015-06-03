@@ -30,7 +30,7 @@ public:
 inline float log_gamma_ratio(float x1, float x2) {
     float u = x1 - x2;
     float n = x1 - 0.5 - u * 0.5;
-    return u * 0.5 * log(n * n + (1 - u * u) / 12);
+    return u * 0.5 * log2(n * n + (1 - u * u) / 12);
 }
 
 inline int uni_sample(float * p, int len) {
@@ -210,8 +210,9 @@ public:
             y_d[i] = rand() % T;
         }
 
-        mu_0 = alpha_0 = beta_0 = 0.0;
-        kappa_0 = 1e-5;
+        mu_0 = = beta_0 = 0.0;
+        kappa_0 = 1e-6;
+        alpha_0 = 1e-2;
 
         mu_k_t = new float * [T];
         for (int i = 0; i < T; i ++) {
@@ -409,7 +410,7 @@ public:
                 float variance = n > 0 ? sqr_k[i][j] - sum_k[i][j] * sum_k[i][j] / n : 0;
                 float mean = n > 0 ? sum_k[i][j] / n : 0;
 
-                float alpha_n = 0.5 * n;
+                float alpha_n = alpha_0 + 0.5 * n;
                 float beta_n = 0.5 * variance +
                     kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
 
@@ -478,9 +479,10 @@ public:
     }
 
     inline float g_t(int t, int * n_r_t, int dn) {
+        assert(dn > 0);
         float ret = 0.0;
         int n = n_r_t[t];
-        ret += log_gamma_ratio(n + dn, n);
+        ret += log_gamma_ratio(alpha_0 + n + dn, alpha_0 + n);
         ASSERT_VALNUM(ret);
         ret += 0.5 * (log2((kappa_0 + n) / (kappa_0 + n + dn)));
         ASSERT_VALNUM(ret);
@@ -506,7 +508,7 @@ public:
         float beta_n = 0.5 * variance + 
             kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
 
-        float ret = 0.5 * n * fasterlog2(beta_n_pr) - 0.5 * (n + dn) * fasterlog2(beta_n);
+        float ret = 0.5 * (n + alpha_0) * fasterlog2(beta_n_pr) - 0.5 * (n + dn + alpha_0) * fasterlog2(beta_n);
         ASSERT_VALNUM(ret);
         return ret;
     }
