@@ -489,6 +489,7 @@ public:
 
                     for (int l = 0; l < E_r; l ++) {
                         temp += g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
+                        ASSERT(temp);
                     }
 
                     p[k] *= fastpow2(temp);
@@ -528,6 +529,7 @@ public:
 
                         for (int m = 0; m < E_k; m ++) {
                             temp += g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
+                            ASSERT(temp);
                         }
 
                         p[l] *= fastpow2(temp);
