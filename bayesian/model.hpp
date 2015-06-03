@@ -549,7 +549,8 @@ public:
 
             #pragma omp parallel num_threads(64)
             for (int j = 0; j < D; j ++) {
-                #pragma omp master {
+                #pragma omp master
+                {
                     if (j % 100000 == 0) {
                         sprintf(temp, "samping researcher %d", j);
                         logging(temp);
@@ -574,14 +575,15 @@ public:
                     ASSERT_VALNUM(p[k]);
                 }
 
-                #pragma omp master {
+                #pragma omp master 
+                {
                     y_d[j] = log_uni_sample(p, T);
                     set_r_topic(j, y_d[j], true, false);
                 }
             }
 
-            for (int i = 0; i < T; i ++) {
-                cout << ' ' << n_r_t[i];
+            for (int j = 0; j < T; j ++) {
+                cout << ' ' << n_r_t[j];
             }
             cout << endl;
 
@@ -620,8 +622,8 @@ public:
                 }
             }
 
-            for (int i = 0; i < T; i ++) {
-                cout << ' ' << n_k_t[i];
+            for (int j = 0; j < T; j ++) {
+                cout << ' ' << n_k_t[j];
             }
             cout << endl;
 
