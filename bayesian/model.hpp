@@ -111,6 +111,8 @@ public:
 
     const int learning_max_iter = 10;
 
+    float * llh_temp;
+
     int max_M;
 
     ~model() {
@@ -158,6 +160,8 @@ public:
         delete [] sum_k;
         delete [] sqr_r;
         delete [] sum_r;
+
+        delete [] llh_temp;
     }
 
     model(document * docs, int D, int W, float ** f_r_d, float ** f_k_w):
@@ -272,36 +276,32 @@ public:
 
         read_out_cnt = 0;
 
+        llh_temp = new float[D];
+
         logging("model init done");
     }
 
     float log_likelihood() {
         parameter_update();
 
-        float temp[D];
-        int visited[D];
-        memset(visited, 0, sizeof(int) * D);
-
         float llh = 0.0;
-        // #pragma omp parallel for num_threads(64)
+        #pragma omp parallel for num_threads(64)
         for (int i = 0; i < D; i ++) {
-            visited[i] = 1;
-            temp[i] = 0.0;
+            llh_temp[i] = 0.0;
             for (int j = 0; j < E_r; j ++) {
                 int topic = y_d[i];
-                temp[i] += log_gaussian(f_r_d[i][j], mu_r_t[topic][j], lambda_r_t[topic][j]);
+                llh_temp[i] += log_gaussian(f_r_d[i][j], mu_r_t[topic][j], lambda_r_t[topic][j]);
             }
 
             for (int j = 0; j < M[i]; j ++) {
                 int topic = z_d_m[i][j], w_id = docs[i].w_id[j], w_freq = docs[i].w_freq[j];
                 for (int k = 0; k < E_k; k ++) {
-                    temp[i] += log_gaussian(f_k_w[w_id][k], mu_k_t[topic][k], lambda_k_t[topic][k]) * w_freq;
+                    llh_temp[i] += log_gaussian(f_k_w[w_id][k], mu_k_t[topic][k], lambda_k_t[topic][k]) * w_freq;
                 }
             }
         }
 
-        for (int i = 0; i < D; i ++) assert(visited[i]);
-        for (int i = 0; i < D; i ++) llh += temp[i];
+        for (int i = 0; i < D; i ++) llh += llh_temp[i];
         return llh;
     }
 
