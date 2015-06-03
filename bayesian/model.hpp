@@ -571,10 +571,10 @@ public:
                 set_r_topic(j, y_d[j], true, false);
             }
 
-            for (int j = 0; j < T; j ++) {
-                cout << ' ' << n_r_t[j];
-            }
-            cout << endl;
+            // for (int j = 0; j < T; j ++) {
+            //     cout << ' ' << n_r_t[j];
+            // }
+            // cout << endl;
 
             for (int j = 0; j < D; j ++) {
                 // if (j % 100000 == 0) {
@@ -605,10 +605,10 @@ public:
                 }
             }
 
-            for (int j = 0; j < T; j ++) {
-                cout << ' ' << n_k_t[j];
-            }
-            cout << endl;
+            // for (int j = 0; j < T; j ++) {
+            //     cout << ' ' << n_k_t[j];
+            // }
+            // cout << endl;
             
             logging("sampling keywords done");
         }
