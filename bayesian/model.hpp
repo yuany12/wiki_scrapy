@@ -107,7 +107,7 @@ public:
     int * n_k_t, * n_r_t;
     float ** sqr_k, ** sum_k, ** sqr_r, ** sum_r;
 
-    float lr_r = 1e-2, lr_k = 1.0; // learning rate for embedding update
+    float lr_r = 1e-3, lr_k = 1e-2; // learning rate for embedding update
     const int emb_max_iter = 5;
 
     const int learning_max_iter = 10;
@@ -290,6 +290,7 @@ public:
 
         stat_k_update();
         stat_r_update();
+        parameter_update();
 
         read_out_cnt = 0;
 
@@ -346,8 +347,6 @@ public:
     }
 
     float log_likelihood() {
-        parameter_update();
-
         float llh = 0.0;
         #pragma omp parallel for num_threads(64)
         for (int i = 0; i < D; i ++) {
@@ -609,8 +608,10 @@ public:
             //     cout << ' ' << n_k_t[j];
             // }
             // cout << endl;
-            
+
             logging("sampling keywords done");
+
+            parameter_update();
         }
     }
 
@@ -653,8 +654,6 @@ public:
                     f_k_w[i][k] += gd * lr_k;
                 }
             }
-
-            lr_r /= 10;
         }
     }
 
@@ -664,8 +663,6 @@ public:
             logging(temp);
 
             sample_topics();
-
-            parameter_update();
 
             embedding_update();
 
