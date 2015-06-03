@@ -555,7 +555,7 @@ public:
 
                 set_r_topic(j, 0, false, true);
 
-                #pragma omp parallel for num_threads(32)
+                #pragma omp parallel for num_threads(16)
                 for (int k = 0; k < T; k ++) {
                     p[k] = n_d_t[j][k] + laplace;
                     p[k] = log2(p[k]);
@@ -589,7 +589,7 @@ public:
 
                     set_k_topic(j, k, 0, false, true);
 
-                    #pragma omp parallel for num_threads(32)
+                    #pragma omp parallel for num_threads(16)
                     for (int l = 0; l < T; l ++) {
                         p[l] = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
                         p[l] = log2(p[l]);
