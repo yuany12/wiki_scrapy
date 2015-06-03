@@ -552,10 +552,10 @@ public:
 
             stat_r_update();
 
-            for (int i = 0; i < T; i ++) {
-                cout << ' ' << n_r_t[i];
-            }
-            cout << endl;
+            // for (int i = 0; i < T; i ++) {
+            //     cout << ' ' << n_r_t[i];
+            // }
+            // cout << endl;
 
             #pragma omp parallel for num_threads(12)
             for (int j = 0; j < T; j ++) {
@@ -598,6 +598,11 @@ public:
             }
 
             stat_k_update();
+
+            for (int i = 0; i < T; i ++) {
+                cout << ' ' << n_k_t[i];
+            }
+            cout << endl;
 
             logging("sampling keywords done");
 
