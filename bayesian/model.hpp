@@ -27,13 +27,13 @@ public:
     int * w_freq;
 };
 
-float log_gamma_ratio(float x1, float x2) {
+inline float log_gamma_ratio(float x1, float x2) {
     float u = x1 - x2;
     float n = x1 - 0.5 - u * 0.5;
     return u * 0.5 * log(n * n + (1 - u * u) / 12);
 }
 
-int uni_sample(float * p, int len) {
+inline int uni_sample(float * p, int len) {
     float sum = 0;
     for (int i = 0; i < len; i ++) sum += p[i];
     float cur = 0, th = 1.0 * rand() / RAND_MAX;
@@ -44,7 +44,7 @@ int uni_sample(float * p, int len) {
     return len - 1;
 }
 
-int log_uni_sample(float * p, int len) {
+inline int log_uni_sample(float * p, int len) {
     static const float MIN_FLOAT = -1e30;
     static const float BIG_FLOAT = 100.0f;
     static const float MAX_GAP = 4.0f;
@@ -68,7 +68,7 @@ float gaussian(float x, float mu, float lambda) {
     return pow(lambda, 0.5) * exp(- lambda * 0.5 * (x - mu) * (x - mu));
 }
 
-float log_gaussian(float x, float mu, float lambda) {
+inline float log_gaussian(float x, float mu, float lambda) {
     float ret = 0.5 * log(lambda) + (-lambda * 0.5 * (x - mu) * (x - mu));
     ASSERT_VALNUM(ret);
     return ret;
@@ -279,10 +279,13 @@ public:
         parameter_update();
 
         float temp[D];
+        int visited[D];
+        memset(visited, 0, sizeof(int) * D);
 
         float llh = 0.0;
         #pragma omp parallel for num_threads(64)
         for (int i = 0; i < D; i ++) {
+            visited[i] = 1;
             temp[i] = 0.0;
             for (int j = 0; j < E_r; j ++) {
                 int topic = y_d[i];
@@ -297,6 +300,7 @@ public:
             }
         }
 
+        for (int i = 0; i < D; i ++) assert(visited[i]);
         for (int i = 0; i < D; i ++) llh += temp[i];
         return llh;
     }
@@ -371,14 +375,16 @@ public:
                 mu_k_t[i][j] = kappa_0 + n_k_t[i] > 0 ? (mu_0 * kappa_0 + sum_k[i][j]) / (kappa_0 + n_k_t[i]) : 0;
 
                 int n = n_k_t[i];
-                float mean = n > 0 ? sum_k[i][j] / n : 0;
-                float variance = sqr_k[i][j] - (n > 0 ? sum_k[i][j] * sum_k[i][j] / n : 0);
+                // float mean = n > 0 ? sum_k[i][j] / n : 0;
+                float variance = n > 0 ? sqr_k[i][j] - sum_k[i][j] * sum_k[i][j] / n : 0;
 
-                float alpha_n = alpha_0 + 0.5 * n;
-                float beta_n = beta_0 + 0.5 * variance +
-                    kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
+                // float alpha_n = alpha_0 + 0.5 * n;
+                float alpha_n = 0.5 * n;
+                float beta_n = 0.5 * variance;
+                // float beta_n = beta_0 + 0.5 * variance +
+                //     kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
 
-                lambda_k_t[i][j] = alpha_n / beta_n;
+                lambda_k_t[i][j] = beta_n > 0 ? alpha_n / beta_n : 0.0;
             }
         }
     }
