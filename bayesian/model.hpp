@@ -658,8 +658,13 @@ public:
             logging(temp);
 
             sample_topics();
+
             parameter_update();
+
             embedding_update();
+
+            stat_k_update();
+            stat_r_update();
         }
     }
 
