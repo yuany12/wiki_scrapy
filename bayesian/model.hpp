@@ -540,7 +540,6 @@ public:
     }
 
     void sample_topics() {
-        float p[T];
         const int BATCH = 1000;
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
@@ -562,6 +561,8 @@ public:
                         sprintf(temp, "samping researcher %d", j);
                         logging(temp);
                     }
+
+                    float p[T];
 
                     // set_r_topic(j, 0, false, true);
 
@@ -604,6 +605,8 @@ public:
                     int w_id = docs[j].w_id[k], w_freq = docs[j].w_freq[k];
 
                     set_k_topic(j, k, 0, false, true);
+
+                    float p[T];
 
                     #pragma omp parallel for num_threads(12)
                     for (int l = 0; l < T; l ++) {
