@@ -553,7 +553,7 @@ public:
 
                 #pragma omp parallel for num_threads(12)
                 for (int k = 0; k < T; k ++) {
-                    double temp_p = n_d_t[j][k] + laplace;
+                    float temp_p = n_d_t[j][k] + laplace;
                     temp_p = log2(temp_p);
 
                     temp_p += g_t(k, n_r_t, 1) * E_r;
@@ -587,7 +587,7 @@ public:
 
                     #pragma omp parallel for num_threads(12)
                     for (int l = 0; l < T; l ++) {
-                        double temp_p = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
+                        float temp_p = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
                         temp_p = log2(temp_p);
 
                         temp_p += g_t(l, n_k_t, w_freq) * E_k;
