@@ -603,12 +603,12 @@ public:
                 for (int k = 0; k < M[j]; k ++) {
                     int w_id = docs[j].w_id[k], w_freq = docs[j].w_freq[k];
 
-                    // set_k_topic(j, k, 0, false, true);
+                    set_k_topic(j, k, 0, false, true);
 
                     #pragma omp parallel for num_threads(12)
                     for (int l = 0; l < T; l ++) {
-                        p[l] = n_d_t[j][y_d[j]] + ((l == y_d[j]) - (z_d_m[j][k] == y_d[j])) * w_freq + laplace;
-                        // p[l] = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
+                        // p[l] = n_d_t[j][y_d[j]] + ((l == y_d[j]) - (z_d_m[j][k] == y_d[j])) * w_freq + laplace;
+                        p[l] = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
                         p[l] = log2(p[l]);
                         ASSERT_VALNUM(p[l]);
 
@@ -625,7 +625,7 @@ public:
                         ASSERT_VALNUM(p[l]);
                     }
                     z_d_m[j][k] = log_uni_sample(p, T);
-                    // set_k_topic(j, k, z_d_m[j][k], true, false);
+                    set_k_topic(j, k, z_d_m[j][k], true, false);
                 }
             }
 
