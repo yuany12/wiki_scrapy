@@ -546,6 +546,8 @@ public:
             sprintf(temp, "sampling topics #%d log-likelihood = %f", i, log_likelihood());
             logging(temp);
 
+            #pragma omp parallel num_threads(64)
+            #pragma omp master
             for (int b = 0; b < BATCH; b ++) {
                 int size = D / BATCH + 1;
                 int start = b * size;
@@ -555,7 +557,7 @@ public:
                     set_r_topic(j, y_d[j], false, true);
                 }
 
-                #pragma omp parallel for num_threads(64)
+                #pragma omp for
                 for (int j = start; j < end; j ++) {
                     if (j % 100000 == 0) {
                         sprintf(temp, "samping researcher %d", j);
