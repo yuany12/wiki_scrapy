@@ -442,40 +442,48 @@ public:
         }
     }
 
-    inline void set_k_topic(int d, int m, int t) {
-        int topic = z_d_m[d][m], w_id = docs[d].w_id[m], w_freq = docs[d].w_freq[m];
-        for (int i = 0; i < E_k; i ++) {
-            sqr_k[topic][i] -= f_k_w[w_id][i] * f_k_w[w_id][i] * w_freq;
-            sum_k[topic][i] -= f_k_w[w_id][i] * w_freq;
+    inline void set_k_topic(int d, int m, int t, bool set = true, bool unset = true) {
+        if (unset) {
+            int topic = z_d_m[d][m], w_id = docs[d].w_id[m], w_freq = docs[d].w_freq[m];
+            for (int i = 0; i < E_k; i ++) {
+                sqr_k[topic][i] -= f_k_w[w_id][i] * f_k_w[w_id][i] * w_freq;
+                sum_k[topic][i] -= f_k_w[w_id][i] * w_freq;
+            }
+            n_k_t[topic] -= w_freq;
+            n_d_t[d][topic] -= w_freq;
+            n_w_t[w_id][topic] -= w_freq;
         }
-        n_k_t[topic] -= w_freq;
-        n_d_t[d][topic] -= w_freq;
-        n_w_t[w_id][topic] -= w_freq;
 
-        z_d_m[d][m] = t;
-        for (int i = 0; i < E_k; i ++) {
-            sqr_k[t][i] += f_k_w[w_id][i] * f_k_w[w_id][i] * w_freq;
-            sum_k[t][i] += f_k_w[w_id][i] * w_freq;
+        if (set) {
+            z_d_m[d][m] = t;
+            for (int i = 0; i < E_k; i ++) {
+                sqr_k[t][i] += f_k_w[w_id][i] * f_k_w[w_id][i] * w_freq;
+                sum_k[t][i] += f_k_w[w_id][i] * w_freq;
+            }
+            n_k_t[t] += w_freq;
+            n_d_t[d][t] += w_freq;
+            n_w_t[w_id][t] += w_freq;
         }
-        n_k_t[t] += w_freq;
-        n_d_t[d][t] += w_freq;
-        n_w_t[w_id][t] += w_freq;
     }
 
-    inline void set_r_topic(int d, int t) {
-        int topic = y_d[d];
-        for (int i = 0; i < E_r; i ++) {
-            sqr_r[topic][i] -= f_r_d[d][i] * f_r_d[d][i];
-            sum_r[topic][i] -= f_r_d[d][i];
+    inline void set_r_topic(int d, int t, bool set = true, bool unset = true) {
+        if (unset) {
+            int topic = y_d[d];
+            for (int i = 0; i < E_r; i ++) {
+                sqr_r[topic][i] -= f_r_d[d][i] * f_r_d[d][i];
+                sum_r[topic][i] -= f_r_d[d][i];
+            }
+            n_r_t[topic] --;
         }
-        n_r_t[topic] --;
 
-        y_d[d] = t;
-        for (int i = 0; i < E_r; i ++) {
-            sqr_r[t][i] += f_r_d[d][i] * f_r_d[d][i];
-            sum_r[t][i] += f_r_d[d][i];
+        if (set) {
+            y_d[d] = t;
+            for (int i = 0; i < E_r; i ++) {
+                sqr_r[t][i] += f_r_d[d][i] * f_r_d[d][i];
+                sum_r[t][i] += f_r_d[d][i];
+            }
+            n_r_t[t] ++;
         }
-        n_r_t[t] ++;
     }
 
     inline float g_t(int t, int * n_r_t, int dn) {
@@ -518,25 +526,31 @@ public:
 
         float g_r_t[T];
         float g_k_t[T][max_con + 1];
+        float p[T];
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
             sprintf(temp, "sampling topics #%d log-likelihood = %f", i, log_likelihood());
             logging(temp);
 
-            for (int j = 0; j < T; j ++) {
-                g_r_t[j] = g_t(j, n_r_t, 1);
-            }
+            // for (int j = 0; j < T; j ++) {
+            //     g_r_t[j] = g_t(j, n_r_t, 1);
+            // }
 
-            #pragma omp parallel for num_threads(64)
             for (int j = 0; j < D; j ++) {
-                float p[T];
+                if (j % 100000 == 0) {
+                    sprintf(temp, "samping researcher %d", j);
+                    logging(temp);
+                }
 
+                set_r_topic(j, 0, false, true);
+
+                #pragma omp parallel for num_threads(12)
                 for (int k = 0; k < T; k ++) {
                     p[k] = n_d_t[j][k];
                     if (p[k] == 0) continue;
                     p[k] = log2(p[k]);
 
-                    float temp = g_r_t[k] * E_r;
+                    float temp = g_t(j, n_r_t, 1) * E_r;
 
                     for (int l = 0; l < E_r; l ++) {
                         temp += g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
@@ -548,42 +562,45 @@ public:
                 }
 
                 y_d[j] = log_uni_sample(p, T);
+                set_r_topic(j, y_d[j], true, false);
             }
 
-            stat_r_update();
+            // stat_r_update();
 
             // for (int i = 0; i < T; i ++) {
             //     cout << ' ' << n_r_t[i];
             // }
             // cout << endl;
 
-            #pragma omp parallel for num_threads(12)
-            for (int j = 0; j < T; j ++) {
-                for (int k = 1; k < max_con + 1; k ++) {
-                    g_k_t[j][k] = g_t(j, n_k_t, k);
-                }
-            }
+            // #pragma omp parallel for num_threads(12)
+            // for (int j = 0; j < T; j ++) {
+            //     for (int k = 1; k < max_con + 1; k ++) {
+            //         g_k_t[j][k] = g_t(j, n_k_t, k);
+            //     }
+            // }
 
-            #pragma omp parallel for num_threads(64) schedule(dynamic, 1000)
+            // #pragma omp parallel for num_threads(64) schedule(dynamic, 1000)
             for (int j = 0; j < D; j ++) {
-                if (j % 100000 == 0) {
+                if (j % 10000 == 0) {
                     sprintf(temp, "sampling keyword %d", j);
                     logging(temp);
                 }
 
-                float p[T];
-
                 for (int k = 0; k < M[j]; k ++) {
                     int w_id = docs[j].w_id[k], w_freq = docs[j].w_freq[k];
 
+                    set_k_topic(j, k, 0, false, true);
+
+                    #pragma omp parallel for num_threads(12)
                     for (int l = 0; l < T; l ++) {
                         p[l] = n_d_t[j][y_d[j]] + ((l == y_d[j]) - (z_d_m[j][k] == y_d[j])) * w_freq;
                         if (p[l] == 0) continue;
                         p[l] = log2(p[l]);
                         ASSERT_VALNUM(p[l]);
 
-                        float temp = w_freq <= max_con ? g_k_t[l][w_freq] : g_t(l, n_k_t, w_freq);
-                        temp *= E_k;
+                        // float temp = w_freq <= max_con ? g_k_t[l][w_freq] : g_t(l, n_k_t, w_freq);
+                        // temp *= E_k;
+                        float temp = g_t(l, n_k_t, w_freq) * E_k;
 
                         for (int m = 0; m < E_k; m ++) {
                             temp += g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
@@ -594,15 +611,16 @@ public:
                         ASSERT_VALNUM(p[l]);
                     }
                     z_d_m[j][k] = log_uni_sample(p, T);
+                    set_k_topic(j, k, z_d_m[j][k], true, false);
                 }
             }
 
-            stat_k_update();
+            // stat_k_update();
 
-            for (int i = 0; i < T; i ++) {
-                cout << ' ' << n_k_t[i];
-            }
-            cout << endl;
+            // for (int i = 0; i < T; i ++) {
+            //     cout << ' ' << n_k_t[i];
+            // }
+            // cout << endl;
 
             logging("sampling keywords done");
 
