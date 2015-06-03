@@ -646,7 +646,7 @@ public:
                         gd += cur;
                     }
                     gd /= float(sum_);
-                    f_k_w[w_id][k] += gd * lr;
+                    f_k_w[i][k] += gd * lr;
                 }
             }
         }
