@@ -189,8 +189,6 @@ public:
 
         srand(0);
 
-        this->D /= 100;
-
         alpha = 1.0 * 50 / T;
 
         theta_d_t = new float*[D];
@@ -543,59 +541,59 @@ public:
 
     void sample_topics() {
         float p[T];
+        const int BATCH = 1000;
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
             sprintf(temp, "sampling topics #%d log-likelihood = %f", i, log_likelihood());
             logging(temp);
 
-            // for (int j = 0; j < T; j ++) {
-            //     g_r_t[j] = g_t(j, n_r_t, 1);
-            // }
+            for (int b = 0; b < BATCH; b ++) {
+                int size = D / b + 1;
+                int start = b * size;
+                int end = min(b * size + size, D);
 
-            for (int j = 0; j < D; j ++) {
-                if (j % 100000 == 0) {
-                    sprintf(temp, "samping researcher %d", j);
-                    logging(temp);
+                for (int j = start; j < end; j ++) {
+                    set_r_topic(j, y_d[j], false, true);
                 }
 
-                set_r_topic(j, 0, false, true);
-
-                #pragma omp parallel for num_threads(12)
-                for (int k = 0; k < T; k ++) {
-                    p[k] = n_d_t[j][k] + laplace;
-                    // if (p[k] == 0) continue;
-                    p[k] = log2(p[k]);
-
-                    float temp = g_t(k, n_r_t, 1) * E_r;
-
-                    for (int l = 0; l < E_r; l ++) {
-                        temp += g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
-                        ASSERT_VALNUM(temp);
+                #pragma omp parallel for num_threads(64)
+                for (int j = start; j < end; j ++) {
+                    if (j % 100000 == 0) {
+                        sprintf(temp, "samping researcher %d", j);
+                        logging(temp);
                     }
 
-                    p[k] += temp;
-                    ASSERT_VALNUM(p[k]);
+                    // set_r_topic(j, 0, false, true);
+
+                    for (int k = 0; k < T; k ++) {
+                        p[k] = n_d_t[j][k] + laplace;
+                        p[k] = log2(p[k]);
+
+                        float temp = g_t(k, n_r_t, 1) * E_r;
+
+                        for (int l = 0; l < E_r; l ++) {
+                            temp += g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
+                            ASSERT_VALNUM(temp);
+                        }
+
+                        p[k] += temp;
+                        ASSERT_VALNUM(p[k]);
+                    }
+
+                    y_d[j] = log_uni_sample(p, T);
+                    // set_r_topic(j, y_d[j], true, false);
                 }
 
-                y_d[j] = log_uni_sample(p, T);
-                set_r_topic(j, y_d[j], true, false);
+                for (int j = start; j < end; j ++) {
+                    set_r_topic(j, y_d[j], true, false);
+                }
             }
-
-            // stat_r_update();
 
             for (int i = 0; i < T; i ++) {
                 cout << ' ' << n_r_t[i];
             }
             cout << endl;
 
-            // #pragma omp parallel for num_threads(12)
-            // for (int j = 0; j < T; j ++) {
-            //     for (int k = 1; k < max_con + 1; k ++) {
-            //         g_k_t[j][k] = g_t(j, n_k_t, k);
-            //     }
-            // }
-
-            // #pragma omp parallel for num_threads(64) schedule(dynamic, 1000)
             for (int j = 0; j < D; j ++) {
                 if (j % 10000 == 0) {
                     sprintf(temp, "sampling keyword %d", j);
@@ -605,13 +603,12 @@ public:
                 for (int k = 0; k < M[j]; k ++) {
                     int w_id = docs[j].w_id[k], w_freq = docs[j].w_freq[k];
 
-                    set_k_topic(j, k, 0, false, true);
+                    // set_k_topic(j, k, 0, false, true);
 
                     #pragma omp parallel for num_threads(12)
                     for (int l = 0; l < T; l ++) {
-                        // p[l] = n_d_t[j][y_d[j]] + ((l == y_d[j]) - (z_d_m[j][k] == y_d[j])) * w_freq;
-                        p[l] = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
-                        // if (p[l] == 0) continue;
+                        p[l] = n_d_t[j][y_d[j]] + ((l == y_d[j]) - (z_d_m[j][k] == y_d[j])) * w_freq + laplace;
+                        // p[l] = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
                         p[l] = log2(p[l]);
                         ASSERT_VALNUM(p[l]);
 
@@ -628,11 +625,9 @@ public:
                         ASSERT_VALNUM(p[l]);
                     }
                     z_d_m[j][k] = log_uni_sample(p, T);
-                    set_k_topic(j, k, z_d_m[j][k], true, false);
+                    // set_k_topic(j, k, z_d_m[j][k], true, false);
                 }
             }
-
-            // stat_k_update();
 
             for (int i = 0; i < T; i ++) {
                 cout << ' ' << n_k_t[i];
