@@ -113,11 +113,15 @@ public:
 
     float * llh_temp;
 
-    int max_M;
+    float ** sum_theta_d_t;
+    float ** sum_mu_k_t, ** sum_lambda_k_t, ** sum_mu_r_t, ** sum_lambda_r_t;
 
     ~model() {
         for (int i = 0; i < D; i ++) delete [] theta_d_t[i];
         delete [] theta_d_t;
+
+        for (int i = 0; i < D; i ++) delete [] sum_theta_d_t[i];
+        delete [] sum_theta_d_t;
 
         for (int i = 0; i < D; i ++) delete [] z_d_m[i];
         delete [] z_d_m;
@@ -138,6 +142,15 @@ public:
         delete [] lambda_k_t;
         delete [] mu_r_t;
         delete [] lambda_r_t;
+
+        for (int i = 0; i < T; i ++) delete [] sum_mu_k_t[i];
+        for (int i = 0; i < T; i ++) delete [] sum_lambda_k_t[i];
+        for (int i = 0; i < T; i ++) delete [] sum_mu_r_t[i];
+        for (int i = 0; i < T; i ++) delete [] sum_lambda_r_t[i];
+        delete [] sum_mu_k_t;
+        delete [] sum_lambda_k_t;
+        delete [] sum_mu_r_t;
+        delete [] sum_lambda_r_t;
 
         delete [] M;
         delete [] docs;
@@ -174,14 +187,15 @@ public:
         theta_d_t = new float*[D];
         for (int i = 0; i < D; i ++) {
             theta_d_t[i] = new float[T];
-            memset(theta_d_t[i], 0, sizeof(float) * T);
+        }
+
+        sum_theta_d_t = new float * [D];
+        for (int i = 0; i < D; i ++) {
+            sum_theta_d_t[i] = new float[T];
         }
 
         M = new int[D];
         for (int i = 0; i < D; i ++) M[i] = docs[i].w_cnt;
-
-        max_M = 0;
-        for (int i = 0; i < D; i ++) max_M = max(max_M, M[i]);
 
         z_d_m = new int*[D];
         for (int i = 0; i < D; i ++) {
@@ -201,59 +215,83 @@ public:
         mu_k_t = new float * [T];
         for (int i = 0; i < T; i ++) {
             mu_k_t[i] = new float[E_k];
-            memset(mu_k_t[i], 0, sizeof(float) * E_k);
         }
 
         lambda_k_t = new float * [T];
         for (int i = 0; i < T; i ++) {
             lambda_k_t[i] = new float[E_k];
-            memset(lambda_k_t[i], 0, sizeof(float) * E_k);
         }
 
         mu_r_t = new float * [T];
         for (int i = 0; i < T; i ++) {
             mu_r_t[i] = new float[E_r];
-            memset(mu_r_t[i], 0, sizeof(float) * E_r);
         }
 
         lambda_r_t = new float * [T];
         for (int i = 0; i < T; i ++) {
             lambda_r_t[i] = new float[E_r];
-            memset(lambda_r_t[i], 0, sizeof(float) * E_r);
+        }
+
+        sum_mu_k_t = new float * [T];
+        for (int i = 0; i < T; i ++) {
+            sum_mu_k_t[i] = new float[E_k];
+        }
+
+        sum_lambda_k_t = new float * [T];
+        for (int i = 0; i < T; i ++) {
+            sum_lambda_k_t[i] = new float[E_k];
+        }
+
+        sum_mu_r_t = new float * [T];
+        for (int i = 0; i < T; i ++) {
+            sum_mu_r_t[i] = new float[E_r];
+        }
+
+        sum_lambda_r_t = new float * [T];
+        for (int i = 0; i < T; i ++) {
+            sum_lambda_r_t[i] = new float[E_r];
         }
 
         n_d_t = new int*[D];   
         for (int i = 0; i < D; i ++) {
             n_d_t[i] = new int[T];
-            memset(n_d_t[i], 0, sizeof(int) * T);
         }
 
         n_w_t = new int*[W];
         for (int i = 0; i < W; i ++) {
             n_w_t[i] = new int[T];
-            memset(n_w_t[i], 0, sizeof(int) * T);
         }
 
         n_k_t = new int[T];
-        memset(n_k_t, 0, sizeof(int) * T);
 
         n_r_t = new int[T];
-        memset(n_r_t, 0, sizeof(int) * T);
 
         sqr_k = new float*[T]; sum_k = new float*[T];
         sqr_r = new float*[T]; sum_r = new float*[T];
         for (int i = 0; i < T; i ++) {
             sqr_k[i] = new float[E_k];
             sum_k[i] = new float[E_k];
-            memset(sqr_k[i], 0, sizeof(float) * E_k);
-            memset(sum_k[i], 0, sizeof(float) * E_k);
 
             sqr_r[i] = new float[E_r];
             sum_r[i] = new float[E_r];
+        }
+
+        stat_k_update();
+        stat_r_update();
+
+        read_out_cnt = 0;
+
+        llh_temp = new float[D];
+
+        logging("model init done");
+    }
+
+    void stat_r_update() {
+        memset(n_r_t, 0, sizeof (int) * T);
+        for (int i = 0; i < T; i ++) {
             memset(sqr_r[i], 0, sizeof(float) * E_r);
             memset(sum_r[i], 0, sizeof(float) * E_r);
         }
-
         for (int i = 0; i < D; i ++) {
             int topic = y_d[i];
             for (int j = 0; j < E_r; j ++) {
@@ -261,7 +299,21 @@ public:
                 sum_r[topic][j] += f_r_d[i][j];
             }
             n_r_t[topic] ++;
+        }
+    }
 
+    void stat_k_update() {
+        for (int i = 0; i < D; i ++) memset(n_d_t[i], 0, sizeof(int) * T);
+        for (int i = 0; i < W; i ++) memset(n_w_t[i], 0, sizeof(int) * T);
+
+        memset(n_k_t, 0, sizeof (int) * T);
+
+        for (int i = 0; i < T; i ++) {
+            memset(sqr_k[i], 0, sizeof(float) * E_k);
+            memset(sum_k[i], 0, sizeof(float) * E_k);
+        }
+
+        for (int i = 0; i < D; i ++) {
             for (int j = 0; j < M[i]; j ++) {
                 int topic = z_d_m[i][j], w_id = docs[i].w_id[j], w_freq = docs[i].w_freq[j];
                 for (int k = 0; k < E_k; k ++) {
@@ -273,12 +325,6 @@ public:
                 n_w_t[w_id][topic] += w_freq;
             }
         }
-
-        read_out_cnt = 0;
-
-        llh_temp = new float[D];
-
-        logging("model init done");
     }
 
     float log_likelihood() {
@@ -308,52 +354,35 @@ public:
     void read_out() {
         read_out_cnt ++;
 
+        #pragma omp parallel for num_threads(64)
         for (int i = 0; i < D; i ++) {
-            float sum = 0;
-            for (int j = 0; j < T; j ++) sum += n_d_t[i][j] + alpha;
-            for (int j = 0; j < T; j ++) theta_d_t[i][j] += (n_d_t[i][j] + alpha) / sum;
+            for (int j = 0; j < T; j ++) sum_theta_d_t[i][j] += theta_d_t[i][j];
         }
 
         for (int i = 0; i < T; i ++) {
             for (int j = 0; j < E_r; j ++) {
-                mu_r_t[i][j] += kappa_0 + (n_r_t[i] > 0 ? (mu_0 * kappa_0 + sum_r[i][j]) / (kappa_0 + n_r_t[i]) : 0);
-
-                int n = n_r_t[i];
-                float mean = n > 0 ? sum_r[i][j] / n : 0;
-                float variance = sqr_r[i][j] - (n > 0 ? sum_r[i][j] * sum_r[i][j] / n : 0);
-
-                float alpha_n = alpha_0 + 0.5 * n;
-                float beta_n = beta_0 + 0.5 * variance + 
-                    kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
-
-                lambda_r_t[i][j] += alpha_n / beta_n;
+                sum_mu_r_t[i][j] += mu_r_t[i][j];
+                sum_lambda_r_t[i][j] += lambda_r_t[i][j];
             }
         }
 
         for (int i = 0; i < T; i ++) {
             for (int j = 0; j < E_k; j ++) {
-                mu_k_t[i][j] += kappa_0 + (n_k_t[i] > 0 ? (mu_0 * kappa_0 + sum_k[i][j]) / (kappa_0 + n_k_t[i]) : 0);
-
-                int n = n_k_t[i];
-                float mean = n > 0 ? sum_k[i][j] / n : 0;
-                float variance = sqr_k[i][j] - (n > 0 ? sum_k[i][j] * sum_k[i][j] / n : 0);
-
-                float alpha_n = alpha_0 + 0.5 * n;
-                float beta_n = beta_0 + 0.5 * variance +
-                    kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
-
-                lambda_k_t[i][j] += alpha_n / beta_n;
+                sum_mu_k_t[i][j] += mu_k_t[i][j];
+                sum_lambda_k_t[i][j] += lambda_k_t[i][j];
             }
         }
     }
 
     void parameter_update() {
+        #pragma omp parallel for num_threads(64)
         for (int i = 0; i < D; i ++) {
             float sum = 0;
             for (int j = 0; j < T; j ++) sum += n_d_t[i][j] + alpha;
             for (int j = 0; j < T; j ++) theta_d_t[i][j] = (n_d_t[i][j] + alpha) / sum;
         }
 
+        #pragma omp parallel for num_threads(12)
         for (int i = 0; i < T; i ++) {
             for (int j = 0; j < E_r; j ++) {
                 mu_r_t[i][j] = kappa_0 + n_r_t[i] > 0 ? (mu_0 * kappa_0 + sum_r[i][j]) / (kappa_0 + n_r_t[i]) : 0;
@@ -370,19 +399,16 @@ public:
             }
         }
 
+        #pragma omp parallel for num_threads(12)
         for (int i = 0; i < T; i ++) {
             for (int j = 0; j < E_k; j ++) {
                 mu_k_t[i][j] = kappa_0 + n_k_t[i] > 0 ? (mu_0 * kappa_0 + sum_k[i][j]) / (kappa_0 + n_k_t[i]) : 0;
 
                 int n = n_k_t[i];
-                // float mean = n > 0 ? sum_k[i][j] / n : 0;
                 float variance = n > 0 ? sqr_k[i][j] - sum_k[i][j] * sum_k[i][j] / n : 0;
 
-                // float alpha_n = alpha_0 + 0.5 * n;
                 float alpha_n = 0.5 * n;
                 float beta_n = 0.5 * variance;
-                // float beta_n = beta_0 + 0.5 * variance +
-                //     kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
 
                 lambda_k_t[i][j] = beta_n > 0 ? alpha_n / beta_n : 0.0;
             }
@@ -390,26 +416,26 @@ public:
     }
 
     void norm_read_out() {
+        #pragma omp parallel for num_threads(64)
         for (int i = 0; i < D; i ++) {
             for (int j = 0; j < T; j ++) {
-                theta_d_t[i][j] /= read_out_cnt;
+                theta_d_t[i][j] = sum_theta_d_t[i][j] / read_out_cnt;
             }
         }
 
         for (int i = 0; i < T; i ++) {
             for (int j = 0; j < E_r; j ++) {
-                mu_r_t[i][j] /= read_out_cnt;
-                lambda_r_t[i][j] /= read_out_cnt;
+                mu_r_t[i][j] = sum_mu_r_t[i][j] / read_out_cnt;
+                lambda_r_t[i][j] = sum_lambda_r_t[i][j] / read_out_cnt;
             }
         }
 
         for (int i = 0; i < T; i ++) {
             for (int j = 0; j < E_k; j ++) {
-                mu_k_t[i][j] /= read_out_cnt;
-                lambda_k_t[i][j] /= read_out_cnt;
+                mu_k_t[i][j] = sum_mu_k_t[i][j] / read_out_cnt;
+                lambda_k_t[i][j] = sum_lambda_k_t[i][j] / read_out_cnt;
             }
         }
-        read_out_cnt = 1;
     }
 
     inline void set_k_topic(int d, int m, int t) {
@@ -496,11 +522,7 @@ public:
     }
 
     void sample_topics() {
-        const int max_con = 10;
-
-        int topics[D];
-        int ** k_topics = new int * [D];
-        for (int i = 0; i < D; i ++) k_topics[i] = new int[M[i]];
+        const int max_con = 50;
 
         float g_r_t[T];
         float g_k_t[T][max_con + 1];
@@ -533,13 +555,12 @@ public:
                     ASSERT_VALNUM(p[k]);
                 }
 
-                topics[j] = log_uni_sample(p, T);
+                y_d[j] = log_uni_sample(p, T);
             }
 
-            for (int j = 0; j < D; j ++) {
-                set_r_topic(j, topics[j]);
-            }
+            stat_r_update();
 
+            #pragma omp parallel for num_threads(12)
             for (int j = 0; j < T; j ++) {
                 for (int k = 1; k < max_con + 1; k ++) {
                     g_k_t[j][k] = g_t(j, n_k_t, k);
@@ -575,14 +596,11 @@ public:
                         p[l] += temp;
                         ASSERT_VALNUM(p[l]);
                     }
-                    k_topics[j][k] = log_uni_sample(p, T);
+                    z_d_m[j][k] = log_uni_sample(p, T);
                 }
             }
-            for (int j = 0; j < D; j ++) {
-                for (int k = 0; k < M[j]; k ++) {
-                    set_k_topic(j, k, k_topics[j][k]);
-                }
-            }
+
+            stat_k_update();
 
             logging("sampling keywords done");
 
@@ -593,9 +611,6 @@ public:
         }
 
         // norm_read_out();
-
-        for (int i = 0; i < D; i ++) delete [] k_topics[i];
-        delete [] k_topics;
     }
 
     void embedding_update() {
