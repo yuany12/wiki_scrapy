@@ -542,6 +542,7 @@ public:
     void sample_topics() {
 
         float p[T];
+        float p_temp[T][max(E_r, E_k)];
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
             sprintf(temp, "sampling topics #%d log-likelihood = %f", i, log_likelihood());
@@ -560,15 +561,23 @@ public:
                     p[k] = n_d_t[j][k] + laplace;
                     p[k] = log2(p[k]);
 
-                    float temp = g_t(k, n_r_t, 1) * E_r;
-
-                    for (int l = 0; l < E_r; l ++) {
-                        temp += g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
-                        ASSERT_VALNUM(temp);
-                    }
-
-                    p[k] += temp;
+                    p[k] += g_t(k, n_r_t, 1) * E_r;
                     ASSERT_VALNUM(p[k]);
+                }
+
+                #pragma omp parallel for num_threads(64) collapse(2)
+                for (int k = 0; k < T; k ++)
+                    for (int l = 0; l < E_r; l ++) {
+                        p_temp[k][l] = g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
+                        ASSERT_VALNUM(p_temp[k][l]);
+                    }
+                }
+
+                #pragma omp parallel for num_threads(8)
+                for (int k = 0; k < T; k ++) {
+                    for (int l = 0; l < E_r; l ++) {
+                        p[k] += p_temp[k][l];
+                    }
                 }
 
                 y_d[j] = log_uni_sample(p, T);
