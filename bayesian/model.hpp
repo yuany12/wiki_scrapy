@@ -49,8 +49,12 @@ int log_uni_sample(float * p, int len) {
     static const float BIG_FLOAT = 100.0f;
     static const float MAX_GAP = 4.0f;
     float max_ = MIN_FLOAT;
-    for (int i = 0; i < len; i ++) max_ = max(max_, p[i]);
     for (int i = 0; i < len; i ++) {
+        if (p[i] == 0) continue;
+        max_ = max(max_, p[i]);
+    }
+    for (int i = 0; i < len; i ++) {
+        if (p[i] == 0) continue;
         if (max_ - p[i] > MAX_GAP) p[i] = 0.0;
         else {
             p[i] = BIG_FLOAT / fastpow2(max_ - p[i]);
