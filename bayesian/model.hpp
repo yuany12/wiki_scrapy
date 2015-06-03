@@ -189,6 +189,8 @@ public:
 
         srand(0);
 
+        this->D /= 100;
+
         alpha = 1.0 * 50 / T;
 
         theta_d_t = new float*[D];
