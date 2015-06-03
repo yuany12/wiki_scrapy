@@ -210,7 +210,8 @@ public:
             y_d[i] = rand() % T;
         }
 
-        mu_0 = kappa_0 = alpha_0 = beta_0 = 0.0;
+        mu_0 = alpha_0 = beta_0 = 0.0;
+        kappa_0 = 0.01;
 
         mu_k_t = new float * [T];
         for (int i = 0; i < T; i ++) {
@@ -406,11 +407,13 @@ public:
 
                 int n = n_k_t[i];
                 float variance = n > 0 ? sqr_k[i][j] - sum_k[i][j] * sum_k[i][j] / n : 0;
+                float mean = n > 0 ? sum_k[i][j] / n : 0;
 
                 float alpha_n = 0.5 * n;
-                float beta_n = 0.5 * variance;
+                float beta_n = 0.5 * variance +
+                    kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
 
-                lambda_k_t[i][j] = beta_n > 0 ? alpha_n / beta_n : 0.0;
+                lambda_k_t[i][j] = alpha_n / beta_n;
             }
         }
     }
@@ -478,7 +481,7 @@ public:
         float ret = 0.0;
         int n = n_r_t[t];
         ret += log_gamma_ratio(n + dn, n);
-        ret += 0.5 * (log2(n) - log2(n + dn));
+        ret += 0.5 * (log2((kappa_0 + n) / (kappa_0 + n + dn));
         ret += 0.5 * dn * LOG_2_PI;
         ASSERT_VALNUM(ret);
         return ret;
@@ -486,39 +489,24 @@ public:
 
     inline float g(int t, int e, float f, int * n_r_t, float ** sum_r, float ** sqr_r, int dn) {
         int n = n_r_t[t];
-        float beta_n_pr = n > 0 ? 0.5 * (sqr_r[t][e] - sum_r[t][e] * sum_r[t][e] / n) : 0;
-        float t_sum = sum_r[t][e] + f * dn;
-        float beta_n = 0.5 * (sqr_r[t][e] + f * f * dn - t_sum * t_sum / (n + dn));
-        float ret = n * fasterlog2(beta_n_pr) - (n + dn) * fasterlog2(beta_n);
+        float mean = n > 0 ? sum_r[t][e] / n : 0;
+        float variance = n > 0 ? sqr_r[t][e] - sum_r[t][e] * sum_r[t][e] / n : 0;
+
+        float beta_n_pr = 0.5 * variance +
+            kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
+
+        n += dn;
+        float sum = sum_r[t][e] + f * dn;
+        float sqr = sqr_r[t][e] + f * f * dn;
+        mean = sum / n;
+        variance = sqr - sum * sum / n;
+
+        float beta_n = 0.5 * variance + 
+            kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
+
+        float ret = 0.5 * n * fasterlog2(beta_n_pr) - 0.5 * (n + dn) * fasterlog2(beta_n);
         ASSERT_VALNUM(ret);
         return ret;
-
-        // int n = n_r_t[t];
-        // float mean = n > 0 ? sum_r[t][e] / n : 0;
-        // float variance = n > 0 ? sqr_r[t][e] - sum_r[t][e] * sum_r[t][e] / n : 0;
-
-        // float alpha_n_pr = alpha_0 + 0.5 * n;
-        // float beta_n_pr = beta_0 + 0.5 * variance +
-        //     kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
-        // float kappa_n_pr = kappa_0 + n;
-
-        // n += dn;
-        // float sum = sum_r[t][e] + f * dn;
-        // float sqr = sqr_r[t][e] + f * f * dn;
-        // mean = sum / n;
-        // variance = sqr - sum * sum / n;
-
-        // float alpha_n = alpha_0 + 0.5 * n;
-        // float beta_n = beta_0 + 0.5 * variance + 
-        //     kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
-        // float kappa_n = kappa_0 + n;
-
-        // float ret = 1.0;
-        // ret *= gamma_ratio(alpha_n, alpha_n_pr);
-        // ret *= fast_pow(beta_n_pr, alpha_n_pr) / fast_pow(beta_n, alpha_n);
-        // ret *= fast_pow(kappa_n_pr / kappa_n, 0.5);
-        // ret *= fast_pow(_2_PI, dn * 0.5);
-        // return ret;
     }
 
     void sample_topics() {
