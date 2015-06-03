@@ -583,7 +583,7 @@ public:
             }
 
             for (int i = 0; i < samp_topic_max_iter; i ++) {
-                #pragma omp master
+                #pragma omp single
                 {
                     sprintf(temp, "sampling topics #%d log-likelihood = %f", i, log_likelihood());
                     logging(temp);
@@ -631,7 +631,7 @@ public:
                     }
                 }
 
-                #pragma omp master
+                #pragma omp single
                 {
                     stat_r_update();
 
@@ -693,7 +693,7 @@ public:
                     }
                 }
 
-                #pragma omp master
+                #pragma omp single
                 {
                     stat_k_update();
 
