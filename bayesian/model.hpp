@@ -18,6 +18,7 @@ char temp[200];
 
 const float LOG_2_PI = log2(atan(1) * 8);
 const float _2_PI = atan(1) * 8;
+const float LOG_INV_2_PI = log2(1.0 / (atan(1) * 8));
 
 class document {
 public:
@@ -69,7 +70,7 @@ float gaussian(float x, float mu, float lambda) {
 }
 
 inline float log_gaussian(float x, float mu, float lambda) {
-    float ret = 0.5 * log(lambda) + (-lambda * 0.5 * (x - mu) * (x - mu));
+    float ret = LOG_INV_2_PI + 0.5 * log2(lambda) + (-lambda * 0.5 * (x - mu) * (x - mu));
     ASSERT_VALNUM(ret);
     return ret;
 }
@@ -115,6 +116,10 @@ public:
 
     float ** sum_theta_d_t;
     float ** sum_mu_k_t, ** sum_lambda_k_t, ** sum_mu_r_t, ** sum_lambda_r_t;
+
+    static const float laplace = 0.1;
+
+    int * sum_m;
 
     ~model() {
         for (int i = 0; i < D; i ++) delete [] theta_d_t[i];
@@ -175,6 +180,8 @@ public:
         delete [] sum_r;
 
         delete [] llh_temp;
+
+        delete [] sum_m;
     }
 
     model(document * docs, int D, int W, float ** f_r_d, float ** f_k_w):
@@ -210,9 +217,10 @@ public:
             y_d[i] = rand() % T;
         }
 
-        mu_0 = beta_0 = 0.0;
-        kappa_0 = 1e-6;
-        alpha_0 = 1e-2;
+        mu_0 = 0.0;
+        kappa_0 = 1.0;
+        alpha_0 = 2.0;
+        beta_0 = 1e-2;
 
         mu_k_t = new float * [T];
         for (int i = 0; i < T; i ++) {
@@ -285,6 +293,12 @@ public:
 
         llh_temp = new float[D];
 
+        sum_m = new int[D];
+        for (int i = 0; i < D; i ++) {
+            sum_m[i] = 0;
+            for (int j = 0; j < M[i]; j ++) sum_m[i] += docs[i].w_freq[j];
+        }
+
         logging("model init done");
     }
 
@@ -336,8 +350,8 @@ public:
         #pragma omp parallel for num_threads(64)
         for (int i = 0; i < D; i ++) {
             llh_temp[i] = 0.0;
+            int topic = y_d[i];
             for (int j = 0; j < E_r; j ++) {
-                int topic = y_d[i];
                 llh_temp[i] += log_gaussian(f_r_d[i][j], mu_r_t[topic][j], lambda_r_t[topic][j]);
             }
 
@@ -347,6 +361,10 @@ public:
                     llh_temp[i] += log_gaussian(f_k_w[w_id][k], mu_k_t[topic][k], lambda_k_t[topic][k]) * w_freq;
                 }
             }
+
+            llh_temp[i] += log2((laplace + n_d_t[i][y_d[i]]) / (sum_m[i] * (1 + laplace)));
+
+            ASSERT_VALNUM(llh_temp[i]);
         }
 
         for (int i = 0; i < D; i ++) llh += llh_temp[i];
@@ -387,11 +405,11 @@ public:
         #pragma omp parallel for num_threads(12)
         for (int i = 0; i < T; i ++) {
             for (int j = 0; j < E_r; j ++) {
-                mu_r_t[i][j] = kappa_0 + n_r_t[i] > 0 ? (mu_0 * kappa_0 + sum_r[i][j]) / (kappa_0 + n_r_t[i]) : 0;
+                mu_r_t[i][j] = (mu_0 * kappa_0 + sum_r[i][j]) / (kappa_0 + n_r_t[i]);
 
                 int n = n_r_t[i];
                 float mean = n > 0 ? sum_r[i][j] / n : 0;
-                float variance = sqr_r[i][j] - (n > 0 ? sum_r[i][j] * sum_r[i][j] / n : 0);
+                float variance = n > 0 ? sqr_r[i][j] - sum_r[i][j] * sum_r[i][j] / n : 0;
 
                 float alpha_n = alpha_0 + 0.5 * n;
                 float beta_n = beta_0 + 0.5 * variance + 
@@ -404,14 +422,14 @@ public:
         #pragma omp parallel for num_threads(12)
         for (int i = 0; i < T; i ++) {
             for (int j = 0; j < E_k; j ++) {
-                mu_k_t[i][j] = kappa_0 + n_k_t[i] > 0 ? (mu_0 * kappa_0 + sum_k[i][j]) / (kappa_0 + n_k_t[i]) : 0;
+                mu_k_t[i][j] = (mu_0 * kappa_0 + sum_k[i][j]) / (kappa_0 + n_k_t[i]);
 
                 int n = n_k_t[i];
                 float variance = n > 0 ? sqr_k[i][j] - sum_k[i][j] * sum_k[i][j] / n : 0;
                 float mean = n > 0 ? sum_k[i][j] / n : 0;
 
                 float alpha_n = alpha_0 + 0.5 * n;
-                float beta_n = 0.5 * variance +
+                float beta_n = beta_0 + 0.5 * variance +
                     kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
 
                 lambda_k_t[i][j] = alpha_n / beta_n;
@@ -504,7 +522,7 @@ public:
         float mean = n > 0 ? sum_r[t][e] / n : 0;
         float variance = n > 0 ? sqr_r[t][e] - sum_r[t][e] * sum_r[t][e] / n : 0;
 
-        float beta_n_pr = 0.5 * variance +
+        float beta_n_pr = beta_0 + 0.5 * variance +
             kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
 
         n += dn;
@@ -513,19 +531,15 @@ public:
         mean = sum / n;
         variance = sqr - sum * sum / n;
 
-        float beta_n = 0.5 * variance + 
+        float beta_n = beta_0 + 0.5 * variance + 
             kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
 
-        float ret = 0.5 * (n + alpha_0) * fasterlog2(beta_n_pr) - 0.5 * (n + dn + alpha_0) * fasterlog2(beta_n);
+        float ret = (n + alpha_0) * fasterlog2(beta_n_pr) - (n + dn + alpha_0) * fasterlog2(beta_n);
         ASSERT_VALNUM(ret);
         return ret;
     }
 
     void sample_topics() {
-        const int max_con = 50;
-
-        float g_r_t[T];
-        float g_k_t[T][max_con + 1];
         float p[T];
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
@@ -546,8 +560,8 @@ public:
 
                 #pragma omp parallel for num_threads(12)
                 for (int k = 0; k < T; k ++) {
-                    p[k] = n_d_t[j][k];
-                    if (p[k] == 0) continue;
+                    p[k] = n_d_t[j][k] + laplace;
+                    // if (p[k] == 0) continue;
                     p[k] = log2(p[k]);
 
                     float temp = g_t(k, n_r_t, 1) * E_r;
@@ -567,10 +581,10 @@ public:
 
             // stat_r_update();
 
-            // for (int i = 0; i < T; i ++) {
-            //     cout << ' ' << n_r_t[i];
-            // }
-            // cout << endl;
+            for (int i = 0; i < T; i ++) {
+                cout << ' ' << n_r_t[i];
+            }
+            cout << endl;
 
             // #pragma omp parallel for num_threads(12)
             // for (int j = 0; j < T; j ++) {
@@ -594,8 +608,8 @@ public:
                     #pragma omp parallel for num_threads(12)
                     for (int l = 0; l < T; l ++) {
                         // p[l] = n_d_t[j][y_d[j]] + ((l == y_d[j]) - (z_d_m[j][k] == y_d[j])) * w_freq;
-                        p[l] = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq;
-                        if (p[l] == 0) continue;
+                        p[l] = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
+                        // if (p[l] == 0) continue;
                         p[l] = log2(p[l]);
                         ASSERT_VALNUM(p[l]);
 
@@ -618,10 +632,10 @@ public:
 
             // stat_k_update();
 
-            // for (int i = 0; i < T; i ++) {
-            //     cout << ' ' << n_k_t[i];
-            // }
-            // cout << endl;
+            for (int i = 0; i < T; i ++) {
+                cout << ' ' << n_k_t[i];
+            }
+            cout << endl;
 
             logging("sampling keywords done");
 
