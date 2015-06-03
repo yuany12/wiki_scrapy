@@ -643,7 +643,11 @@ public:
                         if (n_w_t[i][l] == 0) continue;
                         sum_ += n_w_t[i][l];
                         float cur = n_w_t[i][l];
-                        cur *= gaussian_pr(f_k_w[i][k], mu_k_t[l][k], lambda_k_t[l][k]);
+                        ASSERT_VALNUM(cur);
+                        float temp_d = gaussian_pr(f_k_w[i][k], mu_k_t[l][k], lambda_k_t[l][k]);
+                        ASSERT_VALNUM(temp_d);
+                        cur *= temp_d;
+                        ASSERT_VALNUM(cur);
                         gd += cur;
                     }
                     gd /= float(sum_);
