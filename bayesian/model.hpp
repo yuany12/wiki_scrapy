@@ -556,7 +556,6 @@ public:
 
                 set_r_topic(j, 0, false, true);
 
-                #pragma omp parallel for num_threads(8)
                 for (int k = 0; k < T; k ++) {
                     p[k] = n_d_t[j][k] + laplace;
                     p[k] = log2(p[k]);
@@ -565,7 +564,7 @@ public:
                     ASSERT_VALNUM(p[k]);
                 }
 
-                #pragma omp parallel for num_threads(64) collapse(2)
+                #pragma omp parallel for num_threads(16) collapse(2)
                 for (int k = 0; k < T; k ++) {
                     for (int l = 0; l < E_r; l ++) {
                         p_temp[k][l] = g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
