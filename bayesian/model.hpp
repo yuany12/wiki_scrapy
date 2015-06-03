@@ -550,7 +550,7 @@ public:
                     if (p[k] == 0) continue;
                     p[k] = log2(p[k]);
 
-                    float temp = g_t(j, n_r_t, 1) * E_r;
+                    float temp = g_t(k, n_r_t, 1) * E_r;
 
                     for (int l = 0; l < E_r; l ++) {
                         temp += g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
