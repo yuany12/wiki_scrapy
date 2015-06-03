@@ -540,7 +540,6 @@ public:
     }
 
     void sample_topics() {
-        const int BATCH = 1000;
 
         #pragma omp parallel num_threads(64)
         {
@@ -661,7 +660,6 @@ public:
                             sqr_k_my[topic_][l] -= f_k_w[w_id][l] * f_k_w[w_id][l];
                         }
 
-                        #pragma omp parallel for num_threads(12)
                         for (int l = 0; l < T; l ++) {
                             // p[l] = n_d_t[j][y_d[j]] + ((l == y_d[j]) - (z_d_m[j][k] == y_d[j])) * w_freq + laplace;
                             p[l] = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
