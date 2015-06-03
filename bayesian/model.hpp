@@ -647,7 +647,7 @@ public:
                         gd += cur;
                     }
                     gd /= float(sum_);
-                    if (i == 0) cout << "gd k = " << gd << endl;
+                    if (i == 0 && k == 0) cout << "gd k = " << gd << endl;
                     f_k_w[i][k] += gd * lr;
                 }
             }
