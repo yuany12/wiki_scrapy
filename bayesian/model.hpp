@@ -23,8 +23,8 @@ const float LOG_INV_2_PI = log2(1.0 / (atan(1) * 8));
 class document {
 public:
     int r_id;
-    int * w_id;
     int w_cnt;
+    int * w_id;
     int * w_freq;
 };
 
@@ -509,11 +509,8 @@ public:
         float ret = 0.0;
         int n = n_r_t[t];
         ret += log_gamma_ratio(alpha_0 + n + dn, alpha_0 + n);
-        ASSERT_VALNUM(ret);
         ret += 0.5 * (log2((kappa_0 + n) / (kappa_0 + n + dn)));
-        ASSERT_VALNUM(ret);
         ret += 0.5 * dn * LOG_2_PI;
-        ASSERT_VALNUM(ret);
         return ret;
     }
 
@@ -535,7 +532,6 @@ public:
             kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
 
         float ret = (n + alpha_0) * fasterlog2(beta_n_pr) - (n + dn + alpha_0) * fasterlog2(beta_n);
-        ASSERT_VALNUM(ret);
         return ret;
     }
 
@@ -557,16 +553,16 @@ public:
 
                 #pragma omp parallel for num_threads(12)
                 for (int k = 0; k < T; k ++) {
-                    p[k] = n_d_t[j][k] + laplace;
-                    p[k] = log2(p[k]);
+                    double temp = n_d_t[j][k] + laplace;
+                    temp = log2(temp);
 
-                    p[k] += g_t(k, n_r_t, 1) * E_r;
-                    ASSERT_VALNUM(p[k]);
+                    temp += g_t(k, n_r_t, 1) * E_r;
 
                     for (int l = 0; l < E_r; l ++) {
-                        p[k] += g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
-                        ASSERT_VALNUM(p[k]);
+                        temp += g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
                     }
+                    ASSERT_VALNUM(temp);
+                    p[k] = temp;
                 }
 
                 y_d[j] = log_uni_sample(p, T);
@@ -591,15 +587,16 @@ public:
 
                     #pragma omp parallel for num_threads(12)
                     for (int l = 0; l < T; l ++) {
-                        p[l] = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
-                        p[l] = log2(p[l]);
+                        double temp = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
+                        temp = log2(temp);
 
-                        p[l] += g_t(l, n_k_t, w_freq) * E_k;
+                        temp += g_t(l, n_k_t, w_freq) * E_k;
 
                         for (int m = 0; m < E_k; m ++) {
-                            p[l] += g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
+                            temp += g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
                         }
-                        ASSERT_VALNUM(p[l]);
+                        ASSERT_VALNUM(temp);
+                        p[l] = temp;
                     }
                     z_d_m[j][k] = log_uni_sample(p, T);
                     set_k_topic(j, k, z_d_m[j][k], true, false);
