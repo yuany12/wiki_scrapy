@@ -62,3 +62,15 @@ fasterpow2 (float p)
   union { uint32_t i; float f; } v = { cast_uint32_t ( (1 << 23) * (clipp + 126.94269504f) ) };
   return v.f;
 }
+
+static inline float
+fastexp (float p)
+{
+  return fastpow2 (1.442695040f * p);
+}
+
+static inline float
+fasterexp (float p)
+{
+  return fasterpow2 (1.442695040f * p);
+}

@@ -65,8 +65,8 @@ inline int log_uni_sample(float * p, int len) {
     return uni_sample(p, len);
 }
 
-float gaussian(float x, float mu, float lambda) {
-    return pow(lambda, 0.5) * exp(- lambda * 0.5 * (x - mu) * (x - mu));
+inline float gaussian_pr(float x, float mu, float lambda) {
+    return sqrt(lambda) * fastexp(- 0.5 * lambda * (x - mu) * (x - mu)) * (- lambda) * (x - mu);
 }
 
 inline float log_gaussian(float x, float mu, float lambda) {
@@ -100,7 +100,7 @@ public:
     document * docs;
 
     const int time_lag = 10;   // time lag of parameter read out
-    const int samp_topic_max_iter = 100; // max iteration
+    const int samp_topic_max_iter = 10; // max iteration
     int read_out_cnt;
 
     int ** n_d_t, ** n_w_t;   // number of topic t in document d, D times T
@@ -108,7 +108,7 @@ public:
     float ** sqr_k, ** sum_k, ** sqr_r, ** sum_r;
 
     const float lr = 1e-2; // learning rate for embedding update
-    const int emb_max_iter = 10;
+    const int emb_max_iter = 5;
 
     const int learning_max_iter = 10;
 
@@ -186,6 +186,8 @@ public:
 
     model(document * docs, int D, int W, float ** f_r_d, float ** f_k_w):
         docs(docs), D(D), W(W), f_r_d(f_r_d), f_k_w(f_k_w) {
+
+        this->D /= 100;
 
         srand(0);
 
@@ -544,10 +546,10 @@ public:
             logging(temp);
 
             for (int j = 0; j < D; j ++) {
-                if (j % 100000 == 0) {
-                    sprintf(temp, "sampling researcher %d", j);
-                    logging(temp);
-                }
+                // if (j % 100000 == 0) {
+                //     sprintf(temp, "sampling researcher %d", j);
+                //     logging(temp);
+                // }
 
                 set_r_topic(j, 0, false, true);
 
@@ -575,10 +577,10 @@ public:
             cout << endl;
 
             for (int j = 0; j < D; j ++) {
-                if (j % 100000 == 0) {
-                    sprintf(temp, "sampling keyword %d", j);
-                    logging(temp);
-                }
+                // if (j % 100000 == 0) {
+                //     sprintf(temp, "sampling keyword %d", j);
+                //     logging(temp);
+                // }
 
                 for (int k = 0; k < M[j]; k ++) {
                     int w_id = docs[j].w_id[k], w_freq = docs[j].w_freq[k];
@@ -617,12 +619,15 @@ public:
             sprintf(temp, "updating embeddings #%d log-likelihood = %f", tt, log_likelihood());
             logging(temp);
 
+            #pragma omp parallel for num_threads(64)
             for (int i = 0; i < D; i ++) {
                 for (int j = 0; j < E_r; j ++) {
                     float gd = 0.0;
                     for (int k = 0; k < T; k ++) {
-                        if (n_d_t[i][k] == 0) continue;
-                        gd += 0.5 * n_d_t[i][k] * lambda_r_t[k][j] * log(lambda_r_t[k][j]) * (f_r_d[i][j] - mu_r_t[k][j]);
+                        float cur = (n_d_t[i][k] + laplace) / (sum_m[i] * (1 + laplace));
+                        cur *= gaussian_pr(f_r_d[i][j], mu_r_t[k][j], lambda_r_t[k][j]);
+                        ASSERT_VALNUM(cur);
+                        gd += cur;
                     }
                     f_r_d[i][j] -= gd * lr;
                 }
@@ -633,10 +638,15 @@ public:
                     int w_id = docs[i].w_id[j];
                     for (int k = 0; k < E_k; k ++) {
                         float gd = 0.0;
+                        int sum_ = 0;
                         for (int l = 0; l < T; l ++) {
                             if (n_w_t[w_id][l] == 0) continue;
-                            gd += 0.5 * n_w_t[w_id][l] * lambda_k_t[l][k] * log(lambda_k_t[l][k]) * (f_k_w[w_id][k] - mu_k_t[l][k]);
+                            sum_ += n_w_t[w_id][l];
+                            float cur = n_w_t[w_id][l];
+                            cur *= gaussian_pr(f_k_w[w_id][k], mu_k_t[l][k], lambda_k_t[l][k]);
+                            gd += cur;
                         }
+                        gd /= float(sum_);
                         f_k_w[w_id][k] -= gd * lr;
                     }
                 }
@@ -650,6 +660,7 @@ public:
             logging(temp);
 
             sample_topics();
+            parameter_update();
             embedding_update();
         }
     }
@@ -658,12 +669,12 @@ public:
         float prob = 0.0;
         for (int i = 0; i < T; i ++) {
             if (theta_d_t[r_id][i] == 0) continue;
-            float cur = 1.0;
+            float cur = 0.0;
             for (int j = 0; j < E_r; j ++)
-                cur *= gaussian(f_r_d[r_id][j], mu_r_t[i][j], lambda_r_t[i][j]);
+                cur += log_gaussian(f_r_d[r_id][j], mu_r_t[i][j], lambda_r_t[i][j]);
             for (int j = 0; j < E_k; j ++)
-                cur *= gaussian(f_k_w[w_id][j], mu_k_t[i][j], lambda_k_t[i][j]);
-            cur *= theta_d_t[r_id][i];
+                cur += log_gaussian(f_k_w[w_id][j], mu_k_t[i][j], lambda_k_t[i][j]);
+            cur = fastpow2(cur) * theta_d_t[r_id][i];
             prob += cur;
         }
         return prob;
