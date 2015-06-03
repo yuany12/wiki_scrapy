@@ -552,6 +552,11 @@ public:
 
             stat_r_update();
 
+            for (int i = 0; i < T; i ++) {
+                cout << ' ' << n_r_t[i];
+            }
+            cout << endl;
+
             #pragma omp parallel for num_threads(12)
             for (int j = 0; j < T; j ++) {
                 for (int k = 1; k < max_con + 1; k ++) {
