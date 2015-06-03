@@ -138,7 +138,7 @@ public:
     model(document * docs, int D, int W, float ** f_r_d, float ** f_k_w):
         docs(docs), D(D), W(W), f_r_d(f_r_d), f_k_w(f_k_w) {
 
-        srand(0);
+        srand(1);
 
         alpha = 1.0 * 50 / T;
 
@@ -322,7 +322,7 @@ public:
 
         for (int i = 0; i < T; i ++) {
             for (int j = 0; j < E_r; j ++) {
-                mu_r_t[i][j] = kappa_0 + (n_r_t[i] > 0 ? (mu_0 * kappa_0 + sum_r[i][j]) / (kappa_0 + n_r_t[i]) : 0);
+                mu_r_t[i][j] = kappa_0 + n_r_t[i] > 0 ? (mu_0 * kappa_0 + sum_r[i][j]) / (kappa_0 + n_r_t[i]) : 0;
 
                 int n = n_r_t[i];
                 float mean = n > 0 ? sum_r[i][j] / n : 0;
@@ -338,7 +338,7 @@ public:
 
         for (int i = 0; i < T; i ++) {
             for (int j = 0; j < E_k; j ++) {
-                mu_k_t[i][j] = kappa_0 + (n_k_t[i] > 0 ? (mu_0 * kappa_0 + sum_k[i][j]) / (kappa_0 + n_k_t[i]) : 0);
+                mu_k_t[i][j] = kappa_0 + n_k_t[i] > 0 ? (mu_0 * kappa_0 + sum_k[i][j]) / (kappa_0 + n_k_t[i]) : 0;
 
                 int n = n_k_t[i];
                 float mean = n > 0 ? sum_k[i][j] / n : 0;
@@ -539,13 +539,13 @@ public:
 
             logging("sampling keywords done");
 
-            if (i > 0 && i % time_lag == 0) {
-                read_out();
-                norm_read_out();
-            }
+            // if (i > 0 && i % time_lag == 0) {
+            //     read_out();
+            //     norm_read_out();
+            // }
         }
 
-        norm_read_out();
+        // norm_read_out();
 
         for (int i = 0; i < D; i ++) delete [] k_topics[i];
         delete [] k_topics;
