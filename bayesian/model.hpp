@@ -542,7 +542,6 @@ public:
     void sample_topics() {
 
         float p[T];
-        const float SMALL_FLOAT = -100.0f;
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
             sprintf(temp, "sampling topics #%d log-likelihood = %f", i, log_likelihood());
@@ -556,10 +555,8 @@ public:
 
                 set_r_topic(j, 0, false, true);
 
-                #pragma omp parallel for num_threads(16)
+                #pragma omp parallel for num_threads(8)
                 for (int k = 0; k < T; k ++) {
-                    if (n_d_t[j][k] == 0) p[k] = SMALL_FLOAT;
-                    continue;
                     p[k] = n_d_t[j][k] + laplace;
                     p[k] = log2(p[k]);
 
@@ -594,7 +591,7 @@ public:
 
                     set_k_topic(j, k, 0, false, true);
 
-                    #pragma omp parallel for num_threads(16)
+                    #pragma omp parallel for num_threads(8)
                     for (int l = 0; l < T; l ++) {
                         p[l] = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
                         p[l] = log2(p[l]);
