@@ -278,7 +278,7 @@ public:
     float log_likelihood() {
         parameter_update();
 
-        static float temp[D];
+        float temp[D];
 
         float llh = 0.0;
         #pragma omp parallel for num_threads(64)
