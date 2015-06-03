@@ -541,7 +541,7 @@ public:
 
     void sample_topics() {
 
-        #pragma omp parallel num_threads(64)
+        #pragma omp parallel num_threads(2)
         {
             int * n_r_t_my = new int[T];
             memcpy(n_r_t_my, n_r_t, sizeof(int) * T);
