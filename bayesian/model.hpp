@@ -593,7 +593,8 @@ public:
 
                     #pragma omp parallel for num_threads(12)
                     for (int l = 0; l < T; l ++) {
-                        p[l] = n_d_t[j][y_d[j]] + ((l == y_d[j]) - (z_d_m[j][k] == y_d[j])) * w_freq;
+                        // p[l] = n_d_t[j][y_d[j]] + ((l == y_d[j]) - (z_d_m[j][k] == y_d[j])) * w_freq;
+                        p[l] = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq;
                         if (p[l] == 0) continue;
                         p[l] = log2(p[l]);
                         ASSERT_VALNUM(p[l]);
