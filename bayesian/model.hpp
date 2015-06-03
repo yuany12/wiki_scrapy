@@ -629,26 +629,24 @@ public:
                         ASSERT_VALNUM(cur);
                         gd += cur;
                     }
-                    f_r_d[i][j] -= gd * lr;
+                    f_r_d[i][j] += gd * lr;
                 }
             }
 
-            for (int i = 0; i < D; i ++) {
-                for (int j = 0; j < M[i]; j ++) {
-                    int w_id = docs[i].w_id[j];
-                    for (int k = 0; k < E_k; k ++) {
-                        float gd = 0.0;
-                        int sum_ = 0;
-                        for (int l = 0; l < T; l ++) {
-                            if (n_w_t[w_id][l] == 0) continue;
-                            sum_ += n_w_t[w_id][l];
-                            float cur = n_w_t[w_id][l];
-                            cur *= gaussian_pr(f_k_w[w_id][k], mu_k_t[l][k], lambda_k_t[l][k]);
-                            gd += cur;
-                        }
-                        gd /= float(sum_);
-                        f_k_w[w_id][k] -= gd * lr;
+            #pragma omp parallel for num_threads(64)
+            for (int i = 0; i < W; i ++) {
+                for (int k = 0; k < E_k; k ++) {
+                    float gd = 0.0;
+                    int sum_ = 0;
+                    for (int l = 0; l < T; l ++) {
+                        if (n_w_t[i][l] == 0) continue;
+                        sum_ += n_w_t[i][l];
+                        float cur = n_w_t[i][l];
+                        cur *= gaussian_pr(f_k_w[i][k], mu_k_t[i][k], lambda_k_t[i][k]);
+                        gd += cur;
                     }
+                    gd /= float(sum_);
+                    f_k_w[w_id][k] += gd * lr;
                 }
             }
         }
