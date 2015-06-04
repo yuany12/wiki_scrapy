@@ -202,13 +202,13 @@ public:
 
         for (int i = 0; i < D; i ++) {
             for (int j = 0; j < E_r; j ++) {
-                f_r_d[i][j] = 2.0 * rand() / RAND_MAX - 1.0;
+                f_r_d[i][j] = 1.0 * rand() / RAND_MAX - 0.5;
             }
         }
 
         for (int i = 0; i < W; i ++) {
             for (int j = 0; j < E_k; j ++) {
-                f_k_w[i][j] = 2.0 * rand() / RAND_MAX - 1.0;
+                f_k_w[i][j] = 1.0 * rand() / RAND_MAX - 0.5;
             }
         }
 
