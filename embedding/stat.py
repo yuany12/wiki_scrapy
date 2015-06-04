@@ -7,12 +7,11 @@ def count_overlap():
         authors_in_data.append(line.strip())
     authors_in_data = set(authors_in_data)
 
-    files = os.listdir('.')
-
-    print files[0]
+    files = os.listdir('../homepage')
 
     pos_cnt, neg_cnt = 0, 0
     for filename in files:
+        filename = filename.split('.')[0]
         if filename in authors_in_data:
             pos_cnt += 1
         else:
