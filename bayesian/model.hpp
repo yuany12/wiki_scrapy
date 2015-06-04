@@ -110,7 +110,7 @@ public:
     const float decay = 0.5;
     const int emb_max_iter = 5;
 
-    const int learning_max_iter = 10;
+    const int learning_max_iter = 1;
 
     float * llh_temp;
 
