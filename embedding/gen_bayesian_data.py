@@ -7,6 +7,7 @@ from bson.objectid import ObjectId
 import time
 import gensim
 import random
+import os
 
 def get_mongodb():
     password = open('password_mongo.txt').readline().strip()
