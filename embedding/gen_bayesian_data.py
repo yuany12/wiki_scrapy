@@ -117,7 +117,7 @@ def sample():
 
     fout = open('sample.pair.select.txt', 'w')
     for line in open('pair.select.txt'):
-        if line.strip().split(';')[0] in target_authors or random.random() < 0.1:
+        if line.strip().split(';')[0] in target_authors or random.random() < 0.01:
             fout.write(line)
     fout.close()
 
@@ -205,8 +205,8 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     # pool = multiprocessing.Pool(processes = 8)
     # pool.map(gen_pair, [(5000000, i) for i in range(8)])
-    select_()
-    merge()
+    # select_()
+    # merge()
     sample()
     indexing()
     format()
