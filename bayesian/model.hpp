@@ -91,7 +91,7 @@ public:
     float ** lambda_r_t;    // Gaussian precision for researcher embeddings, T
     int D;  // number of documents
     int * M;  // number of keywords in each document, D
-    const int T = 20;  // number of topics
+    const int T = 200;  // number of topics
     int W;  // number of keywords
     static const int E_k = 200;    // dimension of keyword embeddings
     static const int E_r = 128;    // dimension of researcher embeddings
@@ -613,11 +613,17 @@ public:
                         float temp_p = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
                         temp_p = log2(temp_p);
 
+                        if (j == 0 && k == 0 && l == 0)
+                        cout << "log y|z = " << temp_p;
+
                         temp_p += g_t(l, n_k_t, w_freq) * E_k;
 
                         for (int m = 0; m < E_k; m ++) {
                             temp_p += g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
                         }
+
+                        if (j == 0 && k == 0 && l == 0)
+                        cout << "\t log final = " << temp_p << endl;
                         ASSERT_VALNUM(temp_p);
                         p[l] = temp_p;
                     }
