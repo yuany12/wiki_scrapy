@@ -704,7 +704,7 @@ public:
                 cur += log_gaussian(f_r_d[r_id][j], mu_r_t[i][j], lambda_r_t[i][j]);
             for (int j = 0; j < E_k; j ++)
                 cur += log_gaussian(f_k_w[w_id][j], mu_k_t[i][j], lambda_k_t[i][j]);
-            if (r_id == 0 && w_id < 100 && i == 0) cout << cur << endl;
+            if (r_id == 0 && i == 0) cout << cur << endl;
             cur = fastpow2(cur) * theta_d_t[r_id][i];
             ASSERT_VALNUM(cur);
             prob += cur;
