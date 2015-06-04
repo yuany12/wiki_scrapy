@@ -582,41 +582,41 @@ public:
     void sample_topics() {
 
         float p[T];
+        const int BATCH_SIZE = 1000;
+        int b_num = D / BATCH_SIZE + 1;
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
             sprintf(temp, "sampling topics iter %d log-likelihood = %f", i, log_likelihood());
             logging(temp);
 
-            for (int j = 0; j < D; j ++) {
-                // if (j % 100000 == 0) {
-                //     sprintf(temp, "sampling researcher %d", j);
-                //     logging(temp);
-                // }
+            for (int b = 0; b < b_num; b ++) {
+                int start = b * BATCH_SIZE;
+                int end = min((b + 1) * BATCH_SIZE, D);
 
-                set_r_topic(j, 0, false, true);
+                #pragma omp parallel for num_threads(64) private(p)
+                for (int j = start; j < end; j ++) {
+                    // set_r_topic(j, 0, false, true);
 
-                #pragma omp parallel for num_threads(12)
-                for (int k = 0; k < T; k ++) {
-                    float temp_p = n_d_t[j][k] + laplace;
-                    temp_p = log2(temp_p);
+                    // #pragma omp parallel for num_threads(12)
+                    for (int k = 0; k < T; k ++) {
+                        float temp_p = n_d_t[j][k] + laplace;
+                        temp_p = log2(temp_p);
 
-                    temp_p += g_t(k, n_r_t, 1) * E_r;
+                        temp_p += g_t(k, n_r_t, 1) * E_r;
 
-                    for (int l = 0; l < E_r; l ++) {
-                        temp_p += g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
+                        for (int l = 0; l < E_r; l ++) {
+                            temp_p += g(k, l, f_r_d[j][l], n_r_t, sum_r, sqr_r, 1);
+                        }
+                        ASSERT_VALNUM(temp_p);
+                        p[k] = temp_p;
                     }
-                    ASSERT_VALNUM(temp_p);
-                    p[k] = temp_p;
+
+                    y_d[j] = log_uni_sample(p, T);
+                    // set_r_topic(j, y_d[j], true, false);
                 }
 
-                y_d[j] = log_uni_sample(p, T);
-                set_r_topic(j, y_d[j], true, false);
+                for (int j = start; j < end; j ++) set_r_topic(j, y_d[j], true, true);
             }
-
-            // for (int j = 0; j < T; j ++) {
-            //     cout << ' ' << n_r_t[j];
-            // }
-            // cout << endl;
 
             for (int j = 0; j < D; j ++) {
                 // if (j % 100000 == 0) {
@@ -646,11 +646,6 @@ public:
                     set_k_topic(j, k, z_d_m[j][k], true, false);
                 }
             }
-
-            // for (int j = 0; j < T; j ++) {
-            //     cout << ' ' << n_k_t[j];
-            // }
-            // cout << endl;
 
             parameter_update();
         }
