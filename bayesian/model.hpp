@@ -379,8 +379,6 @@ public:
                 }
             }
 
-            // llh_temp[i] += log2((laplace + n_d_t[i][y_d[i]]) / (sum_m[i] * (1 + laplace)));
-
             ASSERT_VALNUM(llh_temp[i]);
         }
 
@@ -405,8 +403,6 @@ public:
                     llh_temp[i] += log_gaussian(t_f_k_w[w_id][k], mu_k_t[topic][k], lambda_k_t[topic][k]) * w_freq;
                 }
             }
-
-            llh_temp[i] += log2((laplace + n_d_t[i][y_d[i]]) / (sum_m[i] * (1 + laplace)));
 
             ASSERT_VALNUM(llh_temp[i]);
         }
