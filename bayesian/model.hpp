@@ -119,6 +119,8 @@ public:
 
     const float laplace = 1e-5; // 0.1
 
+    const float multi_magnifier = 100.0;
+
     int * sum_m;
 
     ~model() {
@@ -586,7 +588,7 @@ public:
                 #pragma omp parallel for num_threads(20)
                 for (int k = 0; k < T; k ++) {
                     float temp_p = n_d_t[j][k] + laplace;
-                    temp_p = log2(temp_p);
+                    temp_p = log2(temp_p) * multi_magnifier;
 
                     temp_p += g_t(k, n_r_t, 1) * E_r;
 
@@ -611,10 +613,10 @@ public:
                     #pragma omp parallel for num_threads(20)
                     for (int l = 0; l < T; l ++) {
                         float temp_p = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
-                        temp_p = log2(temp_p);
+                        temp_p = log2(temp_p) * multi_magnifier;
 
-                        if (j == 0 && k == 0 && l == 0)
-                        cout << "log y|z = " << temp_p;
+                        // if (j == 0 && k == 0 && l == 0)
+                        // cout << "log y|z = " << temp_p;
 
                         temp_p += g_t(l, n_k_t, w_freq) * E_k;
 
@@ -622,8 +624,8 @@ public:
                             temp_p += g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
                         }
 
-                        if (j == 0 && k == 0 && l == 0)
-                        cout << "\t log final = " << temp_p << endl;
+                        // if (j == 0 && k == 0 && l == 0)
+                        // cout << "\t log final = " << temp_p << endl;
                         ASSERT_VALNUM(temp_p);
                         p[l] = temp_p;
                     }
