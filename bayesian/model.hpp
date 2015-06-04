@@ -348,25 +348,32 @@ public:
 
     float log_likelihood() {
         float llh = 0.0;
-        #pragma omp parallel for num_threads(64)
+        float t1, t2, t3;
+
+        // #pragma omp parallel for num_threads(64)
         for (int i = 0; i < D; i ++) {
             llh_temp[i] = 0.0;
             int topic = y_d[i];
             for (int j = 0; j < E_r; j ++) {
                 llh_temp[i] += log_gaussian(f_r_d[i][j], mu_r_t[topic][j], lambda_r_t[topic][j]);
+                t1 += log_gaussian(f_r_d[i][j], mu_r_t[topic][j], lambda_r_t[topic][j]);
             }
 
             for (int j = 0; j < M[i]; j ++) {
                 int topic = z_d_m[i][j], w_id = docs[i].w_id[j], w_freq = docs[i].w_freq[j];
                 for (int k = 0; k < E_k; k ++) {
                     llh_temp[i] += log_gaussian(f_k_w[w_id][k], mu_k_t[topic][k], lambda_k_t[topic][k]) * w_freq;
+                    t2 += log_gaussian(f_k_w[w_id][k], mu_k_t[topic][k], lambda_k_t[topic][k]) * w_freq;
                 }
             }
 
             llh_temp[i] += log2((laplace + n_d_t[i][y_d[i]]) / (sum_m[i] * (1 + laplace)));
+            t3 += log2((laplace + n_d_t[i][y_d[i]]) / (sum_m[i] * (1 + laplace)));
 
             ASSERT_VALNUM(llh_temp[i]);
         }
+
+        cout << t1 << ' ' << t2 << ' ' << t3 << endl;
 
         for (int i = 0; i < D; i ++) llh += llh_temp[i];
         return llh;
