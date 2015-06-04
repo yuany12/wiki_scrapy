@@ -107,7 +107,7 @@ public:
     int * n_k_t, * n_r_t;
     float ** sqr_k, ** sum_k, ** sqr_r, ** sum_r;
 
-    float lr_r = 0, lr_k = 1e-2; // learning rate for embedding update
+    float lr_r = 1e-4, lr_k = 1e-4; // learning rate for embedding update
     const int emb_max_iter = 5;
 
     const int learning_max_iter = 10;
@@ -630,13 +630,8 @@ public:
             #pragma omp parallel for num_threads(64)
             for (int i = 0; i < D; i ++) {
                 for (int j = 0; j < E_r; j ++) {
-                    float gd = 0.0;
-                    for (int k = 0; k < T; k ++) {
-                        float cur = (n_d_t[i][k] + laplace) / (sum_m[i] * (1 + laplace));
-                        cur *= gaussian_pr(f_r_d[i][j], mu_r_t[k][j], lambda_r_t[k][j]);
-                        ASSERT_VALNUM(cur);
-                        gd += cur;
-                    }
+                    int topic = y_d[i];
+                    float gd = - lambda_r_t[topic][j] * (f_r_d[i][j] - mu_r_t[topic][j]);
                     if (i == 0 && j == 0) cout << "gd r = " << gd << endl;
                     f_r_d[i][j] += gd * lr_r;
                 }
@@ -646,17 +641,10 @@ public:
             for (int i = 0; i < W; i ++) {
                 for (int k = 0; k < E_k; k ++) {
                     float gd = 0.0;
-                    int sum_ = 0;
                     for (int l = 0; l < T; l ++) {
                         if (n_w_t[i][l] == 0) continue;
-                        sum_ += n_w_t[i][l];
-                        float cur = n_w_t[i][l];
-                        float temp_d = gaussian_pr(f_k_w[i][k], mu_k_t[l][k], lambda_k_t[l][k]);
-                        cur *= temp_d;
-                        gd += cur;
+                        gd += n_w_t[i][l] * (- lambda_k_t[l][k]) * (f_k_w[i][k] - mu_k_t[l][k]);
                     }
-                    if (sum_ == 0) continue;
-                    gd /= float(sum_);
                     if (i < 10 && k == 0) cout << "gd k = " << gd << endl;
                     f_k_w[i][k] += gd * lr_k;
                 }
