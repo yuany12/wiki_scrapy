@@ -587,7 +587,7 @@ public:
         for (int i = 0; i < D; i ++) {
             k_topics[i] = new int[M[i]];
         }
-        const int BATCH_SIZE = 1000;
+        const int BATCH_SIZE = 100;
         int b_num = D / BATCH_SIZE + 1;
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
