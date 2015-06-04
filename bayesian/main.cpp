@@ -7,7 +7,7 @@
 
 using namespace std;
 
-bool comp(pair<int, float> & p1, pair<int, float> & p2) {
+bool comp(const pair<int, float> p1, const pair<int, float> p2) {
     return p1.second > p2.second;
 }
 
