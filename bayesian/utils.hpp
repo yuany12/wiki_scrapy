@@ -74,3 +74,17 @@ fasterexp (float p)
 {
   return fasterpow2 (1.442695040f * p);
 }
+
+static inline float
+fastpow (float x,
+         float p)
+{
+  return fastpow2 (p * fastlog2 (x));
+}
+
+static inline float
+fasterpow (float x,
+           float p)
+{
+  return fasterpow2 (p * fasterlog2 (x));
+}

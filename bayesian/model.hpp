@@ -19,6 +19,7 @@ char temp[200];
 const float LOG_2_PI = log2(atan(1) * 8);
 const float _2_PI = atan(1) * 8;
 const float LOG_INV_2_PI = log2(1.0 / (atan(1) * 8));
+const float LOG_2_EXP = log2(exp(1.0));
 
 class document {
 public:
@@ -65,12 +66,8 @@ inline int log_uni_sample(float * p, int len) {
     return uni_sample(p, len);
 }
 
-inline float gaussian_pr(float x, float mu, float lambda) {
-    return sqrt(lambda) * fastexp(- 0.5 * lambda * (x - mu) * (x - mu)) * (- lambda) * (x - mu);
-}
-
 inline float log_gaussian(float x, float mu, float lambda) {
-    float ret = LOG_INV_2_PI + 0.5 * log2(lambda) + (-lambda * 0.5 * (x - mu) * (x - mu));
+    float ret = LOG_INV_2_PI + 0.5 * log2(lambda) + (-lambda * 0.5 * (x - mu) * (x - mu)) * LOG_2_EXP;
     ASSERT_VALNUM(ret);
     return ret;
 }
@@ -196,7 +193,7 @@ public:
     model(document * docs, int D, int W, float ** f_r_d, float ** f_k_w):
         docs(docs), D(D), W(W), f_r_d(f_r_d), f_k_w(f_k_w) {
 
-        this->D /= 100;
+        // this->D /= 100;
 
         srand(0);
 
@@ -605,10 +602,6 @@ public:
             }
 
             for (int j = 0; j < D; j ++) {
-                // if (j % 100000 == 0) {
-                //     sprintf(temp, "sampling keyword %d", j);
-                //     logging(temp);
-                // }
 
                 for (int k = 0; k < M[j]; k ++) {
                     int w_id = docs[j].w_id[k], w_freq = docs[j].w_freq[k];
@@ -704,13 +697,13 @@ public:
     float predict(int r_id, int w_id) {
         float prob = 0.0;
         for (int i = 0; i < T; i ++) {
-            if (theta_d_t[r_id][i] == 0) continue;
             float cur = 0.0;
             for (int j = 0; j < E_r; j ++)
                 cur += log_gaussian(f_r_d[r_id][j], mu_r_t[i][j], lambda_r_t[i][j]);
             for (int j = 0; j < E_k; j ++)
                 cur += log_gaussian(f_k_w[w_id][j], mu_k_t[i][j], lambda_k_t[i][j]);
             cur = fastpow2(cur) * theta_d_t[r_id][i];
+            ASSERT_VALNUM(cur);
             prob += cur;
         }
         return prob;
