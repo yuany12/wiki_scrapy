@@ -697,7 +697,7 @@ public:
     }
 
     float predict(int r_id, int w_id) {
-        float prob = 0.0;
+        float prob = -1e30;
         for (int i = 0; i < T; i ++) {
             float cur = 0.0;
             for (int j = 0; j < E_r; j ++)
@@ -708,7 +708,8 @@ public:
             // cur = fastpow2(cur) * theta_d_t[r_id][i];
             cur += log2(theta_d_t[r_id][i]);
             ASSERT_VALNUM(cur);
-            prob += cur;
+            // prob += cur;
+            prob = max(prob, cur);
         }
         return prob;
     }
