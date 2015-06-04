@@ -117,7 +117,7 @@ public:
     float ** sum_theta_d_t;
     float ** sum_mu_k_t, ** sum_lambda_k_t, ** sum_mu_r_t, ** sum_lambda_r_t;
 
-    const float laplace = 0.1;
+    const float laplace = 1e-5; // 0.1
 
     int * sum_m;
 
