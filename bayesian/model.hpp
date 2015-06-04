@@ -582,6 +582,11 @@ public:
     void sample_topics() {
 
         float p[T];
+        int r_topics[D];
+        int * k_topics[D];
+        for (int i = 0; i < D; i ++) {
+            k_topics[i] = new int[M[i]];
+        }
         const int BATCH_SIZE = 1000;
         int b_num = D / BATCH_SIZE + 1;
 
@@ -611,44 +616,63 @@ public:
                         p[k] = temp_p;
                     }
 
-                    y_d[j] = log_uni_sample(p, T);
+                    // y_d[j] = log_uni_sample(p, T);
                     // set_r_topic(j, y_d[j], true, false);
+                    r_topics[j] = log_uni_sample(p, T);
                 }
 
-                for (int j = start; j < end; j ++) set_r_topic(j, y_d[j], true, true);
+                for (int j = start; j < end; j ++) set_r_topic(j, r_topics[j], true, true);
             }
 
-            for (int j = 0; j < D; j ++) {
-                // if (j % 100000 == 0) {
-                //     sprintf(temp, "sampling keyword %d", j);
-                //     logging(temp);
-                // }
+            for (int b = 0; b < b_num; b ++) {
+                int start = b * BATCH_SIZE;
+                int end = min((b + 1) * BATCH_SIZE, D);
 
-                for (int k = 0; k < M[j]; k ++) {
-                    int w_id = docs[j].w_id[k], w_freq = docs[j].w_freq[k];
+                #pragma omp parallel for num_threads(64)
+                for (int j = start; j < end; j ++) {
+                    // if (j % 100000 == 0) {
+                    //     sprintf(temp, "sampling keyword %d", j);
+                    //     logging(temp);
+                    // }
 
-                    set_k_topic(j, k, 0, false, true);
+                    for (int k = 0; k < M[j]; k ++) {
+                        int w_id = docs[j].w_id[k], w_freq = docs[j].w_freq[k];
 
-                    #pragma omp parallel for num_threads(12)
-                    for (int l = 0; l < T; l ++) {
-                        float temp_p = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
-                        temp_p = log2(temp_p);
+                        // set_k_topic(j, k, 0, false, true);
+                        n_d_t[j][z_d_m[j][k]] --;
 
-                        temp_p += g_t(l, n_k_t, w_freq) * E_k;
+                        #pragma omp parallel for num_threads(12)
+                        for (int l = 0; l < T; l ++) {
+                            float temp_p = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
+                            temp_p = log2(temp_p);
 
-                        for (int m = 0; m < E_k; m ++) {
-                            temp_p += g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
+                            temp_p += g_t(l, n_k_t, w_freq) * E_k;
+
+                            for (int m = 0; m < E_k; m ++) {
+                                temp_p += g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
+                            }
+                            ASSERT_VALNUM(temp_p);
+                            p[l] = temp_p;
                         }
-                        ASSERT_VALNUM(temp_p);
-                        p[l] = temp_p;
+                        // z_d_m[j][k] = log_uni_sample(p, T);
+                        // set_k_topic(j, k, z_d_m[j][k], true, false);
+                        k_topics[j][k] = log_uni_sample(p, T);
+                        n_d_t[j][k_topics[j][k]] ++;
                     }
-                    z_d_m[j][k] = log_uni_sample(p, T);
-                    set_k_topic(j, k, z_d_m[j][k], true, false);
+                }
+                for (int j = start; j < end; j ++) {
+                    for (int k = 0; k < M[j]; k ++) {
+                        n_d_t[j][k_topics[j][k]] --;
+                        n_d_t[j][z_d_m[j][k]] ++;
+                        set_k_topic(j, k, k_topics[j][k], true, true);
+                    }
                 }
             }
 
             parameter_update();
         }
+
+        for (int i = 0; i < D; i ++) delete [] k_topics[i];
     }
 
     void embedding_update() {
