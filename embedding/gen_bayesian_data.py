@@ -195,7 +195,7 @@ def format():
 
 def cnt_pair():
     cnt = 0
-    for line in open('smaple.pair.select.txt'):
+    for line in open('sample.pair.select.txt'):
         inputs = line.strip().split(';')
         cnt += len(inputs) - 1
     print cnt
@@ -206,7 +206,7 @@ if __name__ == '__main__':
     # pool.map(gen_pair, [(5000000, i) for i in range(8)])
     # select_()
     # merge()
-    sample()
-    indexing()
-    format()
+    # sample()
+    # indexing()
+    # format()
     cnt_pair()
