@@ -6,6 +6,7 @@ import logging
 from bson.objectid import ObjectId
 import time
 import gensim
+import random
 
 def get_mongodb():
     password = open('password_mongo.txt').readline().strip()
@@ -106,12 +107,23 @@ def merge():
             fout.write(line)
     fout.close()
 
+def sample():
+    target_authors = []
+    for filename in os.listdir('../homepage'):
+        target_authors.append(filename.split('.')[0])
+    target_authors = set(target_authors)
+
+    fout = open('sample.pair.select.txt', 'w')
+    for line in open('pair.select.txt'):
+        if line.strip().split(';')[0] in target_authors or random.random() < 0.01:
+            fout.write(line)
+    fout.close()
 
 def indexing():
     model = gensim.models.Word2Vec.load('online.author_word.model')
     authors, keywords = set(), set()
     cnt = 0
-    for line in open('pair.select.txt'):
+    for line in open('sample.pair.select.txt'):
         if cnt % 10000 == 0:
             logging.info('indexing %d' % cnt)
         cnt += 1
@@ -145,7 +157,7 @@ def format():
     fout = open('../bayesian/data.main.txt', 'w')
     fout.write("%d %d\n" % (len(authors), len(keywords)))
     cnt = 0
-    for line in open('pair.select.txt'):
+    for line in open('sample.pair.select.txt'):
         if cnt % 10000 == 0:
             logging.info('printing author %d' % cnt)
         cnt += 1
@@ -182,7 +194,7 @@ def format():
 
 def cnt_pair():
     cnt = 0
-    for line in open('pair.select.txt'):
+    for line in open('smaple.pair.select.txt'):
         inputs = line.strip().split(';')
         cnt += len(inputs) - 1
     print cnt
@@ -193,6 +205,7 @@ if __name__ == '__main__':
     # pool.map(gen_pair, [(5000000, i) for i in range(8)])
     # select_()
     # merge()
-    # indexing()
-    # format()
+    sample()
+    indexing()
+    format()
     cnt_pair()
