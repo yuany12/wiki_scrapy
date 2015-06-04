@@ -99,7 +99,7 @@ public:
     document * docs;
 
     const int time_lag = 10;   // time lag of parameter read out
-    const int samp_topic_max_iter = 20; // max iteration
+    const int samp_topic_max_iter = 200; // max iteration
     int read_out_cnt;
 
     int ** n_d_t, ** n_w_t;   // number of topic t in document d, D times T
