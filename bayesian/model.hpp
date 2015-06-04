@@ -107,7 +107,7 @@ public:
     int * n_k_t, * n_r_t;
     float ** sqr_k, ** sum_k, ** sqr_r, ** sum_r;
 
-    float lr_r = 1e-6, lr_k = 1e-6; // learning rate for embedding update
+    float lr_r = 1e-3, lr_k = 1e-3; // learning rate for embedding update
     const int emb_max_iter = 5;
 
     const int learning_max_iter = 10;
@@ -649,6 +649,9 @@ public:
                     f_k_w[i][k] += gd * lr_k;
                 }
             }
+
+            lr_r /= 2.0;
+            lr_k /= 2.0;
         }
     }
 
