@@ -119,7 +119,7 @@ public:
 
     const float laplace = 1e-5; // 0.1
 
-    const float multi_magnifier = 100.0;
+    const float multi_magnifier = 0.0;
 
     int * sum_m;
 
