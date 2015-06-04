@@ -18,7 +18,7 @@ int main() {
 
     read_data(D, W, docs, f_r, f_k);
 
-    model m(docs, D, W, f_r, f_k);
+    model m(docs, D / 100, W, f_r, f_k);
 
     m.learn();
 
@@ -32,7 +32,7 @@ int main() {
 
     char buffer[200];
     FILE * fout = fopen("model.result.prob.txt", "w");
-    for (int i = 0; i < D; i ++) {
+    for (int i = 0; i < D / 100; i ++) {
         pair<int, float> * pairs = new pair<int, float>[m.M[i]];
         for (int j = 0; j < m.M[i]; j ++) {
             int w_id = docs[i].w_id[j];
