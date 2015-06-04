@@ -19,5 +19,19 @@ def count_overlap():
 
     print pos_cnt, neg_cnt
 
+def count_more_than_five():
+    target_authors = []
+    for filename in os.listdir('../homepage'):
+        target_authors.append(filename.split('.')[0])
+    target_authors = set(target_authors)
+
+    cnt = 0
+    for line in open('sample.pair.select.txt'):
+        inputs = line.strip().split(';')
+        if inputs[0] in target_authors and len(inputs) >= 6:
+            cnt += 1
+    print cnt
+
 if __name__ == '__main__':
-    count_overlap()
+    # count_overlap()
+    count_more_than_five()
