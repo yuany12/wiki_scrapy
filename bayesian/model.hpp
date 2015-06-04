@@ -67,7 +67,7 @@ inline int log_uni_sample(float * p, int len) {
 }
 
 inline float log_gaussian(float x, float mu, float lambda) {
-    float ret = LOG_INV_2_PI + 0.5 * log2(lambda) + (-lambda * 0.5 * (x - mu) * (x - mu)) * LOG_2_EXP;
+    float ret = LOG_INV_2_PI + 0.5 * log2(lambda) + (-lambda * 0.5 * (x - mu) * (x - mu))* LOG_2_EXP;
     ASSERT_VALNUM(ret);
     return ret;
 }
@@ -705,7 +705,8 @@ public:
             for (int j = 0; j < E_k; j ++)
                 cur += log_gaussian(f_k_w[w_id][j], mu_k_t[i][j], lambda_k_t[i][j]);
             if (r_id == 0 && i == 0) cout << cur << endl;
-            cur = fastpow2(cur) * theta_d_t[r_id][i];
+            // cur = fastpow2(cur) * theta_d_t[r_id][i];
+            cur += log2(theta_d_t[r_id][i]);
             ASSERT_VALNUM(cur);
             prob += cur;
         }
