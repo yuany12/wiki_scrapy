@@ -18,7 +18,7 @@ int main() {
 
     read_data(D, W, docs, f_r, f_k);
 
-    model m(docs, D, W, f_r, f_k);
+    model m(docs, D / 100, W, f_r, f_k);
 
     m.learn();
 
@@ -53,7 +53,7 @@ int main() {
     FILE * fout = fopen("model.result.topics.txt", "w");
     for (int i = 0; i < m.T; i ++) {
         fprintf(fout, "###topic%d\n", i);
-        for (int j = 0; j < D; j ++) {
+        for (int j = 0; j < D / 100; j ++) {
             for (int k = 0; k < m.M[j]; k ++) {
                 if (m.z_d_m[j][k] != i) continue;
                 int w_id = docs[j].w_id[k];
