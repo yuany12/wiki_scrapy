@@ -692,6 +692,8 @@ public:
             stat_k_update();
             stat_r_update();
         }
+
+        parameter_update();
     }
 
     float predict(int r_id, int w_id) {
