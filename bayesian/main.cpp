@@ -41,10 +41,9 @@ int main() {
         }
         sort(pairs, pairs + m.M[i], comp);
         for (int j = 0; j < m.M[i]; j ++) {
-            if (j > 0) fprintf(fout, ";");
-            fprintf(fout, "%s,%f", keyword[pairs[j].first], pairs[j].second);
+            fprintf(fout, "%s,%f\n", keyword[pairs[j].first], pairs[j].second);
         }
-        fprintf(fout, "\n");
+        fprintf(fout, "##############\n");
         delete [] pairs;
     }
     fclose(fout);
