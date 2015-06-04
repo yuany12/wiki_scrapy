@@ -687,10 +687,10 @@ public:
 
             sample_topics();
 
-            embedding_update();
+            // embedding_update();
 
-            stat_k_update();
-            stat_r_update();
+            // stat_k_update();
+            // stat_r_update();
         }
 
         parameter_update();
