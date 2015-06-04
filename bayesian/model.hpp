@@ -84,6 +84,8 @@ public:
     int * y_d;  // latent topic of each researcher, D
     float ** f_r_d;    // researcher embeddings, D times E_r
 
+    float ** t_f_r_d, ** t_f_k_w;
+
     float mu_0, kappa_0, beta_0, alpha_0; // hyperparameters for Gaussian distribution
 
     float ** mu_k_t;    // Gaussian mean for keyword embeddings, T
@@ -107,7 +109,7 @@ public:
     int * n_k_t, * n_r_t;
     float ** sqr_k, ** sum_k, ** sqr_r, ** sum_r;
 
-    float lr_r = 1e-4, lr_k = 1e-4; // learning rate for embedding update
+    float lr_r = 1e-3, lr_k = 1e-3; // learning rate for embedding update
     const int emb_max_iter = 5;
 
     const int learning_max_iter = 10;
@@ -130,6 +132,12 @@ public:
 
         for (int i = 0; i < D; i ++) delete [] z_d_m[i];
         delete [] z_d_m;
+
+        for (int i = 0; i < D; i ++) delete [] t_f_r_d[i];
+        delete [] t_f_r_d;
+
+        for (int i = 0; i < W; i ++) delete [] t_f_k_w[i];
+        delete [] t_f_k_w;
 
         for (int i = 0; i < W; i ++) delete [] f_k_w[i];
         delete [] f_k_w;
@@ -190,6 +198,12 @@ public:
         this->D /= 100;
 
         srand(0);
+
+        t_f_r_d = new float * [D];
+        for (int i = 0; i < D; i ++) t_f_r_d[i] = new float[E_r];
+
+        t_f_k_w = new float * [W];
+        for (int i = 0; i < W; i ++) t_f_k_w[i] = new float[E_k];
 
         alpha = 1.0 * 50 / T;
 
@@ -346,34 +360,55 @@ public:
         }
     }
 
-    float log_likelihood() {
+    inline float log_likelihood() {
         float llh = 0.0;
-        float t1, t2, t3;
 
-        // #pragma omp parallel for num_threads(64)
+        #pragma omp parallel for num_threads(64)
         for (int i = 0; i < D; i ++) {
             llh_temp[i] = 0.0;
             int topic = y_d[i];
             for (int j = 0; j < E_r; j ++) {
                 llh_temp[i] += log_gaussian(f_r_d[i][j], mu_r_t[topic][j], lambda_r_t[topic][j]);
-                t1 += log_gaussian(f_r_d[i][j], mu_r_t[topic][j], lambda_r_t[topic][j]);
             }
 
             for (int j = 0; j < M[i]; j ++) {
                 int topic = z_d_m[i][j], w_id = docs[i].w_id[j], w_freq = docs[i].w_freq[j];
                 for (int k = 0; k < E_k; k ++) {
                     llh_temp[i] += log_gaussian(f_k_w[w_id][k], mu_k_t[topic][k], lambda_k_t[topic][k]) * w_freq;
-                    t2 += log_gaussian(f_k_w[w_id][k], mu_k_t[topic][k], lambda_k_t[topic][k]) * w_freq;
                 }
             }
 
             llh_temp[i] += log2((laplace + n_d_t[i][y_d[i]]) / (sum_m[i] * (1 + laplace)));
-            t3 += log2((laplace + n_d_t[i][y_d[i]]) / (sum_m[i] * (1 + laplace)));
 
             ASSERT_VALNUM(llh_temp[i]);
         }
 
-        cout << t1 << ' ' << t2 << ' ' << t3 << endl;
+        for (int i = 0; i < D; i ++) llh += llh_temp[i];
+        return llh;
+    }
+
+    inline float temp_log_likelihood() {
+        float llh = 0.0;
+
+        #pragma omp parallel for num_threads(64)
+        for (int i = 0; i < D; i ++) {
+            llh_temp[i] = 0.0;
+            int topic = y_d[i];
+            for (int j = 0; j < E_r; j ++) {
+                llh_temp[i] += log_gaussian(t_f_r_d[i][j], mu_r_t[topic][j], lambda_r_t[topic][j]);
+            }
+
+            for (int j = 0; j < M[i]; j ++) {
+                int topic = z_d_m[i][j], w_id = docs[i].w_id[j], w_freq = docs[i].w_freq[j];
+                for (int k = 0; k < E_k; k ++) {
+                    llh_temp[i] += log_gaussian(t_f_k_w[w_id][k], mu_k_t[topic][k], lambda_k_t[topic][k]) * w_freq;
+                }
+            }
+
+            llh_temp[i] += log2((laplace + n_d_t[i][y_d[i]]) / (sum_m[i] * (1 + laplace)));
+
+            ASSERT_VALNUM(llh_temp[i]);
+        }
 
         for (int i = 0; i < D; i ++) llh += llh_temp[i];
         return llh;
@@ -623,8 +658,10 @@ public:
     }
 
     void embedding_update() {
+        float cur_llh = log_likelihood();
+
         for (int tt = 0; tt < emb_max_iter; tt ++) {
-            sprintf(temp, "updating embeddings #%d log-likelihood = %f", tt, log_likelihood());
+            sprintf(temp, "updating embeddings #%d log-likelihood = %f", tt, cur_llh);
             logging(temp);
 
             #pragma omp parallel for num_threads(64)
@@ -633,7 +670,7 @@ public:
                     int topic = y_d[i];
                     float gd = - lambda_r_t[topic][j] * (f_r_d[i][j] - mu_r_t[topic][j]);
                     if (i == 0 && j == 0) cout << "gd r = " << gd << endl;
-                    f_r_d[i][j] += gd * lr_r;
+                    t_f_r_d[i][j] = f_r_d[i][j] + gd * lr_r;
                 }
             }
 
@@ -646,12 +683,29 @@ public:
                         gd += n_w_t[i][l] * (- lambda_k_t[l][k]) * (f_k_w[i][k] - mu_k_t[l][k]);
                     }
                     if (i < 10 && k == 0 && gd != 0) cout << "gd k = " << gd << endl;
-                    f_k_w[i][k] += gd * lr_k;
+                    t_f_k_w[i][k] = f_k_w[i][k] + gd * lr_k;
                 }
             }
 
-            lr_r *= 0.9;
-            lr_k *= 0.9;
+            float new_llh = temp_log_likelihood();
+
+            if (new_llh < cur_llh) {
+                lr_k *= 0.5;
+                lr_r *= 0.5;
+            }
+            else {
+                cur_llh = new_llh;
+
+                #pragma omp parallel for num_threads(64)
+                for (int i = 0; i < D; i ++) {
+                    memcpy(f_r_d[i], t_f_r_d[i], sizeof(float) * E_r);
+                }
+
+                #pragma omp parallel for num_threads(64)
+                for (int i = 0; i < W; i ++) {
+                    memcpy(f_k_w[i], t_f_k_w[i], sizeof(float) * E_k);
+                }
+            }
         }
     }
 
