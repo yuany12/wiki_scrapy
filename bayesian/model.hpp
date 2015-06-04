@@ -641,7 +641,7 @@ public:
                         // set_k_topic(j, k, 0, false, true);
                         n_d_t[j][z_d_m[j][k]] -= w_freq;
 
-                        #pragma omp parallel for num_threads(12)
+                        // #pragma omp parallel for num_threads(12)
                         for (int l = 0; l < T; l ++) {
                             float temp_p = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
                             temp_p = log2(temp_p);
