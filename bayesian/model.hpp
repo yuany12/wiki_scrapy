@@ -200,18 +200,6 @@ public:
 
         srand(0);
 
-        for (int i = 0; i < D; i ++) {
-            for (int j = 0; j < E_r; j ++) {
-                f_r_d[i][j] = 1.0 * rand() / RAND_MAX - 0.5;
-            }
-        }
-
-        for (int i = 0; i < W; i ++) {
-            for (int j = 0; j < E_k; j ++) {
-                f_k_w[i][j] = 1.0 * rand() / RAND_MAX - 0.5;
-            }
-        }
-
         t_f_r_d = new float * [D];
         for (int i = 0; i < D; i ++) t_f_r_d[i] = new float[E_r];
 
@@ -391,7 +379,7 @@ public:
                 }
             }
 
-            llh_temp[i] += log2((laplace + n_d_t[i][y_d[i]]) / (sum_m[i] * (1 + laplace)));
+            // llh_temp[i] += log2((laplace + n_d_t[i][y_d[i]]) / (sum_m[i] * (1 + laplace)));
 
             ASSERT_VALNUM(llh_temp[i]);
         }
