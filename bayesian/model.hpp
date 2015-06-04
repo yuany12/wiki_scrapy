@@ -628,7 +628,7 @@ public:
                 int start = b * BATCH_SIZE;
                 int end = min((b + 1) * BATCH_SIZE, D);
 
-                #pragma omp parallel for num_threads(64)
+                #pragma omp parallel for num_threads(64) private(p)
                 for (int j = start; j < end; j ++) {
                     // if (j % 100000 == 0) {
                     //     sprintf(temp, "sampling keyword %d", j);
