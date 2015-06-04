@@ -94,7 +94,7 @@ public:
     float ** lambda_r_t;    // Gaussian precision for researcher embeddings, T
     int D;  // number of documents
     int * M;  // number of keywords in each document, D
-    const int T = 100;  // number of topics
+    const int T = 200;  // number of topics
     int W;  // number of keywords
     static const int E_k = 200;    // dimension of keyword embeddings
     static const int E_r = 128;    // dimension of researcher embeddings
@@ -110,6 +110,7 @@ public:
     float ** sqr_k, ** sum_k, ** sqr_r, ** sum_r;
 
     float lr_r = 1e-3, lr_k = 1e-3; // learning rate for embedding update
+    const float decay = 0.5;
     const int emb_max_iter = 5;
 
     const int learning_max_iter = 10;
@@ -583,7 +584,7 @@ public:
         float p[T];
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
-            sprintf(temp, "sampling topics #%d log-likelihood = %f", i, log_likelihood());
+            sprintf(temp, "sampling topics iter %d log-likelihood = %f", i, log_likelihood());
             logging(temp);
 
             for (int j = 0; j < D; j ++) {
@@ -651,8 +652,6 @@ public:
             // }
             // cout << endl;
 
-            logging("sampling keywords done");
-
             parameter_update();
         }
     }
@@ -661,7 +660,7 @@ public:
         float cur_llh = log_likelihood();
 
         for (int tt = 0; tt < emb_max_iter; tt ++) {
-            sprintf(temp, "updating embeddings #%d log-likelihood = %f", tt, cur_llh);
+            sprintf(temp, "updating embeddings iter %d log-likelihood = %f", tt, cur_llh);
             logging(temp);
 
             #pragma omp parallel for num_threads(64)
@@ -669,7 +668,6 @@ public:
                 for (int j = 0; j < E_r; j ++) {
                     int topic = y_d[i];
                     float gd = - lambda_r_t[topic][j] * (f_r_d[i][j] - mu_r_t[topic][j]);
-                    if (i == 0 && j == 0) cout << "gd r = " << gd << endl;
                     t_f_r_d[i][j] = f_r_d[i][j] + gd * lr_r;
                 }
             }
@@ -682,7 +680,6 @@ public:
                         if (n_w_t[i][l] == 0) continue;
                         gd += n_w_t[i][l] * (- lambda_k_t[l][k]) * (f_k_w[i][k] - mu_k_t[l][k]);
                     }
-                    if (i < 10 && k == 0 && gd != 0) cout << "gd k = " << gd << endl;
                     t_f_k_w[i][k] = f_k_w[i][k] + gd * lr_k;
                 }
             }
@@ -690,8 +687,8 @@ public:
             float new_llh = temp_log_likelihood();
 
             if (new_llh < cur_llh) {
-                lr_k *= 0.5;
-                lr_r *= 0.5;
+                lr_k *= decay;
+                lr_r *= decay;
             }
             else {
                 cur_llh = new_llh;
