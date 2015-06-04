@@ -120,8 +120,8 @@ def sample():
             fout.write(line)
     fout.close()
 
-def indexing():
-    model = gensim.models.Word2Vec.load('online.author_word.model')
+def indexing(model):
+    # model = gensim.models.Word2Vec.load('online.author_word.model')
     authors, keywords = set(), set()
     cnt = 0
     for line in open('sample.pair.select.txt'):
@@ -143,7 +143,7 @@ def indexing():
         fout.write(keyword + '\n')
     fout.close()
 
-def format():
+def format(a_model):
     authors, keywords = [], []
     author2id, keyword2id = {}, {}
     for i, line in enumerate(open('author_index.out')):
@@ -182,7 +182,7 @@ def format():
             fout.write("%.8f\n" % ele)
     fout.close()
 
-    model = gensim.models.Word2Vec.load('online.author_word.model')
+    model = a_model
     fout = open('../bayesian/data.embedding.researcher.txt', 'w')
     for i, author in enumerate(authors):
         if i % 10000 == 0:
@@ -202,11 +202,12 @@ def cnt_pair():
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+    model = gensim.models.Word2Vec.load('online.author_word.model')
     # pool = multiprocessing.Pool(processes = 8)
     # pool.map(gen_pair, [(5000000, i) for i in range(8)])
     select_()
     merge()
     sample()
-    indexing()
-    format()
+    indexing(model)
+    format(model)
     cnt_pair()
