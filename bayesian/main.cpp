@@ -37,11 +37,13 @@ int main() {
         for (int j = 0; j < m.M[i]; j ++) {
             int w_id = docs[i].w_id[j];
             float prob = m.predict(i, w_id);
-            pairs[j] = make_pair(w_id, prob);
+            pairs[j] = make_pair(j, prob);
         }
+        fprintf(fout, "%d\n", m.y_d[i]);
         sort(pairs, pairs + m.M[i], comp);
         for (int j = 0; j < m.M[i]; j ++) {
-            fprintf(fout, "%s,%f\n", keyword[pairs[j].first], pairs[j].second);
+            int w_id = docs[i].w_id[j];
+            fprintf(fout, "%s,%f,%d\n", keyword[w_id], pairs[j].second, m.z_d_m[i][j]);
         }
         fprintf(fout, "##############\n");
         delete [] pairs;
