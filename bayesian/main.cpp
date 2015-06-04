@@ -43,7 +43,7 @@ int main() {
         sort(pairs, pairs + m.M[i], comp);
         for (int j = 0; j < m.M[i]; j ++) {
             int w_id = docs[i].w_id[j];
-            fprintf(fout, "%s,%f,%d\n", keyword[w_id], pairs[j].second, m.z_d_m[i][j]);
+            fprintf(fout, "%s,%f,%d\n", keyword[w_id], pairs[j].second, m.z_d_m[i][pairs[j].first]);
         }
         fprintf(fout, "##############\n");
         delete [] pairs;
