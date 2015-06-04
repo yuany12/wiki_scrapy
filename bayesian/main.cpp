@@ -18,7 +18,7 @@ int main() {
 
     read_data(D, W, docs, f_r, f_k);
 
-    model m(docs, D / 100, W, f_r, f_k);
+    model m(docs, D, W, f_r, f_k);
 
     m.learn();
 
