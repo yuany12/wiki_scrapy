@@ -18,7 +18,7 @@ int main() {
 
     read_data(D, W, docs, f_r, f_k);
 
-    model m(docs, D / 100, W, f_r, f_k);
+    model m(docs, D, W, f_r, f_k);
 
     m.learn();
 
@@ -30,30 +30,30 @@ int main() {
     }
     fclose(fin);
 
-    // char buffer[200];
-    // FILE * fout = fopen("model.result.prob.txt", "w");
-    // for (int i = 0; i < D / 100; i ++) {
-    //     pair<int, float> * pairs = new pair<int, float>[m.M[i]];
-    //     for (int j = 0; j < m.M[i]; j ++) {
-    //         int w_id = docs[i].w_id[j];
-    //         float prob = m.predict(i, w_id);
-    //         pairs[j] = make_pair(j, prob);
-    //     }
-    //     fprintf(fout, "%d\n", m.y_d[i]);
-    //     sort(pairs, pairs + m.M[i], comp);
-    //     for (int j = 0; j < m.M[i]; j ++) {
-    //         int w_id = docs[i].w_id[pairs[j].first];
-    //         fprintf(fout, "%s,%f,%d\n", keyword[w_id], pairs[j].second, m.z_d_m[i][pairs[j].first]);
-    //     }
-    //     fprintf(fout, "##############\n");
-    //     delete [] pairs;
-    // }
-    // fclose(fout);
+    char buffer[200];
+    FILE * fout = fopen("model.result.prob.txt", "w");
+    for (int i = 0; i < D; i ++) {
+        pair<int, float> * pairs = new pair<int, float>[m.M[i]];
+        for (int j = 0; j < m.M[i]; j ++) {
+            int w_id = docs[i].w_id[j];
+            float prob = m.predict(i, w_id);
+            pairs[j] = make_pair(j, prob);
+        }
+        fprintf(fout, "%d\n", m.y_d[i]);
+        sort(pairs, pairs + m.M[i], comp);
+        for (int j = 0; j < m.M[i]; j ++) {
+            int w_id = docs[i].w_id[pairs[j].first];
+            fprintf(fout, "%s,%f,%d\n", keyword[w_id], pairs[j].second, m.z_d_m[i][pairs[j].first]);
+        }
+        fprintf(fout, "##############\n");
+        delete [] pairs;
+    }
+    fclose(fout);
 
     FILE * fout = fopen("model.result.topics.txt", "w");
     for (int i = 0; i < m.T; i ++) {
         fprintf(fout, "###topic%d\n", i);
-        for (int j = 0; j < D / 100; j ++) {
+        for (int j = 0; j < D; j ++) {
             for (int k = 0; k < m.M[j]; k ++) {
                 if (m.z_d_m[j][k] != i) continue;
                 int w_id = docs[j].w_id[k];
