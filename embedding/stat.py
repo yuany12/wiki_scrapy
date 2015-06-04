@@ -9,6 +9,8 @@ def count_overlap():
 
     files = os.listdir('.')
 
+    print files[0]
+
     pos_cnt, neg_cnt = 0, 0
     for filename in files:
         if filename in authors_in_data:
