@@ -50,7 +50,7 @@ int main() {
     }
     fclose(fout);
 
-    FILE * fout = fopen("model.result.topics.txt", "w");
+    fout = fopen("model.result.topics.txt", "w");
     for (int i = 0; i < m.T; i ++) {
         fprintf(fout, "###topic%d\n", i);
         for (int j = 0; j < D; j ++) {
