@@ -645,7 +645,7 @@ public:
                         if (n_w_t[i][l] == 0) continue;
                         gd += n_w_t[i][l] * (- lambda_k_t[l][k]) * (f_k_w[i][k] - mu_k_t[l][k]);
                     }
-                    if (i < 10 && k == 0) cout << "gd k = " << gd << endl;
+                    if (i < 10 && k == 0 && gd != 0) cout << "gd k = " << gd << endl;
                     f_k_w[i][k] += gd * lr_k;
                 }
             }
