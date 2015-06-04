@@ -708,6 +708,7 @@ public:
             ASSERT_VALNUM(cur);
             prob += cur;
         }
+        if (r_id == 0) cout << prob << endl;
         return prob;
     }
 };
