@@ -631,6 +631,7 @@ public:
                         p[l] = temp_p;
                         if (j == 0 && k == 0) cout << " " << p[l];
                     }
+                    if (j == 0 && k == 0)
                     cout << endl;
                     z_d_m[j][k] = log_uni_sample(p, T);
                     set_k_topic(j, k, z_d_m[j][k], true, false);
