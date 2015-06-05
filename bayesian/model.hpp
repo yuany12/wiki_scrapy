@@ -230,7 +230,7 @@ public:
             z_d_m[i] = new int[M[i]];
             for (int j = 0; j < M[i]; j ++) {
                 int w_id = docs[i].w_id[j];
-                z_d_m[i][j] = init_topic[i];
+                z_d_m[i][j] = init_topic[j];
             }
         }
 
