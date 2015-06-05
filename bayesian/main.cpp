@@ -24,7 +24,12 @@ int main() {
 
     // m.learn();
 
-    FILE * fin = fopen("../embedding/keyword_index.out", "r");
+    FILE * fin;
+    if (SMALL_DATA)
+        fin = fopen("../embedding/keyword_index.out~", "r");
+    else
+        fin = fopen("../embedding/keyword_index.out", "r");
+
     char ** keyword = new char * [W];
     for (int i = 0; i < W; i ++) {
         keyword[i] = new char[50];
@@ -37,7 +42,12 @@ int main() {
     // m.sample_topics();
 
     char buffer[200];
-    FILE * fout = fopen("model.result.prob.txt", "w");
+    FILE * fout;
+    if (SMALL_DATA)
+        fout = fopen("model.result.prob.txt~", "w");
+    else
+        fout = fopen("model.result.prob.txt", "w");
+
     for (int i = 0; i < D; i ++) {
         if (i % 10000 == 0) {
             sprintf(temp_, "predicting %d", i);
@@ -69,7 +79,10 @@ int main() {
     }
     fclose(fout);
 
-    fout = fopen("model.result.topics.txt", "w");
+    if (SMALL_DATA)
+        fout = fopen("model.result.topics.txt~", "w");
+    else
+        fout = fopen("model.result.topics.txt", "w");
     for (int i = 0; i < m.T; i ++) {
         fprintf(fout, "###topic%d\n", i);
         for (int j = 0; j < D; j ++) {

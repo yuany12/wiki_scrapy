@@ -108,7 +108,7 @@ public:
 
     float lr_r = 1e-3, lr_k = 1e-3; // learning rate for embedding update
     const float decay = 0.5;
-    const int emb_max_iter = 8;
+    const int emb_max_iter = 20;
 
     const int learning_max_iter = 1;
 

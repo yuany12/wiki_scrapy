@@ -7,7 +7,11 @@
 using namespace std;
 
 void read_data(int & D, int & W, document * & docs, float ** & f_r, float ** & f_k) {
-    FILE * fin = fopen("data.main.txt", "r");
+    FILE * fin;
+    if (SMALL_DATA)
+        fin = fopen("data.main.txt~", "r");
+    else
+        fin = fopen("data.main.txt", "r");
     fscanf(fin, "%d %d\n", &D, &W);
 
     docs = new document[D];
@@ -29,7 +33,10 @@ void read_data(int & D, int & W, document * & docs, float ** & f_r, float ** & f
 
     logging("loading data main done");
 
-    fin = fopen("data.embedding.researcher.txt", "r");
+    if (SMALL_DATA)
+        fin = fopen("data.embedding.researcher.txt~", "r");
+    else
+        fin = fopen("data.embedding.researcher.txt", "r");
     f_r = new float * [D];
     float ** temp_r = new float * [D];
     for (int i = 0; i < D; i ++) {
@@ -52,7 +59,10 @@ void read_data(int & D, int & W, document * & docs, float ** & f_r, float ** & f
 
     logging("loading researcher done");
 
-    fin = fopen("data.embedding.keyword.txt", "r");
+    if (SMALL_DATA)
+        fin = fopen("data.embedding.keyword.txt~", "r");
+    else
+        fin = fopen("data.embedding.keyword.txt", "r");
     f_k = new float*[W];
     for (int i = 0; i < W; i ++) {
         f_k[i] = new float[model::E_k];
