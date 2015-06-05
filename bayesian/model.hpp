@@ -93,8 +93,8 @@ public:
     int * M;  // number of keywords in each document, D
     const int T = 50;  // number of topics
     int W;  // number of keywords
-    static const int E_k = 200;    // dimension of keyword embeddings
-    static const int E_r = 128;    // dimension of researcher embeddings
+    static const int E_k = 1;    // dimension of keyword embeddings 200
+    static const int E_r = 1;    // dimension of researcher embeddings 128
 
     document * docs;
 
