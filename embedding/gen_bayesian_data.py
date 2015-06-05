@@ -90,7 +90,7 @@ def select(bulk_info):
         stats.sort(key = lambda x: x[2], reverse = True)
 
         fout.write(rid)
-        for j in range(int(len(stats) * 0.2)):
+        for j in range(int(len(stats) * 0.5)):
             fout.write(';%s,%d' % (stats[j][0], stats[j][1]))
         fout.write('\n')
     fout.close()
@@ -210,9 +210,9 @@ if __name__ == '__main__':
     model = gensim.models.Word2Vec.load('online.author_word.model')
     # pool = multiprocessing.Pool(processes = 8)
     # pool.map(gen_pair, [(5000000, i) for i in range(8)])
-    # select_()
-    # merge()
-    # sample()
-    # indexing(model)
+    select_()
+    merge()
+    sample()
+    indexing(model)
     format(model)
     cnt_pair()
