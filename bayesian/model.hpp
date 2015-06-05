@@ -117,9 +117,9 @@ public:
     float ** sum_theta_d_t;
     float ** sum_mu_k_t, ** sum_lambda_k_t, ** sum_mu_r_t, ** sum_lambda_r_t;
 
-    const float laplace = 1e-5; // 0.1
+    const float laplace = 0.1;
 
-    const float multi_magnifier = 0.0;
+    const float multi_magnifier = 1.0;
 
     int * sum_m;
 
@@ -614,8 +614,8 @@ public:
 
                     #pragma omp parallel for num_threads(20)
                     for (int l = 0; l < T; l ++) {
-                        // float temp_p = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
-                        float temp_p = n_d_t[j][l] + alpha;
+                        float temp_p = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
+                        temp_p += n_d_t[j][l] + alpha;
                         temp_p = log2(temp_p) * multi_magnifier;
 
                         // if (j == 0 && k == 0 && l == 0)
