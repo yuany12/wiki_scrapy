@@ -40,6 +40,8 @@ int main() {
     m.sample_topics();
     m.embedding_update();
     m.sample_topics();
+    m.embedding_update();
+    m.sample_topics();
 
     char buffer[200];
     FILE * fout;
@@ -94,4 +96,6 @@ int main() {
         }
     }
     fclose(fout);
+
+    m.save_model();
 }

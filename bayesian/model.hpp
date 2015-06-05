@@ -192,6 +192,39 @@ public:
         delete [] sum_m;
     }
 
+    void save_model(const char * filename = "model.save.txt") {
+        FILE * fout = fopen(filename, "w");
+        fprintf(fout, "%d %d\n", D, W);
+
+        for (int i = 0; i < D; i ++) {
+            for (int j = 0; j < E_r; j ++) {
+                fprintf(fout, "%f\n", f_r_d[i][j]);
+            }
+        }
+
+        for (int i = 0; i < W; i ++) {
+            for (int j = 0; j < E_k; j ++) {
+                fprintf(fout, "%f\n", f_k_w[i][j]);
+            }
+        }
+
+        for (int i = 0; i < D; i ++) {
+            fprintf(fout, "%d\n", y_d[i]);
+        }
+
+        for (int i = 0; i < D; i ++) {
+            fprintf(fout, "%d\n", M[i]);
+        }
+
+        for (int i = 0; i < D; i ++) {
+            for (int j = 0; j < M[i]; j ++) {
+                fprintf(fout, "%d\n", z_d_m[i][j]);
+            }
+        }
+
+        fclose(fout);
+    }
+
     model(document * docs, int D, int W, float ** f_r_d, float ** f_k_w):
         docs(docs), D(D), W(W), f_r_d(f_r_d), f_k_w(f_k_w) {
 
