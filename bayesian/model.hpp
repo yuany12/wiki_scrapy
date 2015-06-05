@@ -106,7 +106,7 @@ public:
     int * n_k_t, * n_r_t;
     float ** sqr_k, ** sum_k, ** sqr_r, ** sum_r;
 
-    float lr_r = 1e-3, lr_k = 1e-3; // learning rate for embedding update
+    float lr_r = 1e-3, lr_k = 1e-6; // learning rate for embedding update
     const float decay = 0.5;
     const int emb_max_iter = 20;
 
