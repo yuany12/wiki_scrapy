@@ -31,10 +31,10 @@ void read_data(int & D, int & W, document * & docs, float ** & f_r, float ** & f
 
     fin = fopen("data.embedding.researcher.txt", "r");
     f_r = new float * [D];
-    temp_r = new float * [D];
+    float ** temp_r = new float * [D];
     for (int i = 0; i < D; i ++) {
         f_r[i] = new float[model::E_r];
-        temp_r[i] = new float[model:E_r];
+        temp_r[i] = new float[model::E_r];
     }
     for (int i = 0; i < D; i ++) {
         for (int j = 0; j < model::E_r; j ++)
