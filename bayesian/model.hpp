@@ -108,7 +108,7 @@ public:
 
     float lr_r = 1e-3, lr_k = 1e-3; // learning rate for embedding update
     const float decay = 0.5;
-    const int emb_max_iter = 5;
+    const int emb_max_iter = 3;
 
     const int learning_max_iter = 1;
 
@@ -701,6 +701,9 @@ public:
                 }
             }
         }
+
+        stat_k_update();
+        stat_r_update();
     }
 
     void learn() {
@@ -711,9 +714,6 @@ public:
             sample_topics();
 
             // embedding_update();
-
-            // stat_k_update();
-            // stat_r_update();
         }
 
         parameter_update();

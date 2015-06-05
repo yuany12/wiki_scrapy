@@ -24,7 +24,7 @@ int main() {
 
     // m.learn();
 
-    FILE * fin = fopen("../embedding/keyword_index.out", "r");
+    FILE * fin = fopen("../embedding/keyword_index.out~", "r");
     char ** keyword = new char * [W];
     for (int i = 0; i < W; i ++) {
         keyword[i] = new char[50];
@@ -32,6 +32,8 @@ int main() {
     }
     fclose(fin);
 
+    m.sample_topics();
+    m.embedding_update();
     m.sample_topics();
 
     char buffer[200];
@@ -57,7 +59,7 @@ int main() {
         }
         fprintf(fout, "##############\n");
         delete [] pairs;
-        
+
         // fprintf(fout, "%d\n", m.y_d[i]);
         // for (int j = 0; j < m.M[i]; j ++) {
         //     int w_id = docs[i].w_id[j];
