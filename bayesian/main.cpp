@@ -24,7 +24,7 @@ int main() {
 
     // m.learn();
 
-    FILE * fin = fopen("../embedding/keyword_index.out~", "r");
+    FILE * fin = fopen("../embedding/keyword_index.out", "r");
     char ** keyword = new char * [W];
     for (int i = 0; i < W; i ++) {
         keyword[i] = new char[50];
@@ -33,8 +33,8 @@ int main() {
     fclose(fin);
 
     m.sample_topics();
-    m.embedding_update();
-    m.sample_topics();
+    // m.embedding_update();
+    // m.sample_topics();
 
     char buffer[200];
     FILE * fout = fopen("model.result.prob.txt", "w");
