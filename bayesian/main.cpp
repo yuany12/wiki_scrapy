@@ -11,6 +11,8 @@ bool comp(const pair<int, float> p1, const pair<int, float> p2) {
     return p1.second > p2.second;
 }
 
+char temp_[50];
+
 int main() {
     int D, W;
     document * docs;
@@ -37,6 +39,11 @@ int main() {
         char buffer[200];
         FILE * fout = fopen("model.result.prob.txt", "w");
         for (int i = 0; i < D; i ++) {
+            if (i % 10000 == 0) {
+                sprintf(temp_, "predicting %d", i);
+                logging(temp_);
+            }
+
             pair<int, float> * pairs = new pair<int, float>[m.M[i]];
             for (int j = 0; j < m.M[i]; j ++) {
                 int w_id = docs[i].w_id[j];

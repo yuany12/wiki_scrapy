@@ -721,6 +721,8 @@ public:
 
     float predict(int r_id, int w_id) {
         float prob = -1e30;
+
+        #pragma omp parallel for num_threads(20)
         for (int i = 0; i < T; i ++) {
             float cur = 0.0;
             for (int j = 0; j < E_r; j ++)
