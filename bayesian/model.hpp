@@ -83,7 +83,7 @@ public:
 
     float ** t_f_r_d, ** t_f_k_w;
 
-    float mu_0, kappa_0, beta_0, alpha_0; // hyperparameters for Gaussian distribution
+    float mu_0 = 0.0, kappa_0 = 1.0, beta_0 = 1e-2, alpha_0 = 2.0; // hyperparameters for Gaussian distribution
 
     float ** mu_k_t;    // Gaussian mean for keyword embeddings, T
     float ** lambda_k_t;    // Gaussian precision for keyword embeddings, T
@@ -91,10 +91,10 @@ public:
     float ** lambda_r_t;    // Gaussian precision for researcher embeddings, T
     int D;  // number of documents
     int * M;  // number of keywords in each document, D
-    const int T = 2;  // number of topics
+    const int T = 200;  // number of topics
     int W;  // number of keywords
-    static const int E_k = 1;    // dimension of keyword embeddings 200
-    static const int E_r = 1;    // dimension of researcher embeddings 128
+    static const int E_k = 200;    // dimension of keyword embeddings 200
+    static const int E_r = 128;    // dimension of researcher embeddings 128
 
     document * docs;
 
@@ -232,11 +232,6 @@ public:
         for (int i = 0; i < D; i ++) {
             y_d[i] = rand() % T;
         }
-
-        mu_0 = 0.0;
-        kappa_0 = 1.0;
-        alpha_0 = 2.0;
-        beta_0 = 1e-2;
 
         mu_k_t = new float * [T];
         for (int i = 0; i < T; i ++) {
