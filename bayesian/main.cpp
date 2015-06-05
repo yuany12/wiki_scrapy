@@ -20,6 +20,8 @@ int main() {
 
     read_data(D, W, docs, f_r, f_k);
 
+    D /= 1000;
+
     model m(docs, D, W, f_r, f_k);
 
     // m.learn();
