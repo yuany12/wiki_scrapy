@@ -8,6 +8,7 @@ import time
 import gensim
 import random
 import os
+import numpy as np
 
 def get_mongodb():
     password = open('password_mongo.txt').readline().strip()
@@ -189,6 +190,8 @@ def format(a_model):
             logging.info('printing author %d/%d' % (i, len(authors)))
 
         vec = model[author]
+        norm = np.linalg.norm(vec)
+        vec /= norm
         for ele in vec:
             fout.write("%.8f\n" % ele)
     fout.close()
@@ -205,9 +208,9 @@ if __name__ == '__main__':
     model = gensim.models.Word2Vec.load('online.author_word.model')
     # pool = multiprocessing.Pool(processes = 8)
     # pool.map(gen_pair, [(5000000, i) for i in range(8)])
-    select_()
-    merge()
-    sample()
-    indexing(model)
+    # select_()
+    # merge()
+    # sample()
+    # indexing(model)
     format(model)
     cnt_pair()
