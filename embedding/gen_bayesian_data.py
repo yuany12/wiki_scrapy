@@ -84,13 +84,13 @@ def select(bulk_info):
         stats = []
         for j in range(len(keywords)):
             score = 0.0
-            for k in range(len(keywords)):
-                score += model.similarity(keywords[j][0], keywords[k][0]) * keywords[k][1]
+            # for k in range(len(keywords)):
+            #     score += model.similarity(keywords[j][0], keywords[k][0]) * keywords[k][1]
             stats.append((keywords[j][0], keywords[j][1], score))
-        stats.sort(key = lambda x: x[2], reverse = True)
+        # stats.sort(key = lambda x: x[2], reverse = True)
 
         fout.write(rid)
-        for j in range(int(len(stats) * 0.5)):
+        for j in range(int(len(stats))):
             fout.write(';%s,%d' % (stats[j][0], stats[j][1]))
         fout.write('\n')
     fout.close()
@@ -117,7 +117,7 @@ def sample():
 
     fout = open('sample.pair.select.txt', 'w')
     for line in open('pair.select.txt'):
-        if line.strip().split(';')[0] in target_authors or random.random() < 0.1:
+        if line.strip().split(';')[0] in target_authors or random.random() < 2.0:
             fout.write(line)
     fout.close()
 
@@ -207,12 +207,12 @@ def cnt_pair():
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
-    # model = gensim.models.Word2Vec.load('online.author_word.model')
+    model = gensim.models.Word2Vec.load('online.author_word.model')
     # pool = multiprocessing.Pool(processes = 8)
     # pool.map(gen_pair, [(5000000, i) for i in range(8)])
-    # select_()
-    # merge()
-    # sample()
-    # indexing(model)
-    # format(model)
+    select_()
+    merge()
+    sample()
+    indexing(model)
+    format(model)
     cnt_pair()
