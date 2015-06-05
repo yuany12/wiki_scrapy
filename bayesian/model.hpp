@@ -605,49 +605,49 @@ public:
                 set_r_topic(j, y_d[j], true, false);
             }
 
-            // for (int j = 0; j < D; j ++) {
+            for (int j = 0; j < D; j ++) {
 
-            //     for (int k = 0; k < M[j]; k ++) {
-            //         int w_id = docs[j].w_id[k], w_freq = docs[j].w_freq[k];
+                for (int k = 0; k < M[j]; k ++) {
+                    int w_id = docs[j].w_id[k], w_freq = docs[j].w_freq[k];
 
-            //         set_k_topic(j, k, 0, false, true);
+                    set_k_topic(j, k, 0, false, true);
 
-            //         #pragma omp parallel for num_threads(20)
-            //         for (int l = 0; l < T; l ++) {
-            //             // float temp_p = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
-            //             float temp_p = n_d_t[j][l] + alpha;
-            //             temp_p = log2(temp_p) * multi_magnifier;
+                    #pragma omp parallel for num_threads(20)
+                    for (int l = 0; l < T; l ++) {
+                        // float temp_p = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
+                        float temp_p = n_d_t[j][l] + alpha;
+                        temp_p = log2(temp_p) * multi_magnifier;
 
-            //             // if (j == 0 && k == 0 && l == 0)
-            //             // cout << "log y|z = " << temp_p;
+                        // if (j == 0 && k == 0 && l == 0)
+                        // cout << "log y|z = " << temp_p;
 
-            //             temp_p += g_t(l, n_k_t, w_freq) * E_k;
-            //             // p2[l] = g_t(l, n_k_t, w_freq) * E_k;
+                        temp_p += g_t(l, n_k_t, w_freq) * E_k;
+                        // p2[l] = g_t(l, n_k_t, w_freq) * E_k;
 
-            //             for (int m = 0; m < E_k; m ++) {
-            //                 temp_p += g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
-            //                 // p2[l] += g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
-            //             }
+                        for (int m = 0; m < E_k; m ++) {
+                            temp_p += g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
+                            // p2[l] += g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
+                        }
 
-            //             // if (j == 0 && k == 0 && l == 0)
-            //             // cout << "\t log final = " << temp_p << endl;
-            //             ASSERT_VALNUM(temp_p);
-            //             p[l] = temp_p;
-            //         }
-            //         // if (j == 0 && k == 0) {
-            //         //     for (int l = 0; l < T; l ++) {
-            //         //         cout << " " << p[l];
-            //         //     }
-            //         //     cout << endl;
-            //         //     for (int l = 0; l < T; l ++) {
-            //         //         cout << " " << p2[l];
-            //         //     }
-            //         //     cout << endl;
-            //         // }
-            //         z_d_m[j][k] = log_uni_sample(p, T);
-            //         set_k_topic(j, k, z_d_m[j][k], true, false);
-            //     }
-            // }
+                        // if (j == 0 && k == 0 && l == 0)
+                        // cout << "\t log final = " << temp_p << endl;
+                        ASSERT_VALNUM(temp_p);
+                        p[l] = temp_p;
+                    }
+                    // if (j == 0 && k == 0) {
+                    //     for (int l = 0; l < T; l ++) {
+                    //         cout << " " << p[l];
+                    //     }
+                    //     cout << endl;
+                    //     for (int l = 0; l < T; l ++) {
+                    //         cout << " " << p2[l];
+                    //     }
+                    //     cout << endl;
+                    // }
+                    z_d_m[j][k] = log_uni_sample(p, T);
+                    set_k_topic(j, k, z_d_m[j][k], true, false);
+                }
+            }
 
             parameter_update();
         }
