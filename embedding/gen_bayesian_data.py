@@ -207,7 +207,7 @@ def cnt_pair():
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
-    model = gensim.models.Word2Vec.load('online.author_word.model')
+    # model = gensim.models.Word2Vec.load('online.author_word.model')
     # pool = multiprocessing.Pool(processes = 8)
     # pool.map(gen_pair, [(5000000, i) for i in range(8)])
     # select_()
