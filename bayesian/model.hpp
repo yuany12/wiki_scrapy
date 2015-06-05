@@ -99,7 +99,7 @@ public:
     document * docs;
 
     const int time_lag = 10;   // time lag of parameter read out
-    const int samp_topic_max_iter = 30; // max iteration
+    const int samp_topic_max_iter = 10; // max iteration
     int read_out_cnt;
 
     int ** n_d_t, ** n_w_t;   // number of topic t in document d, D times T
@@ -613,6 +613,7 @@ public:
                     #pragma omp parallel for num_threads(20)
                     for (int l = 0; l < T; l ++) {
                         float temp_p = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
+                        temp_p *= n_d_t[j][l] + alpha;
                         temp_p = log2(temp_p) * multi_magnifier;
 
                         // if (j == 0 && k == 0 && l == 0)

@@ -33,20 +33,25 @@ int main() {
     char buffer[200];
     FILE * fout = fopen("model.result.prob.txt", "w");
     for (int i = 0; i < D; i ++) {
-        pair<int, float> * pairs = new pair<int, float>[m.M[i]];
+        // pair<int, float> * pairs = new pair<int, float>[m.M[i]];
+        // for (int j = 0; j < m.M[i]; j ++) {
+        //     int w_id = docs[i].w_id[j];
+        //     float prob = m.predict(i, w_id);
+        //     pairs[j] = make_pair(j, prob);
+        // }
+        fprintf(fout, "%d\n", m.y_d[i]);
+        // sort(pairs, pairs + m.M[i], comp);
+        // for (int j = 0; j < m.M[i]; j ++) {
+        //     int w_id = docs[i].w_id[pairs[j].first];
+        //     fprintf(fout, "%s,%f,%d\n", keyword[w_id], pairs[j].second, m.z_d_m[i][pairs[j].first]);
+        // }
+        // fprintf(fout, "##############\n");
+        // delete [] pairs;
         for (int j = 0; j < m.M[i]; j ++) {
             int w_id = docs[i].w_id[j];
-            float prob = m.predict(i, w_id);
-            pairs[j] = make_pair(j, prob);
+            fprintf(fout, "%s,%d\n", keyword[w_id], m.z_d_m[i][j]);
         }
-        fprintf(fout, "%d\n", m.y_d[i]);
-        sort(pairs, pairs + m.M[i], comp);
-        for (int j = 0; j < m.M[i]; j ++) {
-            int w_id = docs[i].w_id[pairs[j].first];
-            fprintf(fout, "%s,%f,%d\n", keyword[w_id], pairs[j].second, m.z_d_m[i][pairs[j].first]);
-        }
-        fprintf(fout, "##############\n");
-        delete [] pairs;
+        fprintf(fout, "#####\n");
     }
     fclose(fout);
 
