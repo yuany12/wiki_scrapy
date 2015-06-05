@@ -57,6 +57,8 @@ int main() {
         // }
         // fprintf(fout, "##############\n");
         // delete [] pairs;
+        
+        fprintf(fout, "%d\n", m.y_d[i]);
         for (int j = 0; j < m.M[i]; j ++) {
             int w_id = docs[i].w_id[j];
             fprintf(fout, "%s,%d\n", keyword[w_id], m.z_d_m[i][j]);
