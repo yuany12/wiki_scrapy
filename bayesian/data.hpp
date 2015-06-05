@@ -30,15 +30,25 @@ void read_data(int & D, int & W, document * & docs, float ** & f_r, float ** & f
     logging("loading data main done");
 
     fin = fopen("data.embedding.researcher.txt", "r");
-    f_r = new float *[D];
+    f_r = new float * [D];
+    temp_r = new float * [D];
     for (int i = 0; i < D; i ++) {
         f_r[i] = new float[model::E_r];
+        temp_r[i] = new float[model:E_r];
     }
     for (int i = 0; i < D; i ++) {
         for (int j = 0; j < model::E_r; j ++)
-            fscanf(fin, "%f\n", &f_r[i][j]);
+            // fscanf(fin, "%f\n", &f_r[i][j]);
+            fscanf(fin, "%f\n", &temp_r[i][j]);
     }
     fclose(fin);
+    for (int i = 0; i < D; i ++) {
+        int r_id = docs[i].r_id;
+        memcpy(f_r[i], temp_r[r_id], sizeof(float) * model::E_r);
+    }
+
+    for (int i = 0; i < D; i ++) delete [] temp_r[i];
+    delete [] temp_r;
 
     logging("loading researcher done");
 
