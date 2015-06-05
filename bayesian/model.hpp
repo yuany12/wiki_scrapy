@@ -577,6 +577,7 @@ public:
     void sample_topics() {
 
         float p[T];
+        float p2[T];
 
         for (int i = 0; i < samp_topic_max_iter; i ++) {
             sprintf(temp, "sampling topics iter %d log-likelihood = %f", i, log_likelihood());
@@ -620,19 +621,28 @@ public:
                         // cout << "log y|z = " << temp_p;
 
                         temp_p += g_t(l, n_k_t, w_freq) * E_k;
+                        p2[l] = g_t(l, n_k_t, w_freq) * E_k;
 
                         for (int m = 0; m < E_k; m ++) {
                             temp_p += g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
+                            p2[l] += g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
                         }
 
                         // if (j == 0 && k == 0 && l == 0)
                         // cout << "\t log final = " << temp_p << endl;
                         ASSERT_VALNUM(temp_p);
                         p[l] = temp_p;
-                        if (j == 0 && k == 0) cout << " " << p[l];
                     }
-                    if (j == 0 && k == 0)
-                    cout << endl;
+                    if (j == 0 && k == 0) {
+                        for (int l = 0; l < T; l ++) {
+                            cout << " " << p[l];
+                        }
+                        cout << endl;
+                        for (int l = 0; l < T; l ++) {
+                            cout << " " << p2[l];
+                        }
+                        cout << endl;
+                    }
                     z_d_m[j][k] = log_uni_sample(p, T);
                     set_k_topic(j, k, z_d_m[j][k], true, false);
                 }
