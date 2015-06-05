@@ -83,7 +83,7 @@ public:
 
     float ** t_f_r_d, ** t_f_k_w;
 
-    float mu_0 = 0.0, kappa_0 = 1.0, beta_0 = 1e-2, alpha_0 = 2.0; // hyperparameters for Gaussian distribution
+    float mu_0 = 0.0, kappa_0 = 1.0, beta_0 = 1.0, alpha_0 = 0.5; // hyperparameters for Gaussian distribution
 
     float ** mu_k_t;    // Gaussian mean for keyword embeddings, T
     float ** lambda_k_t;    // Gaussian precision for keyword embeddings, T
