@@ -45,7 +45,7 @@ int main() {
             }
             fprintf(fout, "%d\n", m.y_d[i]);
             sort(pairs, pairs + m.M[i], comp);
-            for (int k = 0; k < m.m[i]; k ++) {
+            for (int k = 0; k < m.M[i]; k ++) {
                 int j = pairs[k].first;
                 int w_id = docs[i].w_id[j];
                 fprintf(fout, "%s,%f,%d\n", keyword[w_id], pairs[k].second, m.z_d_m[i][j]);
