@@ -119,7 +119,7 @@ public:
 
     const float laplace = 1e-5; // 0.1
 
-    const float multi_magnifier = 1e3;
+    const float multi_magnifier = 1e2;
 
     int * sum_m;
 
@@ -616,8 +616,8 @@ public:
                         float temp_p = n_d_t[j][l] + alpha;
                         temp_p = log2(temp_p) * multi_magnifier;
 
-                        if (j == 0 && k == 0 && l == 0)
-                        cout << "log y|z = " << temp_p;
+                        // if (j == 0 && k == 0 && l == 0)
+                        // cout << "log y|z = " << temp_p;
 
                         temp_p += g_t(l, n_k_t, w_freq) * E_k;
 
@@ -625,11 +625,13 @@ public:
                             temp_p += g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
                         }
 
-                        if (j == 0 && k == 0 && l == 0)
-                        cout << "\t log final = " << temp_p << endl;
+                        // if (j == 0 && k == 0 && l == 0)
+                        // cout << "\t log final = " << temp_p << endl;
                         ASSERT_VALNUM(temp_p);
                         p[l] = temp_p;
+                        if (j == 0 && k == 0) cout << " " << p[l];
                     }
+                    cout << endl;
                     z_d_m[j][k] = log_uni_sample(p, T);
                     set_k_topic(j, k, z_d_m[j][k], true, false);
                 }
