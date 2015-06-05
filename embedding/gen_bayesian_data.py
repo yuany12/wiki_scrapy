@@ -179,6 +179,8 @@ def format(a_model):
             logging.info('printing keyword %d/%d' % (i, len(keywords)))
 
         vec = model[keyword]
+        norm = np.linalg.norm(vec)
+        vec /= norm
         for ele in vec:
             fout.write("%.8f\n" % ele)
     fout.close()
