@@ -91,7 +91,7 @@ public:
     float ** lambda_r_t;    // Gaussian precision for researcher embeddings, T
     int D;  // number of documents
     int * M;  // number of keywords in each document, D
-    const int T = 50;  // number of topics
+    const int T = 2;  // number of topics
     int W;  // number of keywords
     static const int E_k = 1;    // dimension of keyword embeddings 200
     static const int E_r = 1;    // dimension of researcher embeddings 128
