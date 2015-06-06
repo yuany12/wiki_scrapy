@@ -84,13 +84,13 @@ def select(bulk_info):
         stats = []
         for j in range(len(keywords)):
             score = 0.0
-            # for k in range(len(keywords)):
-            #     score += model.similarity(keywords[j][0], keywords[k][0]) * keywords[k][1]
+            for k in range(len(keywords)):
+                score += model.similarity(keywords[j][0], keywords[k][0]) * keywords[k][1]
             stats.append((keywords[j][0], keywords[j][1], score))
-        # stats.sort(key = lambda x: x[2], reverse = True)
+        stats.sort(key = lambda x: x[2], reverse = True)
 
         fout.write(rid)
-        for j in range(int(len(stats))):
+        for j in range(int(len(stats) * 0.5)):
             fout.write(';%s,%d' % (stats[j][0], stats[j][1]))
         fout.write('\n')
     fout.close()
