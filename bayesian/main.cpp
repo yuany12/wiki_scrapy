@@ -52,28 +52,28 @@ int main() {
             logging(temp_);
         }
 
-        pair<int, float> * pairs = new pair<int, float>[m.M[i]];
-        for (int j = 0; j < m.M[i]; j ++) {
-            int w_id = docs[i].w_id[j];
-            float prob = m.predict(i, w_id);
-            pairs[j] = make_pair(j, prob);
-        }
-        fprintf(fout, "%d\n", m.y_d[i]);
-        sort(pairs, pairs + m.M[i], comp);
-        for (int k = 0; k < m.M[i]; k ++) {
-            int j = pairs[k].first;
-            int w_id = docs[i].w_id[j];
-            fprintf(fout, "%s,%f,%d\n", keyword[w_id], pairs[k].second, m.z_d_m[i][j]);
-        }
-        fprintf(fout, "##############\n");
-        delete [] pairs;
-
-        // fprintf(fout, "%d\n", m.y_d[i]);
+        // pair<int, float> * pairs = new pair<int, float>[m.M[i]];
         // for (int j = 0; j < m.M[i]; j ++) {
         //     int w_id = docs[i].w_id[j];
-        //     fprintf(fout, "%s,%d\n", keyword[w_id], m.z_d_m[i][j]);
+        //     float prob = m.predict(i, w_id);
+        //     pairs[j] = make_pair(j, prob);
         // }
-        // fprintf(fout, "#####\n");
+        // fprintf(fout, "%d\n", m.y_d[i]);
+        // sort(pairs, pairs + m.M[i], comp);
+        // for (int k = 0; k < m.M[i]; k ++) {
+        //     int j = pairs[k].first;
+        //     int w_id = docs[i].w_id[j];
+        //     fprintf(fout, "%s,%f,%d\n", keyword[w_id], pairs[k].second, m.z_d_m[i][j]);
+        // }
+        // fprintf(fout, "##############\n");
+        // delete [] pairs;
+
+        fprintf(fout, "%d\n", m.y_d[i]);
+        for (int j = 0; j < m.M[i]; j ++) {
+            int w_id = docs[i].w_id[j];
+            fprintf(fout, "%s,%d\n", keyword[w_id], m.z_d_m[i][j]);
+        }
+        fprintf(fout, "#####\n");
     }
     fclose(fout);
 
