@@ -38,10 +38,6 @@ int main() {
     fclose(fin);
 
     m.sample_topics();
-    m.embedding_update();
-    m.sample_topics();
-    m.embedding_update();
-    m.sample_topics();
 
     char buffer[200];
     FILE * fout;
