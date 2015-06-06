@@ -24,7 +24,7 @@ int main() {
 
     // m.learn();
 
-    FILE * fin;
+    FILE * fin, * fout;
     if (SMALL_DATA)
         fin = fopen("../embedding/keyword_index.out~", "r");
     else
@@ -38,11 +38,29 @@ int main() {
     fclose(fin);
 
     m.sample_topics();
+
+    m.save_model("model.save.txt.temp");
+
+    if (SMALL_DATA)
+        fout = fopen("model.result.topics.txt.temp~", "w");
+    else
+        fout = fopen("model.result.topics.txt.temp", "w");
+    for (int i = 0; i < m.T; i ++) {
+        fprintf(fout, "###topic%d\n", i);
+        for (int j = 0; j < D; j ++) {
+            for (int k = 0; k < m.M[j]; k ++) {
+                if (m.z_d_m[j][k] != i) continue;
+                int w_id = docs[j].w_id[k];
+                fprintf(fout, "%s\n", keyword[w_id]);
+            }
+        }
+    }
+    fclose(fout);
+
     m.embedding_update();
     m.sample_topics();
 
     char buffer[200];
-    FILE * fout;
     if (SMALL_DATA)
         fout = fopen("model.result.prob.txt~", "w");
     else
