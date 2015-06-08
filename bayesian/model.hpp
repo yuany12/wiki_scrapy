@@ -583,7 +583,8 @@ public:
         int n = n_r_t[t];
         ret += log_gamma_ratio(alpha_0 + n + dn, alpha_0 + n);
         ret += 0.5 * (log2((kappa_0 + n) / (kappa_0 + n + dn)));
-        ret += 0.5 * dn * LOG_2_PI;
+        // ret += 0.5 * dn * LOG_2_PI;
+        ret -= 0.5 * dn * LOG_2_PI;
         return ret;
     }
 
