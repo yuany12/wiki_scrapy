@@ -51,6 +51,6 @@ def count_more_than_five():
     print cnt
 
 if __name__ == '__main__':
-    # count_overlap()
+    count_overlap()
     # count_more_than_five()
     count_linkedin_overlap()
