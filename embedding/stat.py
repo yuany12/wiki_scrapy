@@ -22,7 +22,7 @@ def count_overlap():
 
 def count_linkedin_overlap():
     authors_in_data = []
-    for line in open('author_index.out'):
+    for line in open('author_index.out~'):
         authors_in_data.append(line.strip())
     authors_in_data = set(authors_in_data)
 
