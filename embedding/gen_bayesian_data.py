@@ -115,9 +115,24 @@ def sample():
         target_authors.append(filename.split('.')[0])
     target_authors = set(target_authors)
 
+    authors_in_lk = json.load(open('../match_linkedin.json'))
+    authors_in_lk = [e[1] for e in authors_in_lk]
+
+    for author in authors_in_lk:
+        target_authors.add(author)
+
     fout = open('sample.pair.select.txt', 'w')
+    temp_list = []
     for line in open('pair.select.txt'):
-        if line.strip().split(';')[0] in target_authors or random.random() < 2.0:
+        temp_list.append((line, len(line.strip().split(';'))))
+    temp_list.sort(key = lambda x: x[1], reverse = True)
+
+    cutoff = int(len(temp_list) * 0.1)
+    for line in temp_list[: cutoff]:
+        fout.write(line)
+
+    for line in temp_list[cutoff :]:
+        if line.strip().split(';')[0] in target_authors:
             fout.write(line)
     fout.close()
 
@@ -210,8 +225,8 @@ if __name__ == '__main__':
     model = gensim.models.Word2Vec.load('online.author_word.model')
     # pool = multiprocessing.Pool(processes = 8)
     # pool.map(gen_pair, [(5000000, i) for i in range(8)])
-    select_()
-    merge()
+    # select_()
+    # merge()
     sample()
     indexing(model)
     format(model)
