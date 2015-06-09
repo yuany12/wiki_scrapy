@@ -225,11 +225,42 @@ public:
         fclose(fout);
     }
 
-    model(document * docs, int D, int W, float ** f_r_d, float ** f_k_w):
-        docs(docs), D(D), W(W), f_r_d(f_r_d), f_k_w(f_k_w) {
+    void load_model(const char * filename) {
 
-        // this->D /= 100;
+        FILE * fin = fopen(filename, "r");
 
+        fscanf(fin, "%d %d\n", &D, &W);
+
+        for (int i = 0; i < D; i ++) {
+            for (int j = 0; j < E_r; j ++) {
+                fscanf(fin, "%f\n", &f_r_d[i][j]);
+            }
+        }
+
+        for (int i = 0; i < W; i ++) {
+            for (int j = 0; j < E_k; j ++) {
+                fscanf(fin, "%f\n", &f_k_w[i][j]);
+            }
+        }
+
+        for (int i = 0; i < D; i ++) {
+            fscanf(fin, "%d\n", &y_d[i]);
+        }
+
+        for (int i = 0; i < D; i ++) {
+            fscanf(fin, "%d\n", &M[i]);
+        }
+
+        for (int i = 0; i < D; i ++) {
+            for (int j = 0; j < M[i]; j ++) {
+                fscanf(fin, "%d\n", &z_d_m[i][j]);
+            }
+        }
+
+        fclose(fin);
+    }
+
+    void model_init() {
         srand(0);
 
         t_f_r_d = new float * [D];
@@ -334,6 +365,16 @@ public:
 
             sqr_r[i] = new float[E_r];
             sum_r[i] = new float[E_r];
+        }
+    }
+
+    model(document * docs, int D, int W, float ** f_r_d, float ** f_k_w, const char * filename = NULL):
+        docs(docs), D(D), W(W), f_r_d(f_r_d), f_k_w(f_k_w) {
+
+        model_init();
+
+        if (filename) {
+            load_model(filename);
         }
 
         stat_k_update();
