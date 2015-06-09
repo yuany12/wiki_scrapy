@@ -34,6 +34,13 @@ int main() {
 
     FILE * fout = fopen("model.predict.txt.temp", "w");
 
+    float ** prob = new float * [D];
+
+    for (int i = 0; i < D; i ++) {
+        prob[i] = new float[m.M[i]];
+    }
+
+    #pragma omp parallel for num_threads(64) schedule(dynamic, 1000)
     for (int i = 0; i < D; i ++) {
         if (i % 10000 == 0) {
             sprintf(temp_, "predicting %d", i);
@@ -41,12 +48,23 @@ int main() {
         }
 
         int M = m.M[i];
+        for (int j = 0; j < M; j ++) {
+            int w_id = docs[i].w_id[j];
+            prob[i][j] = m.predict(i, w_id);
+        }
+    }
+
+    for (int i = 0; i < D; i ++) {
+        if (i % 10000 == 0) {
+            sprintf(temp_, "printing %d", i);
+            logging(temp_);
+        }
+
+        int M = m.M[i];
 
         pair<int, float> * pairs = new pair<int, float>[M];
         for (int j = 0; j < M; j ++) {
-            int w_id = docs[i].w_id[j];
-            float prob = m.predict(i, w_id);
-            pairs[j] = make_pair(j, prob);
+            pairs[j] = make_pair(j, prob[i][j]);
         }
         fprintf(fout, "%d %d\n", m.y_d[i], M);
         sort(pairs, pairs + M, comp);
