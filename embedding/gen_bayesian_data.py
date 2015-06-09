@@ -9,6 +9,7 @@ import gensim
 import random
 import os
 import numpy as np
+import json
 
 def get_mongodb():
     password = open('password_mongo.txt').readline().strip()
