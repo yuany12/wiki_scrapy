@@ -129,11 +129,11 @@ def sample():
     temp_list.sort(key = lambda x: x[1], reverse = True)
 
     cutoff = int(len(temp_list) * 0.1)
-    for line in temp_list[: cutoff]:
+    for line, _ in temp_list[: cutoff]:
         fout.write(line)
 
-    for line in temp_list[cutoff :]:
-        if line.strip().split(';')[0] in target_authors:
+    for line, _ in temp_list[cutoff :]:
+        if line.strip().split(';')[0] in target_authors or random.random() < 0.1:
             fout.write(line)
     fout.close()
 
