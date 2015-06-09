@@ -39,23 +39,23 @@ int main() {
 
     m.sample_topics();
 
-    // m.save_model("model.save.txt.temp");
+    m.save_model("model.save.txt.temp");
 
-    // if (SMALL_DATA)
-    //     fout = fopen("model.result.topics.txt.temp~", "w");
-    // else
-    //     fout = fopen("model.result.topics.txt.temp", "w");
-    // for (int i = 0; i < m.T; i ++) {
-    //     fprintf(fout, "###topic%d\n", i);
-    //     for (int j = 0; j < D; j ++) {
-    //         for (int k = 0; k < m.M[j]; k ++) {
-    //             if (m.z_d_m[j][k] != i) continue;
-    //             int w_id = docs[j].w_id[k];
-    //             fprintf(fout, "%s\n", keyword[w_id]);
-    //         }
-    //     }
-    // }
-    // fclose(fout);
+    if (SMALL_DATA)
+        fout = fopen("model.result.topics.txt.temp~", "w");
+    else
+        fout = fopen("model.result.topics.txt.temp", "w");
+    for (int i = 0; i < m.T; i ++) {
+        fprintf(fout, "###topic%d\n", i);
+        for (int j = 0; j < D; j ++) {
+            for (int k = 0; k < m.M[j]; k ++) {
+                if (m.z_d_m[j][k] != i) continue;
+                int w_id = docs[j].w_id[k];
+                fprintf(fout, "%s\n", keyword[w_id]);
+            }
+        }
+    }
+    fclose(fout);
 
     m.embedding_update();
     m.sample_topics();
@@ -113,5 +113,5 @@ int main() {
     }
     fclose(fout);
 
-    // m.save_model();
+    m.save_model();
 }
