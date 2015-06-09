@@ -39,7 +39,7 @@ int main() {
 
     m.sample_topics();
 
-    m.save_model("model.save.txt.temp");
+    // m.save_model("model.save.txt.temp");
 
     if (SMALL_DATA)
         fout = fopen("model.result.topics.txt.temp~", "w");
@@ -113,5 +113,5 @@ int main() {
     }
     fclose(fout);
 
-    m.save_model();
+    // m.save_model();
 }
