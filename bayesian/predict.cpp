@@ -32,6 +32,15 @@ int main() {
     }
     fclose(fin);
 
+    fin = fopen("../embedding/author_index.out", "r");
+
+    char ** author = new char * [D];
+    for (int i = 0; i < D; i ++) {
+        author[i] = new char[50];
+        fscanf(fin, "%s", author[i]);
+    }
+    fclose(fin);
+
     FILE * fout = fopen("model.predict.txt.temp", "w");
 
     float ** prob = new float * [D];
@@ -66,7 +75,7 @@ int main() {
         for (int j = 0; j < M; j ++) {
             pairs[j] = make_pair(j, prob[i][j]);
         }
-        fprintf(fout, "%d %d\n", m.y_d[i], M);
+        fprintf(fout, "%s %d %d\n", author[i], m.y_d[i], M);
         sort(pairs, pairs + M, comp);
         for (int k = 0; k < M; k ++) {
             int j = pairs[k].first;
