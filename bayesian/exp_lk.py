@@ -94,6 +94,30 @@ def test_bayesian():
         rt_cnt += 1
     print rt / rt_cnt
 
+def test_wo_emb():
+    author2words = {}
+    for line in open('model.predict.txt.temp'):
+        inputs = line.strip().split(',')
+        author = inputs[0]
+        author2words[author] = []
+        for keyword in inputs[1: ]:
+            author2words[author].append(keyword)
+
+    rt, rt_cnt = 0.0, 0
+    for line in open('lk_test.txt'):
+        inputs = line.strip().split(',')
+        author = inputs[0]
+        keywords = set(inputs[1 :])
+
+        pos_cnt, neg_cnt = 0, 0
+
+        for keyword in author2words[author][: 5]:
+            if fuzzy_match(keyword, keywords): pos_cnt += 1
+            else: neg_cnt += 1
+        rt += 1.0 * pos_cnt / (pos_cnt + neg_cnt)
+        rt_cnt += 1
+    print rt / rt_cnt
+
 # 0.438025345592
 def test_random_guess():
     author2words = {}
@@ -145,6 +169,7 @@ def test_old():
 if __name__ == '__main__':
     gen_test_data()
     test_bayesian()
+    test_wo_emb()
     test_random_guess()
     test_old()
 
