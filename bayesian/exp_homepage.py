@@ -34,21 +34,14 @@ def gen_test_data():
         keywords = set()
 
         tokens = [e.orth_.lower() for e in nlp(doc, tag = False, parse = False)]
-        i = 0
-        while i + 1 <= len(tokens) - 1:
-            if (i + 2 <= len(tokens) - 1):
-                new_word = "_".join(tokens[i: i + 3])
-                if new_word in author2words[author]:
-                    keywords.add(new_word)
-                    i += 3
-                    continue
-            if (i + 1 <= len(tokens) - 1):
-                new_word = "_".join(tokens[i: i + 2])
-                if new_word in author2words[author]:
-                    keywords.add(new_word)
-                    i += 2
-                    continue
-            i += 1
+        for i in range(len(tokens) - 1):
+            new_word = "_".join(tokens[i: i + 2])
+            if new_word in author2words[author]:
+                keywords.add(new_word)
+        for i in range(len(tokens) - 2):
+            new_word = "_".join(tokens[i: i + 3])
+            if new_word in author2words[author]:
+                keywords.add(new_word)
         if len(keywords) < 5: continue
         gt[author] = keywords
 
