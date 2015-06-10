@@ -21,7 +21,7 @@ int main() {
 
     read_data(D, W, docs, f_r, f_k);
 
-    model m(docs, D, W, f_r, f_k, "model.save.txt.temp");
+    model m(docs, D, W, f_r, f_k, "model.save.txt");
 
     FILE * fin = fopen("../embedding/keyword_index.out", "r");
 
@@ -41,7 +41,7 @@ int main() {
     }
     fclose(fin);
 
-    FILE * fout = fopen("model.predict.txt.temp", "w");
+    FILE * fout = fopen("model.predict.txt", "w");
 
     float ** prob = new float * [D];
 
@@ -49,7 +49,7 @@ int main() {
         prob[i] = new float[m.M[i]];
     }
 
-    #pragma omp parallel for num_threads(64) schedule(dynamic, 1000)
+    #pragma omp parallel for num_threads(64)
     for (int i = 0; i < D; i ++) {
         if (i % 10000 == 0) {
             sprintf(temp_, "predicting %d", i);
@@ -76,17 +76,29 @@ int main() {
         for (int j = 0; j < M; j ++) {
             pairs[j] = make_pair(j, prob[i][j]);
         }
-        fprintf(fout, "%s %d %d\n", author[r_id], m.y_d[i], M);
-        sort(pairs, pairs + M, comp);
-        for (int k = 0; k < M; k ++) {
-            int j = pairs[k].first;
-            int w_id = docs[i].w_id[j];
-            fprintf(fout, "%s,%f,%d\n", keyword[w_id], pairs[k].second, m.z_d_m[i][j]);
-        }
-        fprintf(fout, "##############\n");
-        delete [] pairs;
 
-        fprintf(fout, "#####\n");
+        sort(pairs, pairs + M, comp);
+
+        if (! EXP_DATA) {
+            fprintf(fout, "%s %d %d\n", author[r_id], m.y_d[i], M);
+            for (int k = 0; k < M; k ++) {
+                int j = pairs[k].first;
+                int w_id = docs[i].w_id[j];
+                fprintf(fout, "%s,%f,%d\n", keyword[w_id], pairs[k].second, m.z_d_m[i][j]);
+            }
+            fprintf(fout, "##############\n");
+        }
+        else {
+            fprintf(fout, "%s", author[r_id]);
+            for (int k = 0; k < M; k ++) {
+                int j = pairs[k].first;
+                int w_id = docs[i].w_id[j];
+                fprintf(fout, ",%s", keyword[w_id]);
+            }
+            fprintf(fout, "\n");
+        }
+
+        delete [] pairs;
     }
     fclose(fout);
 }
