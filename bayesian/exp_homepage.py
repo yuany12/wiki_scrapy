@@ -84,6 +84,7 @@ def test_bayesian():
         inputs = line.strip().split(',')
         author = inputs[0]
         keywords = set(inputs[1 :])
+        if len(keywords) < 25: continue
 
         pos_cnt, neg_cnt = 0, 0
 
@@ -125,6 +126,6 @@ def test_old():
         print rt / rt_cnt, pos_cnt, neg_cnt, cnt
 
 if __name__ == '__main__':
-    # test_bayesian()
-    test_old()
+    test_bayesian()
+    # test_old()
     # gen_()
