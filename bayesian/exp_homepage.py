@@ -23,7 +23,7 @@ def test_bayesian():
 
         pos_cnt, neg_cnt = 0, 0
 
-        for keyword in author2words[: 5]:
+        for keyword in author2words[author][: 5]:
             if keyword.replace('_', ' ') in doc: pos_cnt += 1
             else: neg_cnt += 1
 
