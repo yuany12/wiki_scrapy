@@ -108,7 +108,11 @@ def test_random_guess():
         author = inputs[0]
         keywords = set(inputs[1 :])
 
-        rt += 1.0 * len(keywords) / len(author2words[author])
+        pos_cnt = 0
+        for keyword in author2words[author]:
+            if fuzzy_match(keyword, keywords): pos_cnt += 1
+
+        rt += 1.0 * pos_cnt / len(author2words[author])
         rt_cnt += 1
     print rt / rt_cnt
 
@@ -137,6 +141,6 @@ def test_old():
 
 if __name__ == '__main__':
     gen_test_data()
-    test_bayesian()
-    # test_random_guess()
-    test_old()
+    # test_bayesian()
+    test_random_guess()
+    # test_old()
