@@ -29,7 +29,7 @@ def gen_test_data():
         lk_id, author = tuple(ele)
         if author not in author2words: continue
 
-        doc = linkedin.find_one({'_id': ObjectId(lk_id)})
+        doc = linkedin.find_one({'_id': lk_id})
 
         if 'skills' not in doc: continue
         keywords = set()
