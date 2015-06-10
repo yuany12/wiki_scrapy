@@ -79,28 +79,18 @@ def test_bayesian():
         for keyword in inputs[1: ]:
             author2words[author].append(keyword)
 
-    target_authors = []
     rt, rt_cnt = 0.0, 0
-    for filename in os.listdir('../homepage'):
-        author = filename.split('.')[0]
-        if author not in author2words: continue
-
-        doc = open('../homepage/' + filename).read()
-        soup = BeautifulSoup(doc)
-        doc = soup.get_text()
-
-        pos_cnt, neg_cnt = 0, 0
+    for line in open('homepage_test.txt'):
+        inputs = line.strip().split(',')
+        author = inputs[0]
+        keywords = set(inputs[1 :])
 
         for keyword in author2words[author][: 5]:
-            if keyword.replace('_', ' ') in doc: pos_cnt += 1
+            if keyword in keywords: pos_cnt += 1
             else: neg_cnt += 1
-
         rt += 1.0 * pos_cnt / (pos_cnt + neg_cnt)
         rt_cnt += 1
-
         print rt / rt_cnt
-
-    print rt / rt_cnt
 
 def get_mongodb():
     password = open('password_mongo.txt').readline().strip()
@@ -147,6 +137,6 @@ def test_old():
     print rt / rt_cnt
 
 if __name__ == '__main__':
-    # test_bayesian()
+    test_bayesian()
     # test_old()
-    gen_()
+    # gen_()
