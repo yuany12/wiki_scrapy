@@ -795,7 +795,7 @@ public:
         parameter_update();
     }
 
-    float predict(int r_id, int w_id) {
+    float predict(int r_id, int w_id, int j) {
         float prob = -1e30;
 
         // #pragma omp parallel for num_threads(20)
@@ -809,6 +809,7 @@ public:
             if (r_id == 0 && i == 0) cout << cur << endl;
             // cur = fastpow2(cur) * theta_d_t[r_id][i];
             cur += log2(theta_d_t[r_id][i]) * multi_magnifier;
+            cur += log2(1.0 * docs[r_id].w_freq[j] / sum_m[r_id]) * multi_magnifier;
             if (r_id == 0 && i == 0) cout << cur << endl;
             if (r_id == 0 && i == 0) cout << "======" << endl;
             ASSERT_VALNUM(cur);
