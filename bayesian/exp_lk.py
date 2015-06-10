@@ -15,13 +15,13 @@ def gen_test_data():
 
     authors_in_lk = json.load(open('../match_linkedin.json'))
     
-    author2words = {}
-    for line in open('model.predict.txt'):
-        inputs = line.strip().split(',')
-        author = inputs[0]
-        author2words[author] = set()
-        for keyword in inputs[1: ]:
-            author2words[author].add(keyword)
+    # author2words = {}
+    # for line in open('model.predict.txt'):
+    #     inputs = line.strip().split(',')
+    #     author = inputs[0]
+    #     author2words[author] = set()
+    #     for keyword in inputs[1: ]:
+    #         author2words[author].add(keyword)
 
     gt = {}
 
@@ -34,15 +34,18 @@ def gen_test_data():
         if 'skills' not in doc: continue
         keywords = set()
 
-        for keyword in author2words[author]:
-            flag = False
-            for skill in doc['skills']:
-                skill = skill.lower().replace(' ', '_')
-                if skill in keyword or keyword in skill:
-                    flag = True
-                    break
-            if flag:
-                keywords.add(keyword)
+        # for keyword in author2words[author]:
+        #     flag = False
+        #     for skill in doc['skills']:
+        #         skill = skill.lower().replace(' ', '_')
+        #         if skill in keyword or keyword in skill:
+        #             flag = True
+        #             break
+        #     if flag:
+        #         keywords.add(keyword)
+        for skill in doc['skills']:
+            keywords.add(skill)
+
         if len(keywords) > 3:
             gt[author] = keywords
 
@@ -53,6 +56,11 @@ def gen_test_data():
             fout.write(',' + e)
         fout.write('\n')
     fout.close()
+
+def fuzzy_match(k1, ks):
+    for k2 in ks:
+        if k1 in k2 or k2 in k1: return True
+    return False
 
 def test_bayesian():
     author2words = {}
@@ -72,7 +80,7 @@ def test_bayesian():
         pos_cnt, neg_cnt = 0, 0
 
         for keyword in author2words[author][: 5]:
-            if keyword in keywords: pos_cnt += 1
+            if fuzzy_match(keyword, keywords): pos_cnt += 1
             else: neg_cnt += 1
         rt += 1.0 * pos_cnt / (pos_cnt + neg_cnt)
         rt_cnt += 1
@@ -98,14 +106,6 @@ def test_random_guess():
     print rt / rt_cnt
 
 def test_old():
-    author2words = {}
-    for line in open('model.predict.txt'):
-        inputs = line.strip().split(',')
-        author = inputs[0]
-        author2words[author] = set()
-        for keyword in inputs[1: ]:
-            author2words[author].add(keyword)
-
     people = get_mongodb().people
 
     rt, rt_cnt = 0.0, 0
@@ -120,18 +120,16 @@ def test_old():
 
         pos_cnt, neg_cnt = 0, 0
 
-        for keyword in doc['tags']:
+        for keyword in doc['tags'][: 5]:
             keyword = keyword['t'].lower().replace(' ', '_')
-            if keyword not in author2words[author]: continue
-            if keyword in keywords: pos_cnt += 1
+            if fuzzy_match(keyword, keywords): pos_cnt += 1
             else: neg_cnt += 1
-            if pos_cnt + neg_cnt >= 5: break
-        rt += 1.0 * pos_cnt / (pos_cnt + neg_cnt) if pos_cnt + neg_cnt > 0 else 0.0
+        rt += 1.0 * pos_cnt / (pos_cnt + neg_cnt)
         rt_cnt += 1
     print rt / rt_cnt
 
 if __name__ == '__main__':
     gen_test_data()
     test_bayesian()
-    test_random_guess()
+    # test_random_guess()
     test_old()
