@@ -5,7 +5,9 @@ import pymongo
 from bson.objectid import ObjectId
 import spacy.en
 
-def gen_test_data():
+def gen_test_data(bulk_info):
+    bulk_size, bulk_no = bulk_info
+
     nlp = spacy.en.English()
 
     author2words = {}
@@ -18,10 +20,11 @@ def gen_test_data():
 
     gt = {}
 
+    filenames = os.listdir('../homepage')
     cnt = 0
-    for filename in os.listdir('../homepage')[: 1000]:
+    for filename in filenames[bulk_no * bulk_size: min((bulk_no + 1) * bulk_size, len(filenames))]:
         if cnt % 1000 == 0:
-            print cnt
+            print cnt, bulk_no
         cnt += 1
 
         author = filename.split('.')[0]
@@ -45,13 +48,20 @@ def gen_test_data():
         if len(keywords) < 5: continue
         gt[author] = keywords
 
-    fout = open('homepage_test.txt', 'w')
+    fout = open('homepage_test_%d.txt' % bulk_no, 'w')
     for k, v in gt.iteritems():
         fout.write(k)
         for e in v:
             fout.write(',' + e)
         fout.write('\n')
     fout.close()
+
+def gen_():
+    CORE_NUM = 64
+    bulk_size = 68000 / CORE_NUM
+
+    pool = multiprocessing.Pool(processes = CORE_NUM)
+    pool.map(gen_test_data, [(i, bulk_size) for i in range(CORE_NUM)])
 
 def test_bayesian():
     author2words = {}
@@ -132,4 +142,4 @@ def test_old():
 if __name__ == '__main__':
     # test_bayesian()
     # test_old()
-    gen_test_data()
+    gen_()
