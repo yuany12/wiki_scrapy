@@ -73,7 +73,7 @@ def test_old():
             if keyword.replace('_', ' ') in doc: pos_cnt += 1
             else: neg_cnt += 1
 
-        rt += 1.0 * pos_cnt / (pos_cnt + neg_cnt)
+        rt += 1.0 * pos_cnt / (pos_cnt + neg_cnt) if pos_cnt + neg_cnt > 0
         rt_cnt += 1
 
         print rt / rt_cnt
