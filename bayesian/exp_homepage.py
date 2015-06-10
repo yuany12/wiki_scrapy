@@ -84,7 +84,6 @@ def test_bayesian():
         inputs = line.strip().split(',')
         author = inputs[0]
         keywords = set(inputs[1 :])
-        if len(keywords) < 25: continue
 
         pos_cnt, neg_cnt = 0, 0
 
@@ -94,6 +93,26 @@ def test_bayesian():
         rt += 1.0 * pos_cnt / (pos_cnt + neg_cnt)
         rt_cnt += 1
         print rt / rt_cnt
+
+def test_random_guess():
+    author2words = {}
+    for line in open('model.predict.txt'):
+        inputs = line.strip().split(',')
+        author = inputs[0]
+        author2words[author] = set()
+        for keyword in inputs[1: ]:
+            author2words[author].add(keyword)
+
+    rt, rt_cnt = 0.0, 0
+    for line in open('homepage_test.txt'):
+        inputs = line.strip().split(',')
+        author = inputs[0]
+        keywords = set(inputs[1 :])
+
+        rt += 1.0 * len(keywords) / len(author2words[author])
+        rt_cnt += 1
+        print rt / rt_cnt
+
 
 def get_mongodb():
     password = open('password_mongo.txt').readline().strip()
@@ -126,6 +145,7 @@ def test_old():
         print rt / rt_cnt, pos_cnt, neg_cnt, cnt
 
 if __name__ == '__main__':
-    test_bayesian()
+    # test_bayesian()
     # test_old()
+    test_random_guess()
     # gen_()
