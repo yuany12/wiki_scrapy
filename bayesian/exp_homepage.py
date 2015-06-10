@@ -3,6 +3,62 @@ from bs4 import BeautifulSoup
 import os
 import pymongo
 from bson.objectid import ObjectId
+import scapy.en
+
+def gen_test_data():
+    nlp = scapy.en.English()
+
+    author2words = {}
+    for line in open('model.predict.txt'):
+        inputs = line.strip().split(',')
+        author = inputs[0]
+        author2words[author] = set()
+        for keyword in inputs[1: ]:
+            author2words[author].add(keyword)
+
+    gt = {}
+
+    cnt = 0
+    for filename in os.listdir('../homepage'):
+        if cnt % 1000 == 0:
+            print cnt
+        cnt += 1
+
+        author = filename.split('.')[0]
+        if author not in author2words: continue
+
+        doc = open('../homepage/' + filename).read()
+        soup = BeautifulSoup(doc)
+        doc = soup.get_text()
+
+        keywords = set()
+
+        tokens = [e.orth_.lower() for e in nlp(unicode(doc, errors = 'ignore'), tag = False, parse = False)]
+        i = 0
+        while i + 1 <= len(tokens) - 1:
+            if (i + 2 <= len(tokens) - 1):
+                new_word = "_".join(tokens[i: i + 3])
+                if new_word in author2words[author]:
+                    keywords.add(new_word)
+                    i += 3
+                    continue
+            if (i + 1 <= len(tokens) - 1):
+                new_word = "_".join(tokens[i: i + 2])
+                if new_word in author2words[author]:
+                    keywords.add(new_word)
+                    i += 2
+                    continue
+            i += 1
+        if len(keywords) < 5: continue
+        gt[author] = keywords
+
+    fout = open('homepage_test.txt', 'w')
+    for k, v in gt.iteritems():
+        fout.write(k)
+        for e in v:
+            fout.write(',' + e)
+        fout.write('\n')
+    fout.close()
 
 def test_bayesian():
     author2words = {}
@@ -56,12 +112,7 @@ def test_old():
 
     target_authors = []
     rt, rt_cnt = 0.0, 0
-    cnt = 0
     for filename in os.listdir('../homepage'):
-        if cnt % 100 == 0:
-            print 'calc', cnt
-        cnt += 1
-
         author = filename.split('.')[0]
         if author not in author2words: continue
 
@@ -87,4 +138,5 @@ def test_old():
 
 if __name__ == '__main__':
     # test_bayesian()
-    test_old()
+    # test_old()
+    gen_test_data()
