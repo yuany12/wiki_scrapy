@@ -97,7 +97,40 @@ def test_random_guess():
         rt_cnt += 1
         print rt / rt_cnt
 
+def test_old():
+    author2words = {}
+    for line in open('model.predict.txt'):
+        inputs = line.strip().split(',')
+        author = inputs[0]
+        author2words[author] = set()
+        for keyword in inputs[1: ]:
+            author2words[author].add(keyword)
+
+    people = get_mongodb().people
+
+    rt, rt_cnt = 0.0, 0
+    cnt = 0
+    for line in open('lk_test.txt'):
+        cnt += 1
+        inputs = line.strip().split(',')
+        author = inputs[0]
+        keywords = set(inputs[1 :])
+
+        doc = people.find_one({'_id': ObjectId(author)})
+
+        pos_cnt, neg_cnt = 0, 0
+
+        for keyword in doc['tags']:
+            keyword = keyword['t'].lower().replace(' ', '_')
+            if keyword not in author2words[author]: continue
+            if keyword in keywords: pos_cnt += 1
+            else: neg_cnt += 1
+            if pos_cnt + neg_cnt >= 5: break
+        rt += 1.0 * pos_cnt / (pos_cnt + neg_cnt) if pos_cnt + neg_cnt > 0 else 0.0
+        rt_cnt += 1
+        print rt / rt_cnt, pos_cnt, neg_cnt, cnt
+
 if __name__ == '__main__':
     # gen_test_data()
     # test_bayesian()
-    test_random_guess()
+    # test_random_guess()
