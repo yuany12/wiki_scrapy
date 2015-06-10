@@ -3,10 +3,10 @@ from bs4 import BeautifulSoup
 import os
 import pymongo
 from bson.objectid import ObjectId
-import scapy.en
+import spacy.en
 
 def gen_test_data():
-    nlp = scapy.en.English()
+    nlp = spacy.en.English()
 
     author2words = {}
     for line in open('model.predict.txt'):
