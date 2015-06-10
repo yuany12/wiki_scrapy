@@ -43,7 +43,7 @@ def gen_test_data():
                     break
             if flag:
                 keywords.add(keyword)
-        if len(keywords) > 0:
+        if len(keywords) > 3:
             gt[author] = keywords
 
     fout = open('lk_test.txt', 'w')
@@ -76,7 +76,7 @@ def test_bayesian():
             else: neg_cnt += 1
         rt += 1.0 * pos_cnt / (pos_cnt + neg_cnt)
         rt_cnt += 1
-        print rt / rt_cnt
+    print rt / rt_cnt
 
 def test_random_guess():
     author2words = {}
@@ -95,7 +95,7 @@ def test_random_guess():
 
         rt += 1.0 * len(keywords) / len(author2words[author])
         rt_cnt += 1
-        print rt / rt_cnt
+    print rt / rt_cnt
 
 def test_old():
     author2words = {}
@@ -128,10 +128,10 @@ def test_old():
             if pos_cnt + neg_cnt >= 5: break
         rt += 1.0 * pos_cnt / (pos_cnt + neg_cnt) if pos_cnt + neg_cnt > 0 else 0.0
         rt_cnt += 1
-        print rt / rt_cnt, pos_cnt, neg_cnt, cnt
+    print rt / rt_cnt
 
 if __name__ == '__main__':
-    # gen_test_data()
-    # test_bayesian()
-    # test_random_guess()
+    gen_test_data()
+    test_bayesian()
+    test_random_guess()
     test_old()
