@@ -7,7 +7,7 @@ import spacy.en
 import multiprocessing
 
 def gen_test_data(bulk_info):
-    bulk_size, bulk_no = bulk_info
+    bulk_no, bulk_size = bulk_info
 
     nlp = spacy.en.English()
 
