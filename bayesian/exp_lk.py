@@ -15,13 +15,13 @@ def gen_test_data():
 
     authors_in_lk = json.load(open('../match_linkedin.json'))
     
-    # author2words = {}
-    # for line in open('model.predict.txt'):
-    #     inputs = line.strip().split(',')
-    #     author = inputs[0]
-    #     author2words[author] = set()
-    #     for keyword in inputs[1: ]:
-    #         author2words[author].add(keyword)
+    author2words = {}
+    for line in open('model.predict.txt'):
+        inputs = line.strip().split(',')
+        author = inputs[0]
+        author2words[author] = set()
+        for keyword in inputs[1: ]:
+            author2words[author].add(keyword)
 
     gt = {}
 
