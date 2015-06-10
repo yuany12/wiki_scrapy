@@ -46,7 +46,7 @@ def gen_test_data():
         if len(keywords) > 0:
             gt[author] = keywords
 
-    fout = open('homepage_test_%d.txt' % bulk_no, 'w')
+    fout = open('lk_test.txt', 'w')
     for k, v in gt.iteritems():
         fout.write(k)
         for e in v:
