@@ -51,7 +51,7 @@ def gen_test_data():
         for skill in doc['skills']:
             keywords.add(skill)
 
-        if len(keywords) > 3:
+        if len(keywords) > 0:
             gt[author] = keywords
 
     fout = open('lk_test.txt', 'w')
@@ -141,6 +141,6 @@ def test_old():
 
 if __name__ == '__main__':
     gen_test_data()
-    # test_bayesian()
+    test_bayesian()
     test_random_guess()
-    # test_old()
+    test_old()
