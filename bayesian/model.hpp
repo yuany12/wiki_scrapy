@@ -798,8 +798,6 @@ public:
     float predict(int r_id, int w_id, int j) {
         float prob = -1e30;
 
-        return docs[r_id].w_freq[j];
-
         // #pragma omp parallel for num_threads(20)
         for (int i = 0; i < T; i ++) {
             float cur = 0.0;
