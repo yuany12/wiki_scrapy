@@ -55,7 +55,7 @@ def gen_test_data():
         fout.write(k)
         for e in v:
             e = unicodedata.normalize('NFKD', e).encode('ascii','ignore')
-            fout.write(',' + e.lower().replace(' , '_))
+            fout.write(',' + e.lower().replace(' ', '_'))
         fout.write('\n')
     fout.close()
 
