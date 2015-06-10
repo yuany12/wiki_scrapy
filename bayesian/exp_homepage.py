@@ -56,7 +56,12 @@ def test_old():
 
     target_authors = []
     rt, rt_cnt = 0.0, 0
+    cnt = 0
     for filename in os.listdir('../homepage'):
+        if cnt % 100 == 0:
+            print 'calc', cnt
+        cnt += 1
+
         author = filename.split('.')[0]
         if author not in author2words: continue
 
