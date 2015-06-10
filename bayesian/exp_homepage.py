@@ -63,6 +63,12 @@ def gen_():
     pool = multiprocessing.Pool(processes = CORE_NUM)
     pool.map(gen_test_data, [(i, bulk_size) for i in range(CORE_NUM)])
 
+    fout = open('homepage_test.txt', 'w')
+    for i in range(CORE_NUM):
+        for line in open('homepage_test_%d.txt' % i):
+            fout.write(line)
+    fout.close()
+
 def test_bayesian():
     author2words = {}
     for line in open('model.predict.txt'):
