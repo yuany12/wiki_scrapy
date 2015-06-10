@@ -116,6 +116,7 @@ def test_old():
     for line in open('homepage_test.txt'):
         inputs = line.strip().split(',')
         author = inputs[0]
+        keywords = set(inputs[1 :])
 
         doc = people.find_one({'_id': ObjectId(author)})
 
