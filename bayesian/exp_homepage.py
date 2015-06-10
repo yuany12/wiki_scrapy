@@ -1,5 +1,6 @@
 
 from bs4 import BeautifulSoup
+import os
 
 def test_bayesian():
     author2words = {}
