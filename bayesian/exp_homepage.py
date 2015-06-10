@@ -85,6 +85,8 @@ def test_bayesian():
         author = inputs[0]
         keywords = set(inputs[1 :])
 
+        pos_cnt, neg_cnt = 0, 0
+
         for keyword in author2words[author][: 5]:
             if keyword in keywords: pos_cnt += 1
             else: neg_cnt += 1
