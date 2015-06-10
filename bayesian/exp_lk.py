@@ -55,7 +55,7 @@ def gen_test_data():
         fout.write(k)
         for e in v:
             e = unicodedata.normalize('NFKD', e).encode('ascii','ignore')
-            fout.write(',' + e)
+            fout.write(',' + e.lower().replace(' , '_))
         fout.write('\n')
     fout.close()
 
@@ -126,7 +126,7 @@ def test_old():
             keyword = keyword['t'].lower().replace(' ', '_')
             if fuzzy_match(keyword, keywords): pos_cnt += 1
             else: neg_cnt += 1
-        rt += 1.0 * pos_cnt / (pos_cnt + neg_cnt)
+        rt += 1.0 * pos_cnt / (pos_cnt + neg_cnt) if pos_cnt  + neg_cnt > 0 else 0.0
         rt_cnt += 1
     print rt / rt_cnt
 
