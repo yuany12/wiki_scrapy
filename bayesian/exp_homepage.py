@@ -33,7 +33,7 @@ def gen_test_data():
 
         keywords = set()
 
-        tokens = [e.orth_.lower() for e in nlp(unicode(doc, errors = 'ignore'), tag = False, parse = False)]
+        tokens = [e.orth_.lower() for e in nlp(doc, tag = False, parse = False)]
         i = 0
         while i + 1 <= len(tokens) - 1:
             if (i + 2 <= len(tokens) - 1):
