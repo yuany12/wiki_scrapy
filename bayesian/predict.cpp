@@ -21,7 +21,7 @@ int main() {
 
     read_data(D, W, docs, f_r, f_k);
 
-    model m(docs, D, W, f_r, f_k, "model.save.txt");
+    model m(docs, D, W, f_r, f_k, "model.save.txt.temp");
 
     FILE * fin = fopen("../embedding/keyword_index.out", "r");
 
@@ -41,7 +41,7 @@ int main() {
     }
     fclose(fin);
 
-    FILE * fout = fopen("model.predict.txt", "w");
+    FILE * fout = fopen("model.predict.txt.temp", "w");
 
     float ** prob = new float * [D];
 
