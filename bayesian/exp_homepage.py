@@ -95,6 +95,7 @@ def test_bayesian():
         rt_cnt += 1
         print rt / rt_cnt
 
+# 0.655608620895
 def test_random_guess():
     author2words = {}
     for line in open('model.predict.txt'):
