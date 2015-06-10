@@ -19,7 +19,7 @@ def gen_test_data():
     gt = {}
 
     cnt = 0
-    for filename in os.listdir('../homepage'):
+    for filename in os.listdir('../homepage')[: 1000]:
         if cnt % 1000 == 0:
             print cnt
         cnt += 1
