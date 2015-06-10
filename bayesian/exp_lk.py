@@ -134,3 +134,4 @@ if __name__ == '__main__':
     # gen_test_data()
     # test_bayesian()
     # test_random_guess()
+    test_old()
