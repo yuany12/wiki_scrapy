@@ -59,7 +59,7 @@ int main() {
         int M = m.M[i];
         for (int j = 0; j < M; j ++) {
             int w_id = docs[i].w_id[j];
-            prob[i][j] = m.predict(i, w_id);
+            prob[i][j] = m.predict(i, w_id, j);
         }
     }
 
