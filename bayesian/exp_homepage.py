@@ -102,18 +102,12 @@ def get_mongodb():
     return db
 
 def test_old():
-    author2words = {}
-    for line in open('model.predict.txt'):
-        inputs = line.strip().split(',')
-        author = inputs[0]
-        author2words[author] = []
-        for keyword in inputs[1: ]:
-            author2words[author].append(keyword)
-
     people = get_mongodb().people
 
     rt, rt_cnt = 0.0, 0
+    cnt = 0
     for line in open('homepage_test.txt'):
+        cnt += 1
         inputs = line.strip().split(',')
         author = inputs[0]
         keywords = set(inputs[1 :])
@@ -128,7 +122,7 @@ def test_old():
             else: neg_cnt += 1
         rt += 1.0 * pos_cnt / (pos_cnt + neg_cnt)
         rt_cnt += 1
-        print rt / rt_cnt
+        print rt / rt_cnt, pos_cnt, neg_cnt, cnt
 
 if __name__ == '__main__':
     # test_bayesian()
