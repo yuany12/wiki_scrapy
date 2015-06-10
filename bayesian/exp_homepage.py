@@ -30,6 +30,8 @@ def test_bayesian():
         rt += 1.0 * pos_cnt / (pos_cnt + neg_cnt)
         rt_cnt += 1
 
+        print rt / rt_cnt
+
     print rt / rt_cnt
 
 if __name__ == '__main__':
