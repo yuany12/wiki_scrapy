@@ -78,6 +78,26 @@ def test_bayesian():
         rt_cnt += 1
         print rt / rt_cnt
 
+def test_random_guess():
+    author2words = {}
+    for line in open('model.predict.txt'):
+        inputs = line.strip().split(',')
+        author = inputs[0]
+        author2words[author] = set()
+        for keyword in inputs[1: ]:
+            author2words[author].add(keyword)
+
+    rt, rt_cnt = 0.0, 0
+    for line in open('lk_test.txt'):
+        inputs = line.strip().split(',')
+        author = inputs[0]
+        keywords = set(inputs[1 :])
+
+        rt += 1.0 * len(keywords) / len(author2words[author])
+        rt_cnt += 1
+        print rt / rt_cnt
+
 if __name__ == '__main__':
     # gen_test_data()
-    test_bayesian()
+    # test_bayesian()
+    test_random_guess()
