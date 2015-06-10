@@ -4,6 +4,7 @@ import os
 import pymongo
 from bson.objectid import ObjectId
 import spacy.en
+import multiprocessing
 
 def gen_test_data(bulk_info):
     bulk_size, bulk_no = bulk_info
