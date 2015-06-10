@@ -6,7 +6,7 @@
 #include <cstring>
 
 bool SMALL_DATA = false;
-bool EXP_DATA = false;
+bool EXP_DATA = true;
 
 #ifdef __cplusplus
 #define cast_uint32_t static_cast<uint32_t>

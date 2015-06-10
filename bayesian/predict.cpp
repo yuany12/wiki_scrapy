@@ -49,7 +49,7 @@ int main() {
         prob[i] = new float[m.M[i]];
     }
 
-    #pragma omp parallel for num_threads(64)
+    #pragma omp parallel for num_threads(64) schedule(dynamic, 1000)
     for (int i = 0; i < D; i ++) {
         if (i % 10000 == 0) {
             sprintf(temp_, "predicting %d", i);
