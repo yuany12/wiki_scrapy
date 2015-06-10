@@ -66,7 +66,7 @@ def gen_test_data():
 def fuzzy_match(k1, ks):
     for k2 in ks:
         if k1 in k2 or k2 in k1: return True
-        if similar(k1, k2) > 0.2: return True
+        if similar(k1, k2) > 0.7: return True
     return False
 
 def test_bayesian():
