@@ -2,6 +2,7 @@
 import json
 import pymongo
 from bson.objectid import ObjectId
+import unicodedata
 
 def get_mongodb():
     password = open('password_mongo.txt').readline().strip()
@@ -53,6 +54,7 @@ def gen_test_data():
     for k, v in gt.iteritems():
         fout.write(k)
         for e in v:
+            e = unicodedata.normalize('NFKD', e).encode('ascii','ignore')
             fout.write(',' + e)
         fout.write('\n')
     fout.close()
