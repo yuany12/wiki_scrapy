@@ -70,12 +70,13 @@ int main() {
         }
 
         int M = m.M[i];
+        int r_id = docs[i].r_id;
 
         pair<int, float> * pairs = new pair<int, float>[M];
         for (int j = 0; j < M; j ++) {
             pairs[j] = make_pair(j, prob[i][j]);
         }
-        fprintf(fout, "%s %d %d\n", author[i], m.y_d[i], M);
+        fprintf(fout, "%s %d %d\n", author[r_id], m.y_d[i], M);
         sort(pairs, pairs + M, comp);
         for (int k = 0; k < M; k ++) {
             int j = pairs[k].first;
