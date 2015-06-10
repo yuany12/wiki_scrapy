@@ -809,7 +809,7 @@ public:
             // cur = fastpow2(cur) * theta_d_t[r_id][i];
             cur += log2(theta_d_t[r_id][i]) * multi_magnifier;
             if (r_id == 0 && i == 0) cout << cur << endl;
-            cout << "======" << endl;
+            if (r_id == 0 && i == 0) cout << "======" << endl;
             ASSERT_VALNUM(cur);
             // prob += cur;
             prob = max(prob, cur);
