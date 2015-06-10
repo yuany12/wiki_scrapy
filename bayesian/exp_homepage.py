@@ -153,12 +153,13 @@ def test_old():
             if keyword in keywords: pos_cnt += 1
             else: neg_cnt += 1
             if pos_cnt + neg_cnt >= 5: break
+        if pos_cnt + neg_cnt == 0: continue
         rt += 1.0 * pos_cnt / (pos_cnt + neg_cnt) if pos_cnt + neg_cnt > 0 else 0.0
         rt_cnt += 1
         print rt / rt_cnt, pos_cnt, neg_cnt, cnt
 
 if __name__ == '__main__':
     # test_bayesian()
-    # test_old()
-    test_random_guess()
+    test_old()
+    # test_random_guess()
     # gen_()
