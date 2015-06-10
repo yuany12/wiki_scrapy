@@ -69,6 +69,7 @@ def test_old():
         pos_cnt, neg_cnt = 0, 0
 
         for keyword in people_doc['tags'][: 5]:
+            keyword = keyword['t']
             if keyword.replace('_', ' ') in doc: pos_cnt += 1
             else: neg_cnt += 1
 
