@@ -69,6 +69,7 @@ def fuzzy_match(k1, ks):
         if similar(k1, k2) > 0.5: return True
     return False
 
+# 0.447747747748
 def test_bayesian():
     author2words = {}
     for line in open('model.predict.txt'):
@@ -93,6 +94,7 @@ def test_bayesian():
         rt_cnt += 1
     print rt / rt_cnt
 
+# 0.438025345592
 def test_random_guess():
     author2words = {}
     for line in open('model.predict.txt'):
@@ -116,6 +118,7 @@ def test_random_guess():
         rt_cnt += 1
     print rt / rt_cnt
 
+# 0.386636636637
 def test_old():
     people = get_mongodb().people
 
