@@ -117,7 +117,7 @@ def test_old():
         pos_cnt, neg_cnt = 0, 0
 
         for keyword in doc['tags'][: 5]:
-            keyword = keyword['t']
+            keyword = keyword['t'].lower().replace(' ', '_')
             if keyword in keywords: pos_cnt += 1
             else: neg_cnt += 1
         rt += 1.0 * pos_cnt / (pos_cnt + neg_cnt)
